@@ -28,13 +28,16 @@ struct MainView: View {
     @Environment(GameStore.self) private var store
     @State private var screen: Screen = .tank
     @State private var selected: UUID?
+    @State private var selectedPoint: CGPoint?
     @State private var hovered: UUID?
     @State private var editing = false
 
     var body: some View {
         ZStack {
             PixelPalette.deeper.ignoresSafeArea()
-            AquariumView(store: store, interactive: screen == .tank, selectedFish: $selected, editingLayout: $editing, hoveredFish: $hovered)
+            AquariumView(store: store, interactive: screen == .tank, selectedFish: $selected, editingLayout: $editing,
+                         hoveredFish: $hovered, selectedPoint: $selectedPoint)
+                .overlay { fishMenu }
                 .ignoresSafeArea()
 
             if screen != .tank {
@@ -49,12 +52,23 @@ struct MainView: View {
 
             VStack(spacing: 0) {
                 TopHUD(screen: screen, hovered: screen == .tank ? hovered : nil)
-                if screen == .tank { TankOverlays(selected: $selected, editing: $editing) }
+                if screen == .tank { TankOverlays(editing: $editing) }
                 Spacer(minLength: 0)
                 BottomBar(screen: $screen, editing: $editing)
             }
         }
         .animation(.easeOut(duration: 0.15), value: screen)
+        .onChange(of: screen) { _, _ in selected = nil }
+        .onChange(of: editing) { _, now in
+            if now { selected = nil } else if store.placingDecoration != nil { store.finishPlacing() }
+        }
+        // 装飾を買ったら水槽に戻り、置き場所を決めてもらう
+        .onChange(of: store.placingDecoration) { _, id in
+            if id != nil {
+                screen = .tank
+                editing = true
+            }
+        }
         .overlay(alignment: .bottom) { ToastView().padding(.bottom, 72) }
         .font(.pixel(.body))
         .foregroundStyle(PixelPalette.text)
@@ -68,6 +82,23 @@ struct MainView: View {
             BugReportView(crash: req.crash).modifier(PixelSheet())
         }
         .frame(minWidth: 820, minHeight: 560)
+    }
+
+    /// クリックした魚の操作メニュー。クリックした場所の近くに出す。
+    @ViewBuilder
+    private var fishMenu: some View {
+        GeometryReader { geo in
+            if screen == .tank, let f = store.state.tank.fish.first(where: { $0.id == selected }), let p = selectedPoint {
+                let w: CGFloat = 230, h: CGFloat = 250
+                // 画面からはみ出さないように、右に出せなければ左に出す
+                let x = p.x + 24 + w <= geo.size.width - 12 ? p.x + 24 + w / 2 : max(w / 2 + 12, p.x - 24 - w / 2)
+                let y = min(max(p.y, h / 2 + 70), geo.size.height - h / 2 - 80)
+                FishActionMenu(fish: f) { selected = nil }
+                    .frame(width: w)
+                    .position(x: x, y: y)
+                    .transition(.opacity)
+            }
+        }
     }
 
     private var panel: some View {
@@ -185,7 +216,6 @@ private struct FishHoverStatus: View {
 
 private struct TankOverlays: View {
     @Environment(GameStore.self) private var store
-    @Binding var selected: UUID?
     @Binding var editing: Bool
 
     var body: some View {
@@ -198,13 +228,18 @@ private struct TankOverlays: View {
                 message(String(localized: "危険な状態の魚がいます：\(names)。餌やりと水換えをしてください。"),
                         symbol: "exclamationmark.triangle.fill", color: PixelPalette.danger, onClose: nil)
             }
-            HStack(alignment: .top) {
-                Spacer()
-                if let f = store.state.tank.fish.first(where: { $0.id == selected }) {
-                    FishCard(fish: f) { selected = nil }
+            if let id = store.placingDecoration, let d = store.state.tank.decorations.first(where: { $0.id == id }) {
+                HStack(spacing: 10) {
+                    DecorationIcon(kindID: d.kindID).frame(width: 34, height: 26)
+                    Text("\(d.kind.name)を置く場所をクリックしてください").font(.pixel(.callout))
+                    Button(d.layer == 0 ? "手前へ" : "奥へ") { store.toggleDecorationLayer(id) }
+                    Button("ここに置く") { store.finishPlacing() }.buttonStyle(.pixelProminent)
+                    Button("持ち物にしまう") { store.cancelPlacing() }
                 }
-            }
-            if editing {
+                .buttonStyle(.pixel)
+                .pixelPanel(padding: 10)
+                .frame(maxWidth: .infinity)
+            } else if editing {
                 Text("装飾をドラッグで移動・右クリックで奥/手前を変更")
                     .font(.pixel(.callout))
                     .pixelPanel(padding: 10)
@@ -296,37 +331,64 @@ private struct ToastView: View {
     }
 }
 
-// MARK: - 魚の札
+// MARK: - 魚の操作メニュー
 
-private struct FishCard: View {
+/// 魚をクリックしたときに出る操作。ステータスはカーソルを重ねたときに上に出る。
+private struct FishActionMenu: View {
+    @Environment(GameStore.self) private var store
     let fish: Fish
     let onClose: () -> Void
+    @State private var renaming = false
+    @State private var newName = ""
+    @State private var confirmFarewell = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive).frame(width: 40, height: 26)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(fish.name).font(.pixel(.headline))
-                    Text(subtitle).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
-                }
-                Spacer()
-                Button(action: onClose) { Image(systemName: "xmark") }.buttonStyle(.pixel).accessibilityLabel("閉じる")
+            HStack(spacing: 8) {
+                FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive).frame(width: 34, height: 22)
+                Text(fish.name).font(.pixel(.callout)).lineLimit(1)
+                Spacer(minLength: 0)
+                Button(action: onClose) { Image(systemName: "xmark") }
+                    .buttonStyle(.pixel)
+                    .keyboardShortcut(.cancelAction)
+                    .accessibilityLabel("閉じる")
             }
-            ConditionBadge(condition: fish.condition)
             if fish.isAlive {
-                StatBar(title: String(localized: "満腹"), value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? String(localized: "空腹") : String(localized: "十分"))
-                StatBar(title: String(localized: "体調"), value: fish.health, word: fish.condition.label)
+                action("餌をあげる", "leaf.fill") { store.feed(fish: fish.id) }
+                if fish.isSick {
+                    action("薬をあげる（残り \(store.state.medicine)）", "cross.case.fill") { store.giveMedicine(fish.id) }
+                        .disabled(store.state.medicine == 0)
+                        .help(store.state.medicine == 0 ? "お店で薬を買えます" : "薬を1つ使って病気を治します")
+                }
+            } else {
+                action("お別れする", "hand.wave.fill") { confirmFarewell = true }
+            }
+            action("名前を変える", "pencil") {
+                newName = fish.name
+                renaming = true
             }
         }
-        .frame(width: 250)
-        .pixelPanel(padding: 14)
+        .buttonStyle(.pixel)
+        .pixelPanel(padding: 12)
+        .alert("名前を変える", isPresented: $renaming) {
+            TextField("名前", text: $newName)
+            Button("変更") { store.rename(fish.id, to: newName) }
+            Button("キャンセル", role: .cancel) {}
+        }
+        .confirmationDialog("\(fish.name)とお別れしますか？", isPresented: $confirmFarewell) {
+            Button("お別れする", role: .destructive) {
+                store.farewell(fish.id)
+                onClose()
+            }
+        } message: {
+            Text("水槽から取り出します。元には戻せません。")
+        }
     }
 
-    private var subtitle: String {
-        var parts = [fish.species.name, fish.stage.label]
-        if fish.isElderly() { parts.append(String(localized: "老齢")) }
-        return parts.joined(separator: String(localized: "・"))
+    private func action(_ title: LocalizedStringKey, _ symbol: String, perform: @escaping () -> Void) -> some View {
+        Button(action: perform) {
+            Label(title, systemImage: symbol).frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 

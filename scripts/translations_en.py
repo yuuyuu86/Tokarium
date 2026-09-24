@@ -417,4 +417,13 @@ EN = {
 'ON': 'ON',
 '、': ', ',
 '老齢': 'Elderly',
+'%@に餌をあげました': 'Fed %@',
+'キャンセル': 'Cancel',
+'名前を変える': 'Rename',
+'変更': 'Rename',
+'薬をあげる（残り %lld）': 'Give Medicine (%lld left)',
+'%@を置く場所をクリックしてください': 'Click where you want to put the %@',
+'手前へ': 'Front',
+'奥へ': 'Back',
+'ここに置く': 'Place Here',
 }

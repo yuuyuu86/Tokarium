@@ -48,6 +48,8 @@ final class GameStore {
     var toast: String?
     /// 表示中の不具合報告。
     var bugReport: BugReportRequest?
+    /// 置き場所を決めている最中の装飾（買った直後や持ち物から出したとき）。
+    var placingDecoration: UUID?
 
     @ObservationIgnored let engine = SwimEngine()
     @ObservationIgnored private let scanner: UsageScanner
@@ -186,6 +188,16 @@ final class GameStore {
         save()
     }
 
+    /// 1匹だけに餌をあげる（その魚の近くに餌を落とす）。
+    func feed(fish id: UUID) {
+        simulate()
+        guard let f = state.tank.fish.first(where: { $0.id == id }), f.isAlive else { return }
+        Simulation.feed(&state, fish: id, now: Date())
+        engine.dropFood(count: 4, near: engine.position(of: id)?.x ?? f.x)
+        toast = String(localized: "\(f.name)に餌をあげました")
+        save()
+    }
+
     func changeWater() {
         simulate()
         Simulation.changeWater(&state, now: Date())
@@ -246,7 +258,8 @@ final class GameStore {
         state.coinsSpent += kind.price
         save()
         if !d.isPlaced { return .tooManyDecorations }
-        toast = String(localized: "\(kind.name)を置きました")
+        // 置き場所はユーザーが水槽で決める
+        placingDecoration = d.id
         return nil
     }
 
@@ -304,7 +317,23 @@ final class GameStore {
             return
         }
         state.tank.decorations[i].isPlaced = placed
+        placingDecoration = placed ? id : (placingDecoration == id ? nil : placingDecoration)
         save()
+    }
+
+    /// 置き場所を決める。
+    func finishPlacing() {
+        guard let id = placingDecoration, let d = state.tank.decorations.first(where: { $0.id == id }) else { return }
+        placingDecoration = nil
+        toast = String(localized: "\(d.kind.name)を置きました")
+        save()
+    }
+
+    /// 置くのをやめて持ち物にしまう。
+    func cancelPlacing() {
+        guard let id = placingDecoration else { return }
+        setDecoration(id, placed: false)
+        placingDecoration = nil
     }
 
     // MARK: 初回設定

@@ -216,6 +216,15 @@ enum Simulation {
         state.lastFedAt = now
     }
 
+    /// 1匹だけに餌をあげる。
+    static func feed(_ state: inout GameState, fish id: UUID, now: Date) {
+        guard let i = state.tank.fish.firstIndex(where: { $0.id == id && $0.isAlive }) else { return }
+        let after = state.tank.fish[i].fullness + feedAmount
+        state.tank.fish[i].fullness = min(100, after)
+        state.tank.waterQuality = clamp(state.tank.waterQuality - max(0, after - 100) * overfeedPollution)
+        state.lastFedAt = now
+    }
+
     static func changeWater(_ state: inout GameState, now: Date) {
         state.tank.waterQuality = 100
         state.lastWaterChangeAt = now

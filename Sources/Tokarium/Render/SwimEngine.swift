@@ -41,10 +41,12 @@ final class SwimEngine {
     /// 表示の縦横比（幅/高さ）。速度を画面比に合わせる。
     var aspect: Double = 16.0 / 10.0
 
-    func dropFood(count: Int = 8) {
-        let center = Double.random(in: 0.25...0.75)
+    /// 餌を落とす。`near` を渡すとその横位置あたりに落とす。
+    func dropFood(count: Int = 8, near x: Double? = nil) {
+        let center = x ?? Double.random(in: 0.25...0.75)
+        let spread = x == nil ? 0.12 : 0.04
         for _ in 0..<count {
-            pellets.append(Pellet(x: center + .random(in: -0.12...0.12), y: .random(in: -0.04...0.02)))
+            pellets.append(Pellet(x: min(0.97, max(0.03, center + .random(in: -spread...spread))), y: .random(in: -0.04...0.02)))
         }
     }
 

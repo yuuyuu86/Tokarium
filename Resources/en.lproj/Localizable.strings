@@ -13,11 +13,13 @@
 "%@が病気になりました" = "%@ got sick";
 "%@とお別れしますか？" = "Say goodbye to %@?";
 "%@になりました（魚 %lld 匹・装飾 %lld 個まで）" = "Upgraded to %1$@ (up to %2$lld fish and %3$lld decorations)";
+"%@に餌をあげました" = "Fed %@";
 "%@の稚魚が %lld 匹生まれました" = "%2$lld %1$@ fry were born";
 "%@の稚魚が %lld 匹生まれました。" = "%2$lld %1$@ fry were born.";
 "%@へ拡張" = "Upgrade to %@";
 "%@を水槽に入れました" = "Added a %@ to the tank";
 "%@を置きました" = "Placed the %@";
+"%@を置く場所をクリックしてください" = "Click where you want to put the %@";
 "%@を読み取る" = "Read %@";
 "%@（%lld）" = "%@ (%lld)";
 "%@：ドラッグで移動、右クリックで奥/手前・しまう" = "%@: drag to move, right-click to change depth or put away";
@@ -76,6 +78,7 @@
 "かつて海をわたった大きな船。" = "A great ship that once sailed the seas.";
 "きれい" = "Clean";
 "くるりと巻いた貝。" = "A curly spiral shell.";
+"ここに置く" = "Place Here";
 "このMacでは読み取れないもの" = "Not readable on this Mac";
 "このMacに記録が残らないため集計できません。" = "No records are left on this Mac, so they can’t be counted.";
 "この版はアップデートの配信先が設定されていません。" = "This build has no update feed configured.";
@@ -131,6 +134,7 @@
 "カージナルテトラ" = "Cardinal tetra";
 "ガラスや葉にはりつくコケ取り名人。" = "An algae-eating expert that clings to glass and leaves.";
 "キイロハギ" = "Yellow tang";
+"キャンセル" = "Cancel";
 "クマノミの大好きなおうち。" = "A clownfish’s favorite home.";
 "クーリーローチ" = "Kuhli loach";
 "グッピー" = "Guppy";
@@ -235,11 +239,14 @@
 "危険な魚: %@" = "In danger: %@";
 "古代の沈んだつぼ。" = "An ancient sunken jar.";
 "名前" = "Name";
+"名前を変える" = "Rename";
 "場所: %@" = "Location: %@";
+"変更" = "Rename";
 "大きな尾びれをひらひらさせる。" = "Flutters a big, fancy tail.";
 "大きな水槽" = "Large tank";
 "大きな背びれの底の主。" = "The big-finned boss of the bottom.";
 "大きな葉が広がる定番水草。" = "A classic plant with broad leaves.";
+"奥へ" = "Back";
 "奥へ移動" = "Move to Back";
 "宝石のようなミニシクリッド。" = "A jewel-like dwarf cichlid.";
 "宝箱" = "Treasure chest";
@@ -260,6 +267,7 @@
 "成魚" = "Adult";
 "戻る" = "Back";
 "扇のように広がるサンゴ。" = "Coral that spreads like a fan.";
+"手前へ" = "Front";
 "手前へ移動" = "Move to Front";
 "持ち物" = "Inventory";
 "持ち物にしまう" = "Put in Inventory";
@@ -343,6 +351,7 @@
 "薬を1つ使って病気を治します" = "Uses one medicine to cure the illness";
 "薬をあげました" = "Gave medicine";
 "薬をあげる" = "Give Medicine";
+"薬をあげる（残り %lld）" = "Give Medicine (%lld left)";
 "薬を買いました（持っている数: %lld）" = "Bought medicine (you have %lld)";
 "表示" = "Display";
 "表示するディスプレイ" = "Displays";

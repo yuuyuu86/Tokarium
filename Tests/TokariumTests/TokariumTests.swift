@@ -295,3 +295,34 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
     #expect(store.state.medicine == 1)
     #expect(store.coins == Catalog.initialCoins - Catalog.medicinePrice)
 }
+
+@MainActor
+@Test func buyingDecorationStartsPlacement() throws {
+    let store = GameStore(directory: try tempHome())
+    let kind = Catalog.decoration("shell")
+    #expect(store.buyDecoration(kind) == nil)
+    let id = try #require(store.placingDecoration)
+    store.moveDecoration(id, x: 0.3)
+    store.finishPlacing()
+    #expect(store.placingDecoration == nil)
+    let placed = try #require(store.state.tank.decorations.first { $0.id == id })
+    #expect(placed.isPlaced && abs(placed.x - 0.3) < 0.001)
+
+    // 置くのをやめると持ち物に入る
+    #expect(store.buyDecoration(kind) == nil)
+    let second = try #require(store.placingDecoration)
+    store.cancelPlacing()
+    #expect(store.state.tank.decorations.first { $0.id == second }?.isPlaced == false)
+    // 持ち物から出すと、また置き場所を選ぶ
+    store.setDecoration(second, placed: true)
+    #expect(store.placingDecoration == second)
+}
+
+@Test func feedingOneFishOnlyFeedsThatFish() {
+    var s = GameState.newGame()
+    s.tank.fish.append(Fish(speciesID: "guppy", name: "b", fullness: 40))
+    s.tank.fish[0].fullness = 40
+    Simulation.feed(&s, fish: s.tank.fish[1].id, now: Date())
+    #expect(s.tank.fish[0].fullness == 40)
+    #expect(s.tank.fish[1].fullness == 70)
+}

@@ -9,18 +9,22 @@ struct AquariumView: View {
     @Binding var editingLayout: Bool
     /// カーソルが重なっている魚。
     @Binding var hoveredFish: UUID?
+    /// 魚をクリックした場所（操作メニューを出す位置）。
+    @Binding var selectedPoint: CGPoint?
     @State private var hoverPoint: CGPoint?
 
     /// 魚は泳いで動くので、カーソルが止まっていても定期的に判定し直す。
     private let hoverTimer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
 
     init(store: GameStore, interactive: Bool = false, selectedFish: Binding<UUID?> = .constant(nil),
-         editingLayout: Binding<Bool> = .constant(false), hoveredFish: Binding<UUID?> = .constant(nil)) {
+         editingLayout: Binding<Bool> = .constant(false), hoveredFish: Binding<UUID?> = .constant(nil),
+         selectedPoint: Binding<CGPoint?> = .constant(nil)) {
         self.store = store
         self.interactive = interactive
         self._selectedFish = selectedFish
         self._editingLayout = editingLayout
         self._hoveredFish = hoveredFish
+        self._selectedPoint = selectedPoint
     }
 
     var body: some View {
@@ -40,20 +44,29 @@ struct AquariumView: View {
                                        selected: interactive ? (hoveredFish ?? selectedFish) : nil)
                     }
                 }
-                if interactive && editingLayout {
+                if interactive && editingLayout && store.placingDecoration == nil {
                     layoutHandles(size: size, tank: tank, style: style)
                 }
             }
             .contentShape(Rectangle())
             .onTapGesture(coordinateSpace: .local) { point in
-                guard interactive, !editingLayout else { return }
+                guard interactive else { return }
+                // 置き場所を決めている最中なら、クリックした場所に置く
+                if store.placingDecoration != nil {
+                    placeDecoration(at: point, size: size)
+                    store.finishPlacing()
+                    return
+                }
+                guard !editingLayout else { return }
                 selectedFish = hitFish(at: point, size: size, tank: tank, style: style)
+                selectedPoint = selectedFish == nil ? nil : point
             }
             .onContinuousHover(coordinateSpace: .local) { phase in
                 guard interactive else { return }
                 switch phase {
                 case .active(let point):
                     hoverPoint = point
+                    if store.placingDecoration != nil { placeDecoration(at: point, size: size) }
                     updateHover(size: size, tank: tank, style: style)
                 case .ended:
                     hoverPoint = nil
@@ -72,8 +85,14 @@ struct AquariumView: View {
         .accessibilityLabel(accessibilitySummary)
     }
 
+    /// 置き場所を決めている装飾をカーソルの横位置へ動かす。
+    private func placeDecoration(at point: CGPoint, size: CGSize) {
+        guard let id = store.placingDecoration, size.width > 0 else { return }
+        store.moveDecoration(id, x: point.x / size.width)
+    }
+
     private func updateHover(size: CGSize, tank: Tank, style: AquariumStyle) {
-        let hit = editingLayout ? nil : hoverPoint.flatMap { hitFish(at: $0, size: size, tank: tank, style: style) }
+        let hit = editingLayout || store.placingDecoration != nil ? nil : hoverPoint.flatMap { hitFish(at: $0, size: size, tank: tank, style: style) }
         if hit != hoveredFish { hoveredFish = hit }
     }
 
