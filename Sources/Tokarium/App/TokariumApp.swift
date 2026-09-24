@@ -88,7 +88,7 @@ private struct MenuBarContent: View {
             Text("危険な魚: \(store.dangerFish.map(\.name).joined(separator: "、"))")
         }
         Divider()
-        Button("餌をあげる") { store.feed() }
+        Button("餌をあげる（残り \(store.state.food)）") { store.feed() }.disabled(store.state.food == 0)
         Button("水換え") { store.changeWater() }
         Divider()
         Button("Tokarium を開く") {

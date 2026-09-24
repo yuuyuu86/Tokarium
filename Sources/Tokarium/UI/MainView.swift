@@ -148,6 +148,11 @@ private struct TopHUD: View {
                 Image(systemName: "fish.fill").foregroundStyle(Color(rgb: 0x6FC8FF))
                 Text("\(store.livingFish.count)/\(store.state.tank.size.maxFish) 匹")
             }
+            PixelBadge {
+                Image(systemName: "leaf.fill").foregroundStyle(store.state.food <= Catalog.lowFood ? PixelPalette.danger : Color(rgb: 0xE8C060))
+                Text("餌 \(store.state.food)")
+            }
+            .help("餌やり1回で1つ使います。お店で買えます")
             Spacer(minLength: 10)
             if let f = store.state.tank.fish.first(where: { $0.id == hovered }) {
                 FishHoverStatus(fish: f)
@@ -290,8 +295,10 @@ private struct BottomBar: View {
                 .accessibilityAddTraits(screen == s ? .isSelected : [])
             }
             Spacer(minLength: 12)
-            Button { store.feed() } label: { Label("餌をあげる", systemImage: "leaf.fill") }
+            Button { store.feed() } label: { Label("餌をあげる（\(store.state.food)）", systemImage: "leaf.fill") }
                 .buttonStyle(.pixel)
+                .disabled(store.state.food == 0)
+                .help(store.state.food == 0 ? "餌がありません。お店で買えます" : "水槽の魚みんなに餌をあげます（餌を1つ使います）")
             Button { store.changeWater() } label: { Label("水換え", systemImage: "drop.triangle.fill") }
                 .buttonStyle(.pixel)
             if screen == .tank {
@@ -354,7 +361,8 @@ private struct FishActionMenu: View {
                     .accessibilityLabel("閉じる")
             }
             if fish.isAlive {
-                action("餌をあげる", "leaf.fill") { store.feed(fish: fish.id) }
+                action("餌をあげる（残り \(store.state.food)）", "leaf.fill") { store.feed(fish: fish.id) }
+                    .disabled(store.state.food == 0)
                 if fish.isSick {
                     action("薬をあげる（残り \(store.state.medicine)）", "cross.case.fill") { store.giveMedicine(fish.id) }
                         .disabled(store.state.medicine == 0)

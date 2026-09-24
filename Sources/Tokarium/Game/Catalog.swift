@@ -379,6 +379,17 @@ enum Catalog {
 
     static let medicinePrice = 25
 
+    /// 餌のパック（まとめて買うほど割安）。
+    static let foodPacks: [FoodPack] = [
+        FoodPack(id: "food10", servings: 10, price: 5),
+        FoodPack(id: "food30", servings: 30, price: 12),
+        FoodPack(id: "food100", servings: 100, price: 35),
+    ]
+    /// はじめに持っている餌（すでに遊んでいるデータにも配る）。
+    static let initialFood = 20
+    /// これ以下になったら残りが少ないと知らせる。
+    static let lowFood = 3
+
     // MARK: 水槽の大きさ（拡張を買うと上限が増える）
 
     static let tankSizes: [TankSize] = [
@@ -391,6 +402,12 @@ enum Catalog {
     static func tankSize(_ level: Int) -> TankSize {
         tankSizes[min(max(0, level), tankSizes.count - 1)]
     }
+}
+
+struct FoodPack: Identifiable {
+    let id: String
+    let servings: Int
+    let price: Int
 }
 
 struct TankSize: Identifiable {

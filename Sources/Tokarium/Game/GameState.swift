@@ -159,6 +159,8 @@ struct GameState: Codable, Equatable {
     var lastWaterChangeAt: Date?
     /// 持っている薬の数。
     var medicine: Int = 0
+    /// 持っている餌（回数）。
+    var food: Int = Catalog.initialFood
     /// 最後に稚魚が生まれた日時。
     var lastBirthAt: Date?
     /// 危険通知を送った魚（重複通知を防ぐ）。
@@ -180,6 +182,7 @@ struct GameState: Codable, Equatable {
         lastFedAt = try c.decodeIfPresent(Date.self, forKey: .lastFedAt)
         lastWaterChangeAt = try c.decodeIfPresent(Date.self, forKey: .lastWaterChangeAt)
         medicine = try c.decodeIfPresent(Int.self, forKey: .medicine) ?? 0
+        food = try c.decodeIfPresent(Int.self, forKey: .food) ?? Catalog.initialFood
         lastBirthAt = try c.decodeIfPresent(Date.self, forKey: .lastBirthAt)
         notifiedDangerFish = try c.decodeIfPresent(Set<UUID>.self, forKey: .notifiedDangerFish) ?? []
     }

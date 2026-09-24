@@ -14,10 +14,11 @@ struct CareScreen: View {
                                 word: WaterCondition(store.state.tank.waterQuality).label)
                         HStack(spacing: 12) {
                             Button { store.feed() } label: { Label("餌をあげる", systemImage: "leaf") }
+                                .disabled(store.state.food == 0)
                             Button { store.changeWater() } label: { Label("水換え", systemImage: "drop.triangle") }
                         }
                         .controlSize(.large)
-                        Label("持っている薬: \(store.state.medicine) 個", systemImage: "cross.case")
+                        Label("持っている餌: \(store.state.food) 回分　／　薬: \(store.state.medicine) 個", systemImage: "leaf")
                             .font(.pixel(.callout))
                         Text(careHint).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                     }
@@ -227,7 +228,17 @@ struct ShopScreen: View {
 
     @ViewBuilder
     private var suppliesSection: some View {
+        Text("持っている餌: \(store.state.food) 回分　／　薬: \(store.state.medicine) 個").font(.pixel(.callout))
         LazyVGrid(columns: columns, spacing: 12) {
+            ForEach(Catalog.foodPacks) { pack in
+                ShopCard(title: String(localized: "餌（\(pack.servings)回分）"),
+                         blurb: String(localized: "餌やり1回で1つ使います。"),
+                         price: pack.price, canAfford: store.coins >= pack.price) {
+                    FoodIcon(servings: pack.servings)
+                } buy: {
+                    message = store.buyFood(pack)?.errorDescription
+                }
+            }
             ShopCard(title: String(localized: "薬"), blurb: String(localized: "病気の魚を1匹治します。持っている数: \(store.state.medicine)"),
                      price: Catalog.medicinePrice, canAfford: store.coins >= Catalog.medicinePrice) {
                 Image(systemName: "cross.case.fill").font(.system(size: 34)).foregroundStyle(.white)
@@ -247,6 +258,29 @@ struct ShopScreen: View {
         let size = store.state.tank.size
         Text("いまの水槽: \(size.name)（魚 \(store.livingFish.count)/\(size.maxFish) 匹・装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個）")
             .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+    }
+}
+
+/// 餌の袋のドット絵（多いほど袋が大きい）。
+private struct FoodIcon: View {
+    let servings: Int
+
+    var body: some View {
+        Canvas { ctx, size in
+            let rows = ["..kkkkkk..", ".kyyyyyyk.", "kyyyyyyyyk", "kybbyybbyk", "kyyyyyyyyk", "kyrrrrrryk", "kyrwwwwryk",
+                        "kyrrrrrryk", "kyyyyyyyyk", ".kkkkkkkk."]
+            let palette: [Character: Color] = ["k": Color(rgb: 0x3A2410), "y": Color(rgb: 0xE8C060), "b": Color(rgb: 0x8B4A1C),
+                                               "r": Color(rgb: 0xD84A3A), "w": Color(rgb: 0xFFF4E0)]
+            let scale = servings >= 100 ? 1.0 : servings >= 30 ? 0.85 : 0.7
+            let p = floor(min(size.width, size.height) / 10 * scale)
+            let ox = (size.width - p * 10) / 2, oy = (size.height - p * 10) / 2
+            for (r, row) in rows.enumerated() {
+                for (c, ch) in row.enumerated() {
+                    guard let color = palette[ch] else { continue }
+                    ctx.fill(Path(CGRect(x: ox + CGFloat(c) * p, y: oy + CGFloat(r) * p, width: p, height: p)), with: .color(color))
+                }
+            }
+        }
     }
 }
 

@@ -326,3 +326,33 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
     #expect(s.tank.fish[0].fullness == 40)
     #expect(s.tank.fish[1].fullness == 70)
 }
+
+@MainActor
+@Test func feedingUsesFoodAndFoodCanBeBought() throws {
+    let store = GameStore(directory: try tempHome())
+    #expect(store.state.food == Catalog.initialFood)
+    store.feed()
+    #expect(store.state.food == Catalog.initialFood - 1)
+    store.feed(fish: store.state.tank.fish[0].id)
+    #expect(store.state.food == Catalog.initialFood - 2)
+
+    // 餌がないと餌やりできない
+    for _ in 0..<store.state.food { store.feed() }
+    #expect(store.state.food == 0)
+    let fullness = store.state.tank.fish[0].fullness
+    store.feed()
+    #expect(store.state.food == 0)
+    #expect(store.state.tank.fish[0].fullness <= fullness)
+
+    let pack = Catalog.foodPacks[0]
+    let coins = store.coins
+    #expect(store.buyFood(pack) == nil)
+    #expect(store.state.food == pack.servings)
+    #expect(store.coins == coins - pack.price)
+}
+
+@Test func oldSaveGetsStarterFood() throws {
+    let json = #"{"createdAt":0,"tank":{"fish":[],"decorations":[]}}"#
+    let s = try JSONDecoder.tokarium.decode(GameState.self, from: Data(json.utf8))
+    #expect(s.food == Catalog.initialFood)
+}

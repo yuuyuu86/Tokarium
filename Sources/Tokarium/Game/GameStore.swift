@@ -180,9 +180,25 @@ final class GameStore {
 
     // MARK: お世話
 
+    /// 餌を1つ使う。なければ知らせて false。
+    private func useFood() -> Bool {
+        guard state.food > 0 else {
+            toast = String(localized: "餌がありません。お店で買えます")
+            return false
+        }
+        state.food -= 1
+        if state.food == 0 {
+            post(title: String(localized: "餌がなくなりました"), body: String(localized: "お店で餌を買ってください。"))
+        } else if state.food <= Catalog.lowFood {
+            toast = String(localized: "餌が残り \(state.food) 回分です")
+        }
+        return true
+    }
+
     func feed() {
         simulate()
         guard !livingFish.isEmpty else { toast = String(localized: "餌を食べる魚がいません"); return }
+        guard useFood() else { return }
         Simulation.feed(&state, now: Date())
         engine.dropFood(count: min(24, 4 + livingFish.count * 2))
         save()
@@ -192,6 +208,7 @@ final class GameStore {
     func feed(fish id: UUID) {
         simulate()
         guard let f = state.tank.fish.first(where: { $0.id == id }), f.isAlive else { return }
+        guard useFood() else { return }
         Simulation.feed(&state, fish: id, now: Date())
         engine.dropFood(count: 4, near: engine.position(of: id)?.x ?? f.x)
         toast = String(localized: "\(f.name)に餌をあげました")
@@ -269,6 +286,16 @@ final class GameStore {
         state.coinsSpent += Catalog.medicinePrice
         state.medicine += 1
         toast = String(localized: "薬を買いました（持っている数: \(state.medicine)）")
+        save()
+        return nil
+    }
+
+    @discardableResult
+    func buyFood(_ pack: FoodPack) -> PurchaseError? {
+        guard coins >= pack.price else { return .notEnoughCoins }
+        state.coinsSpent += pack.price
+        state.food += pack.servings
+        toast = String(localized: "餌を買いました（残り \(state.food) 回分）")
         save()
         return nil
     }
