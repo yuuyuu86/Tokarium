@@ -17,17 +17,15 @@ struct SpriteImage: View {
     }
 }
 
-/// 今の画風で描いた魚のアイコン。
+/// 魚のアイコン。
 struct FishIcon: View {
     @Environment(GameStore.self) private var store
     let speciesID: String
     var dead = false
     var body: some View {
         let style = store.style
-        let sp = Catalog.species(speciesID)
-        if let art = style.fishImage(speciesID, dotPixels: 64 / CGFloat(sp.design.length), frame: 0, dead: dead) {
-            let image = Image(decorative: art.image, scale: 1)
-            (style.isPixel ? image.interpolation(.none) : image.interpolation(.high))
+        if let art = style.fishImage(speciesID, frame: 0, dead: dead) {
+            Image(decorative: art.image, scale: 1).interpolation(.none)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .scaleEffect(x: 1, y: dead ? -1 : 1)
@@ -35,16 +33,14 @@ struct FishIcon: View {
     }
 }
 
-/// 今の画風で描いた装飾のアイコン。
+/// 装飾のアイコン。
 struct DecorationIcon: View {
     @Environment(GameStore.self) private var store
     let kindID: String
     var body: some View {
         let style = store.style
-        let kind = Catalog.decoration(kindID)
-        if let art = style.decorationImage(kindID, dotPixels: 56 / max(kind.size.width, kind.size.height)) {
-            let image = Image(decorative: art.image, scale: 1)
-            (style.isPixel ? image.interpolation(.none) : image.interpolation(.high))
+        if let art = style.decorationImage(kindID) {
+            Image(decorative: art.image, scale: 1).interpolation(.none)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
         }

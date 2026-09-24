@@ -72,7 +72,6 @@
 "お店で薬を買って、お世話画面であげてください。水換えも効果的です。" = "Buy medicine in the Shop and give it on the Care screen. Changing the water helps too.";
 "かつて海をわたった大きな船。" = "A great ship that once sailed the seas.";
 "きれい" = "Clean";
-"くっきりしたドットのレトロな水槽。" = "A crisp, retro tank made of pixels.";
 "くるりと巻いた貝。" = "A curly spiral shell.";
 "このMacでは読み取れないもの" = "Not readable on this Mac";
 "このMacに記録が残らないため集計できません。" = "No records are left on this Mac, so they can’t be counted.";
@@ -106,7 +105,6 @@
 "まるっこい朱色のアイドル。" = "A round, vermilion idol.";
 "まんまるで好奇心旺盛。" = "Perfectly round and endlessly curious.";
 "めずらしい" = "Uncommon";
-"やわらかい水彩の、絵本のような水槽。" = "A soft watercolor tank, like a picture book.";
 "ゆれる緑の水草。" = "Swaying green plants.";
 "よくお世話すると魚は成長し、元気な成魚が2匹以上いると稚魚が生まれることも。汚れた水が続くと病気になります。魚には寿命もあります。" = "Well-cared-for fish grow up, and two or more healthy adults may have fry. Dirty water can make them sick, and every fish has a natural lifespan.";
 "よごれている（病気になりやすい）" = "Dirty (fish may get sick)";
@@ -115,7 +113,6 @@
 "アップデートを確認…" = "Check for Updates…";
 "アップデートを自動で確認する" = "Automatically check for updates";
 "アニメーション" = "Animation";
-"アニメ調" = "Anime";
 "アプリとして起動していないため、アップデートを確認できません。" = "Updates can’t be checked because this isn’t running as an app.";
 "アマゾンソード" = "Amazon sword";
 "イソギンチャク" = "Sea anemone";
@@ -196,7 +193,6 @@
 "ラスボラ" = "Harlequin rasbora";
 "ラミレジィ" = "Ram cichlid";
 "ラミーノーズテトラ" = "Rummy-nose tetra";
-"リアル" = "Realistic";
 "ルリスズメダイ" = "Blue damselfish";
 "レア" = "Rare";
 "ロイヤルグラマ" = "Royal gramma";
@@ -221,7 +217,6 @@
 "保存するのは水槽・魚・装飾・コイン、利用記録の件数・時刻・取得元・重複判定用のID・トークン数だけです。AIとの会話本文・APIキー・Cookieは保存しません。" = "Tokarium stores only your tank, fish, decorations, and coins, plus record counts, times, sources, de-duplication IDs, and token counts. It never stores AI conversations, API keys, or cookies.";
 "保存フォルダを開く" = "Open Data Folder";
 "元気" = "Healthy";
-"光とかげ、うろこまで描き込んだ本物らしい水槽。" = "A lifelike tank with light, shadow, and detailed scales.";
 "光る宝石" = "Glowing gems";
 "入力 %@・出力 %@・キャッシュ書込 %@・キャッシュ読込 %@ トークン（%lld 件）" = "Input %@ · Output %@ · Cache write %@ · Cache read %@ tokens (%lld records)";
 "内容: %@" = "Reads: %@";
@@ -242,7 +237,6 @@
 "大きな水槽" = "Large tank";
 "大きな背びれの底の主。" = "The big-finned boss of the bottom.";
 "大きな葉が広がる定番水草。" = "A classic plant with broad leaves.";
-"太い線とあざやかな色のアニメのような水槽。" = "Bold outlines and bright colors, like an anime.";
 "奥へ移動" = "Move to Back";
 "宝石のようなミニシクリッド。" = "A jewel-like dwarf cichlid.";
 "宝箱" = "Treasure chest";
@@ -316,8 +310,6 @@
 "特大の水槽" = "Huge tank";
 "玉砂利" = "Pebbles";
 "琉金" = "Ryukin goldfish";
-"画風" = "Art Style";
-"画風を変えても、魚や装飾、配置はそのままです。" = "Changing the style keeps your fish, decorations, and layout.";
 "病気" = "Sick";
 "病気の魚を1匹治します。持っている数: %lld" = "Cures one sick fish. You have: %lld";
 "目のさめるような瑠璃色。" = "A dazzling lapis blue.";
@@ -334,7 +326,6 @@
 "紅白の丸い体と長い尾。" = "A round red-and-white body with a long tail.";
 "紅白の模様が美しい池の王様。" = "The king of the pond, in red and white.";
 "紫と黄色のツートン。" = "Two-tone purple and yellow.";
-"絵本風" = "Picture Book";
 "縦長の体でゆったり泳ぐ。" = "A tall fish that glides gracefully.";
 "置いている装飾 %lld/%lld 個。置いた装飾は「水槽」画面の「配置を編集」で動かせます。" = "Decorations placed: %lld/%lld. Move them with “Edit Layout” on the Tank screen.";
 "置きもの" = "Ornaments";

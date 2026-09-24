@@ -217,39 +217,6 @@ enum Relauncher {
     }
 }
 
-private struct StyleCard: View {
-    let style: AquariumStyle
-    let selected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 6) {
-                ZStack {
-                    LinearGradient(colors: [Color(rgb: 0x4FB6E6), Color(rgb: 0x165D93)], startPoint: .top, endPoint: .bottom)
-                    if let art = style.fishImage("clown", dotPixels: 4, frame: 1, dead: false) {
-                        let image = Image(decorative: art.image, scale: 1)
-                        (style.isPixel ? image.interpolation(.none) : image.interpolation(.high))
-                            .resizable().aspectRatio(contentMode: .fit).padding(10)
-                    }
-                }
-                .frame(height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                Text(style.name).font(.callout.weight(selected ? .bold : .regular))
-                Text(style.blurb).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
-                    .frame(height: 30, alignment: .top)
-            }
-            .padding(6)
-            .frame(maxWidth: .infinity)
-            .background(RoundedRectangle(cornerRadius: 10).strokeBorder(selected ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: selected ? 2 : 1))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(style.name)
-        .accessibilityAddTraits(selected ? .isSelected : [])
-    }
-}
-
 struct SettingsScreen: View {
     @Environment(GameStore.self) private var store
 
@@ -272,17 +239,6 @@ struct SettingsScreen: View {
                     Text("なめらか（60fps）").tag(60)
                     Text("標準（30fps）").tag(30)
                     Text("省電力（15fps）").tag(15)
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("画風")
-                    HStack(spacing: 10) {
-                        ForEach(AquariumStyles.all) { style in
-                            StyleCard(style: style, selected: store.settings.styleID == style.id) {
-                                store.settings.styleID = style.id
-                            }
-                        }
-                    }
-                    Text("画風を変えても、魚や装飾、配置はそのままです。").font(.caption).foregroundStyle(.secondary)
                 }
             }
             Section("起動") {

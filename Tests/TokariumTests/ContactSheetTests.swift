@@ -3,7 +3,7 @@ import Foundation
 import Testing
 @testable import Tokarium
 
-/// 全ての魚と装飾を各画風で並べた画像を書き出す（TOKARIUM_SHEET にフォルダを指定したときだけ）。
+/// 全ての魚と装飾を並べた画像を書き出す（TOKARIUM_SHEET にフォルダを指定したときだけ）。
 @Test func renderContactSheet() throws {
     guard let dir = ProcessInfo.processInfo.environment["TOKARIUM_SHEET"] else { return }
     for style in AquariumStyles.all {
@@ -18,7 +18,7 @@ import Testing
         NSGraphicsContext.current = gc
         let ctx = gc.cgContext
         ctx.setFillColor(CGColor(srgbRed: 0.16, green: 0.45, blue: 0.7, alpha: 1)); ctx.fill(CGRect(origin: .zero, size: size))
-        ctx.interpolationQuality = style.isPixel ? .none : .high
+        ctx.interpolationQuality = .none
         var i = 0
         func place(_ img: CGImage, dots: CGSize, name: String) {
             let col = i % cols, row = i / cols
@@ -31,25 +31,25 @@ import Testing
             i += 1
         }
         for sp in Catalog.fish {
-            if let art = style.fishImage(sp.id, dotPixels: 120 / CGFloat(sp.design.length) / 2, frame: 1, dead: false) { place(art.image, dots: art.dots, name: sp.name) }
+            if let art = style.fishImage(sp.id, frame: 1, dead: false) { place(art.image, dots: art.dots, name: sp.name) }
         }
         for d in Catalog.decorations {
-            if let art = style.decorationImage(d.id, dotPixels: 110 / max(d.size.width, d.size.height) / 2) { place(art.image, dots: art.dots, name: d.name) }
+            if let art = style.decorationImage(d.id) { place(art.image, dots: art.dots, name: d.name) }
         }
         NSGraphicsContext.restoreGraphicsState()
         try rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: "\(dir)/sheet-\(style.id).png"))
     }
 }
 
-@Test func everyItemRendersInEveryStyle() {
+@Test func everyItemRenders() {
     for style in AquariumStyles.all {
         for sp in Catalog.fish {
             for dead in [false, true] {
-                #expect(style.fishImage(sp.id, dotPixels: 3, frame: 1, dead: dead) != nil, "\(style.id) \(sp.id)")
+                #expect(style.fishImage(sp.id, frame: 1, dead: dead) != nil, "\(style.id) \(sp.id)")
             }
         }
         for d in Catalog.decorations {
-            #expect(style.decorationImage(d.id, dotPixels: 3) != nil, "\(style.id) \(d.id)")
+            #expect(style.decorationImage(d.id) != nil, "\(style.id) \(d.id)")
         }
     }
     #expect(Set(Catalog.fish.map(\.id)).count == Catalog.fish.count)
