@@ -1,0 +1,252 @@
+import Foundation
+
+enum DeathCause: String, Codable {
+    case neglect   // 空腹や水の汚れで弱った
+    case illness   // 病気が悪化した
+    case oldAge    // 寿命
+
+    var label: String {
+        switch self {
+        case .neglect: return "弱ってしまい"
+        case .illness: return "病気が悪化して"
+        case .oldAge: return "寿命を迎えて"
+        }
+    }
+}
+
+enum GrowthStage {
+    case fry, juvenile, adult
+
+    var label: String {
+        switch self {
+        case .fry: return "稚魚"
+        case .juvenile: return "若魚"
+        case .adult: return "成魚"
+        }
+    }
+}
+
+struct Fish: Codable, Identifiable, Equatable {
+    var id: UUID = UUID()
+    var speciesID: String
+    var name: String
+    /// 満腹度 0〜100（100=満腹）。
+    var fullness: Double = 80
+    /// 体調 0〜100。
+    var health: Double = 100
+    var isAlive: Bool = true
+    var diedAt: Date?
+    var deathCause: DeathCause?
+    var purchasedAt: Date = Date()
+    /// 生まれた日時（年齢と寿命の計算に使う）。
+    var bornAt: Date = Date()
+    /// 成長 0〜1（1=成魚）。
+    var growth: Double = 0.4
+    var isSick: Bool = false
+    /// 水槽内の位置（0〜1 の正規化座標）。
+    var x: Double = 0.5
+    var y: Double = 0.5
+
+    var species: FishSpecies { Catalog.species(speciesID) }
+
+    var stage: GrowthStage {
+        if growth >= 1 { return .adult }
+        if growth >= 0.34 { return .juvenile }
+        return .fry
+    }
+
+    func ageDays(at now: Date = Date()) -> Double {
+        max(0, now.timeIntervalSince(bornAt) / 86400)
+    }
+
+    /// 寿命のうちどれだけ生きたか（0〜1以上）。
+    func lifeFraction(at now: Date = Date()) -> Double {
+        ageDays(at: diedAt ?? now) / species.lifespanDays
+    }
+
+    func isElderly(at now: Date = Date()) -> Bool {
+        isAlive && lifeFraction(at: now) >= Simulation.elderlyFraction
+    }
+
+    init(id: UUID = UUID(), speciesID: String, name: String, fullness: Double = 80, health: Double = 100,
+         purchasedAt: Date = Date(), bornAt: Date? = nil, growth: Double = 0.4, x: Double = 0.5, y: Double = 0.5) {
+        self.id = id
+        self.speciesID = speciesID
+        self.name = name
+        self.fullness = fullness
+        self.health = health
+        self.purchasedAt = purchasedAt
+        // お店の魚は、寿命の1割ほど育った若魚として迎える
+        self.bornAt = bornAt ?? purchasedAt.addingTimeInterval(-Catalog.species(speciesID).lifespanDays * 0.1 * 86400)
+        self.growth = growth
+        self.x = x
+        self.y = y
+    }
+
+    // 古い保存データに無い項目は既定値で読む
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        speciesID = try c.decode(String.self, forKey: .speciesID)
+        name = try c.decode(String.self, forKey: .name)
+        fullness = try c.decodeIfPresent(Double.self, forKey: .fullness) ?? 80
+        health = try c.decodeIfPresent(Double.self, forKey: .health) ?? 100
+        isAlive = try c.decodeIfPresent(Bool.self, forKey: .isAlive) ?? true
+        diedAt = try c.decodeIfPresent(Date.self, forKey: .diedAt)
+        deathCause = try c.decodeIfPresent(DeathCause.self, forKey: .deathCause)
+        purchasedAt = try c.decodeIfPresent(Date.self, forKey: .purchasedAt) ?? Date()
+        bornAt = try c.decodeIfPresent(Date.self, forKey: .bornAt)
+            ?? purchasedAt.addingTimeInterval(-Catalog.species(speciesID).lifespanDays * 0.1 * 86400)
+        growth = try c.decodeIfPresent(Double.self, forKey: .growth) ?? 0.4
+        isSick = try c.decodeIfPresent(Bool.self, forKey: .isSick) ?? false
+        x = try c.decodeIfPresent(Double.self, forKey: .x) ?? 0.5
+        y = try c.decodeIfPresent(Double.self, forKey: .y) ?? 0.5
+    }
+}
+
+struct Decoration: Codable, Identifiable, Equatable {
+    var id: UUID = UUID()
+    var kindID: String
+    /// 配置済みか（false なら持ち物に入っている）。
+    var isPlaced: Bool = true
+    /// 砂の上の横位置（0〜1）。
+    var x: Double = 0.5
+    /// 手前/奥の重なり順。
+    var layer: Int = 0
+
+    var kind: DecorationKind { Catalog.decoration(kindID) }
+}
+
+struct Tank: Codable, Equatable {
+    /// 水質 0〜100。
+    var waterQuality: Double = 100
+    var fish: [Fish] = []
+    var decorations: [Decoration] = []
+    /// 水槽の大きさ（拡張の段階）。
+    var level: Int = 0
+
+    var size: TankSize { Catalog.tankSize(level) }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        waterQuality = try c.decodeIfPresent(Double.self, forKey: .waterQuality) ?? 100
+        fish = try c.decodeIfPresent([Fish].self, forKey: .fish) ?? []
+        decorations = try c.decodeIfPresent([Decoration].self, forKey: .decorations) ?? []
+        level = try c.decodeIfPresent(Int.self, forKey: .level) ?? 0
+    }
+}
+
+struct GameState: Codable, Equatable {
+    var version = 2
+    /// 通貨付与の基準日時（確定: 初回起動日時）。
+    var createdAt: Date = Date()
+    /// シミュレーションを最後に進めた日時。
+    var lastSimulatedAt: Date = Date()
+    var tank = Tank()
+    var coinsSpent: Int = 0
+    var initialCoins: Int = Catalog.initialCoins
+    var lastFedAt: Date?
+    var lastWaterChangeAt: Date?
+    /// 持っている薬の数。
+    var medicine: Int = 0
+    /// 最後に稚魚が生まれた日時。
+    var lastBirthAt: Date?
+    /// 危険通知を送った魚（重複通知を防ぐ）。
+    var notifiedDangerFish: Set<UUID> = []
+
+    init(createdAt: Date = Date(), lastSimulatedAt: Date = Date()) {
+        self.createdAt = createdAt
+        self.lastSimulatedAt = lastSimulatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = 2
+        createdAt = try c.decode(Date.self, forKey: .createdAt)
+        lastSimulatedAt = try c.decodeIfPresent(Date.self, forKey: .lastSimulatedAt) ?? Date()
+        tank = try c.decodeIfPresent(Tank.self, forKey: .tank) ?? Tank()
+        coinsSpent = try c.decodeIfPresent(Int.self, forKey: .coinsSpent) ?? 0
+        initialCoins = try c.decodeIfPresent(Int.self, forKey: .initialCoins) ?? Catalog.initialCoins
+        lastFedAt = try c.decodeIfPresent(Date.self, forKey: .lastFedAt)
+        lastWaterChangeAt = try c.decodeIfPresent(Date.self, forKey: .lastWaterChangeAt)
+        medicine = try c.decodeIfPresent(Int.self, forKey: .medicine) ?? 0
+        lastBirthAt = try c.decodeIfPresent(Date.self, forKey: .lastBirthAt)
+        notifiedDangerFish = try c.decodeIfPresent(Set<UUID>.self, forKey: .notifiedDangerFish) ?? []
+    }
+
+    static func newGame(now: Date = Date()) -> GameState {
+        var state = GameState(createdAt: now, lastSimulatedAt: now)
+        for (i, speciesID) in Catalog.initialFish.enumerated() {
+            let sp = Catalog.species(speciesID)
+            state.tank.fish.append(Fish(speciesID: speciesID, name: "\(sp.name) \(i + 1)号", fullness: 80, purchasedAt: now, x: 0.4, y: 0.45))
+        }
+        for (kindID, x) in Catalog.initialDecorations {
+            state.tank.decorations.append(Decoration(kindID: kindID, x: x))
+        }
+        return state
+    }
+}
+
+/// 魚の状態を言葉で表したもの（色だけに頼らない）。
+enum FishCondition: Equatable {
+    case healthy, hungry, sick, weak, critical, dead
+
+    var label: String {
+        switch self {
+        case .healthy: return "元気"
+        case .hungry: return "おなかがすいた"
+        case .sick: return "病気"
+        case .weak: return "弱っている"
+        case .critical: return "危険"
+        case .dead: return "死亡"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .healthy: return "face.smiling"
+        case .hungry: return "fork.knife"
+        case .sick: return "cross.case"
+        case .weak: return "bandage"
+        case .critical: return "exclamationmark.triangle.fill"
+        case .dead: return "xmark.circle"
+        }
+    }
+
+    var isDanger: Bool { self == .critical }
+}
+
+extension Fish {
+    var condition: FishCondition {
+        if !isAlive { return .dead }
+        if health < 25 { return .critical }
+        if isSick { return .sick }
+        if health < 60 { return .weak }
+        if fullness < Simulation.hungryThreshold { return .hungry }
+        return .healthy
+    }
+}
+
+enum WaterCondition {
+    case clean, slightlyDirty, dirty, veryDirty
+
+    init(_ quality: Double) {
+        switch quality {
+        case 70...: self = .clean
+        case 45..<70: self = .slightlyDirty
+        case Simulation.dirtyWaterThreshold..<45: self = .dirty
+        default: self = .veryDirty
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .clean: return "きれい"
+        case .slightlyDirty: return "少しにごっている"
+        case .dirty: return "よごれている（病気になりやすい）"
+        case .veryDirty: return "とてもよごれている（魚が弱ります）"
+        }
+    }
+}
