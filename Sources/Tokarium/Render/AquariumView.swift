@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// 水槽の表示。ウィンドウとデスクトップの両方で使う。
@@ -6,12 +7,20 @@ struct AquariumView: View {
     var interactive = false
     @Binding var selectedFish: UUID?
     @Binding var editingLayout: Bool
+    /// カーソルが重なっている魚。
+    @Binding var hoveredFish: UUID?
+    @State private var hoverPoint: CGPoint?
 
-    init(store: GameStore, interactive: Bool = false, selectedFish: Binding<UUID?> = .constant(nil), editingLayout: Binding<Bool> = .constant(false)) {
+    /// 魚は泳いで動くので、カーソルが止まっていても定期的に判定し直す。
+    private let hoverTimer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
+
+    init(store: GameStore, interactive: Bool = false, selectedFish: Binding<UUID?> = .constant(nil),
+         editingLayout: Binding<Bool> = .constant(false), hoveredFish: Binding<UUID?> = .constant(nil)) {
         self.store = store
         self.interactive = interactive
         self._selectedFish = selectedFish
         self._editingLayout = editingLayout
+        self._hoveredFish = hoveredFish
     }
 
     var body: some View {
@@ -27,7 +36,8 @@ struct AquariumView: View {
                     Canvas { ctx, size in
                         store.engine.aspect = size.height > 0 ? size.width / size.height : 1.6
                         store.engine.step(to: timeline.date, fish: tank.fish, decorations: tank.decorations)
-                        style.drawLive(&ctx, size: size, tank: tank, engine: store.engine, selected: interactive ? selectedFish : nil)
+                        style.drawLive(&ctx, size: size, tank: tank, engine: store.engine,
+                                       selected: interactive ? (hoveredFish ?? selectedFish) : nil)
                     }
                 }
                 if interactive && editingLayout {
@@ -39,9 +49,32 @@ struct AquariumView: View {
                 guard interactive, !editingLayout else { return }
                 selectedFish = hitFish(at: point, size: size, tank: tank, style: style)
             }
+            .onContinuousHover(coordinateSpace: .local) { phase in
+                guard interactive else { return }
+                switch phase {
+                case .active(let point):
+                    hoverPoint = point
+                    updateHover(size: size, tank: tank, style: style)
+                case .ended:
+                    hoverPoint = nil
+                    if hoveredFish != nil { hoveredFish = nil }
+                }
+            }
+            .onReceive(hoverTimer) { _ in
+                guard interactive, hoverPoint != nil else { return }
+                updateHover(size: size, tank: tank, style: style)
+            }
+            .onChange(of: interactive) { _, now in
+                if !now { hoverPoint = nil; hoveredFish = nil }
+            }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)
+    }
+
+    private func updateHover(size: CGSize, tank: Tank, style: AquariumStyle) {
+        let hit = editingLayout ? nil : hoverPoint.flatMap { hitFish(at: $0, size: size, tank: tank, style: style) }
+        if hit != hoveredFish { hoveredFish = hit }
     }
 
     private func hitFish(at point: CGPoint, size: CGSize, tank: Tank, style: AquariumStyle) -> UUID? {

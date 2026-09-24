@@ -28,12 +28,13 @@ struct MainView: View {
     @Environment(GameStore.self) private var store
     @State private var screen: Screen = .tank
     @State private var selected: UUID?
+    @State private var hovered: UUID?
     @State private var editing = false
 
     var body: some View {
         ZStack {
             PixelPalette.deeper.ignoresSafeArea()
-            AquariumView(store: store, interactive: screen == .tank, selectedFish: $selected, editingLayout: $editing)
+            AquariumView(store: store, interactive: screen == .tank, selectedFish: $selected, editingLayout: $editing, hoveredFish: $hovered)
                 .ignoresSafeArea()
 
             if screen != .tank {
@@ -47,7 +48,7 @@ struct MainView: View {
             }
 
             VStack(spacing: 0) {
-                TopHUD(screen: screen)
+                TopHUD(screen: screen, hovered: screen == .tank ? hovered : nil)
                 if screen == .tank { TankOverlays(selected: $selected, editing: $editing) }
                 Spacer(minLength: 0)
                 BottomBar(screen: $screen, editing: $editing)
@@ -104,9 +105,10 @@ struct MainView: View {
 private struct TopHUD: View {
     @Environment(GameStore.self) private var store
     let screen: Screen
+    let hovered: UUID?
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(alignment: .top, spacing: 10) {
             PixelBadge {
                 Image(systemName: "drop.fill").foregroundStyle(Color(rgb: 0x6FC8FF))
                 Text("水質：\(WaterCondition(store.state.tank.waterQuality).label)")
@@ -115,7 +117,12 @@ private struct TopHUD: View {
                 Image(systemName: "fish.fill").foregroundStyle(Color(rgb: 0x6FC8FF))
                 Text("\(store.livingFish.count)/\(store.state.tank.size.maxFish) 匹")
             }
-            Spacer()
+            Spacer(minLength: 10)
+            if let f = store.state.tank.fish.first(where: { $0.id == hovered }) {
+                FishHoverStatus(fish: f)
+                    .transition(.opacity)
+            }
+            Spacer(minLength: 10)
             PixelBadge {
                 Image(systemName: "circle.hexagongrid.circle.fill").foregroundStyle(PixelPalette.gold)
                 Text("\(store.coins)").monospacedDigit().foregroundStyle(PixelPalette.gold)
@@ -127,6 +134,50 @@ private struct TopHUD: View {
         .padding(.leading, 84)
         .padding(.trailing, 16)
         .padding(.top, 12)
+        .animation(.easeOut(duration: 0.1), value: hovered)
+    }
+}
+
+/// カーソルを重ねた魚のステータス（上部に出す）。
+private struct FishHoverStatus: View {
+    let fish: Fish
+
+    var body: some View {
+        HStack(spacing: 12) {
+            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive).frame(width: 40, height: 26)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(fish.name).font(.pixel(.callout)).lineLimit(1)
+                Text(subtitle).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim).lineLimit(1)
+            }
+            ConditionBadge(condition: fish.condition)
+            if fish.isAlive {
+                VStack(alignment: .leading, spacing: 4) {
+                    miniBar(String(localized: "満腹"), fish.fullness)
+                    miniBar(String(localized: "体調"), fish.health)
+                }
+                .frame(width: 130)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(PixelFrame(fill: PixelPalette.deep.opacity(0.92), border: PixelPalette.sand, step: 2))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var subtitle: String {
+        var parts = [fish.species.name, fish.stage.label]
+        if fish.isAlive { parts.append(String(localized: "\(Int(fish.ageDays()))日齢")) }
+        if fish.isElderly() { parts.append(String(localized: "老齢")) }
+        return parts.joined(separator: String(localized: "・"))
+    }
+
+    private func miniBar(_ title: String, _ value: Double) -> some View {
+        HStack(spacing: 6) {
+            Text(title).font(.pixel(.caption2)).foregroundStyle(PixelPalette.dim).frame(width: 34, alignment: .leading)
+            PixelBar(value: value, color: value < 25 ? PixelPalette.danger : value < 50 ? Color(rgb: 0xFFA030) : Color(rgb: 0x5FD068))
+                .frame(height: 10)
+            Text("\(Int(value.rounded()))").font(.pixel(.caption2)).monospacedDigit().frame(width: 26, alignment: .trailing)
+        }
     }
 }
 
