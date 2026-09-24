@@ -7,7 +7,7 @@ import UserNotifications
 enum DisplayMode: String, Codable, CaseIterable, Identifiable {
     case window, desktop
     var id: String { rawValue }
-    var label: String { self == .window ? "ウィンドウ表示" : "デスクトップ表示" }
+    var label: String { self == .window ? String(localized: "ウィンドウ表示") : String(localized: "デスクトップ表示") }
 }
 
 enum DesktopScreens: String, Codable, CaseIterable, Identifiable {
@@ -27,6 +27,11 @@ struct AppSettings: Codable, Equatable {
     var notificationsEnabled = true
 }
 
+struct BugReportRequest: Identifiable {
+    let id = UUID()
+    var crash: Diagnostics.CrashInfo?
+}
+
 @MainActor
 @Observable
 final class GameStore {
@@ -41,6 +46,8 @@ final class GameStore {
     var resumeMessage: String?
     /// 画面に出す一時的なお知らせ。
     var toast: String?
+    /// 表示中の不具合報告。
+    var bugReport: BugReportRequest?
 
     @ObservationIgnored let engine = SwimEngine()
     @ObservationIgnored private let scanner: UsageScanner
@@ -55,11 +62,14 @@ final class GameStore {
     var livingFish: [Fish] { state.tank.fish.filter(\.isAlive) }
     var dangerFish: [Fish] { state.tank.fish.filter { $0.condition.isDanger } }
 
+    /// 保存先。動作確認用に TOKARIUM_DATA_DIR で差し替えられる。
+    nonisolated static var defaultDirectory: URL {
+        if let override = ProcessInfo.processInfo.environment["TOKARIUM_DATA_DIR"] { return URL(fileURLWithPath: override) }
+        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Tokarium", isDirectory: true)
+    }
+
     init(directory: URL? = nil) {
-        // 動作確認用に保存先を差し替えられる
-        let override = ProcessInfo.processInfo.environment["TOKARIUM_DATA_DIR"].map { URL(fileURLWithPath: $0) }
-        let dir = directory ?? override ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Tokarium", isDirectory: true)
+        let dir = directory ?? Self.defaultDirectory
         self.dir = dir
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
@@ -105,12 +115,12 @@ final class GameStore {
         let before = state.tank.fish
         let report = Simulation.advance(&state, to: now)
         if report.isCatchUp && report.simulated > 30 * 60 {
-            var msg = "離れていた間の \(Self.durationText(report.simulated)) を水槽に反映しました。"
+            var msg = String(localized: "離れていた間の \(Self.durationText(report.simulated)) を水槽に反映しました。")
             if report.skipped > 0 {
-                msg += "（\(Self.durationText(Simulation.maxCatchUp)) を超えた分は反映していません）"
+                msg += String(localized: "（\(Self.durationText(Simulation.maxCatchUp)) を超えた分は反映していません）")
             }
             let hungry = state.tank.fish.filter { $0.isAlive && $0.condition != .healthy }.count
-            if hungry > 0 { msg += " お世話が必要な魚が \(hungry) 匹います。" }
+            if hungry > 0 { msg += String(localized: " お世話が必要な魚が \(hungry) 匹います。") }
             resumeMessage = msg
         }
         announce(report)
@@ -121,22 +131,23 @@ final class GameStore {
     private func announce(_ report: Simulation.Report) {
         if !report.births.isEmpty {
             let name = report.births[0].species.name
-            toast = "\(name)の稚魚が \(report.births.count) 匹生まれました"
-            post(title: "稚魚が生まれました", body: "\(name)の稚魚が \(report.births.count) 匹生まれました。")
+            toast = String(localized: "\(name)の稚魚が \(report.births.count) 匹生まれました")
+            post(title: String(localized: "稚魚が生まれました"), body: String(localized: "\(name)の稚魚が \(report.births.count) 匹生まれました。"))
         }
         for f in report.newlySick {
-            post(title: "\(f.name)が病気になりました", body: "お店で薬を買って、お世話画面であげてください。水換えも効果的です。")
+            post(title: String(localized: "\(f.name)が病気になりました"), body: String(localized: "お店で薬を買って、お世話画面であげてください。水換えも効果的です。"))
         }
         if let f = report.grownUp.first {
-            toast = "\(f.name)が成魚になりました"
+            toast = String(localized: "\(f.name)が成魚になりました")
         }
     }
 
     static func durationText(_ t: TimeInterval) -> String {
-        let h = Int(t / 3600)
-        if h >= 24 { return "\(h / 24)日\(h % 24 > 0 ? "\(h % 24)時間" : "")" }
-        if h >= 1 { return "\(h)時間" }
-        return "\(max(1, Int(t / 60)))分"
+        let f = DateComponentsFormatter()
+        f.unitsStyle = .full
+        f.allowedUnits = t >= 86400 ? [.day, .hour] : t >= 3600 ? [.hour] : [.minute]
+        f.maximumUnitCount = 2
+        return f.string(from: max(60, t)) ?? ""
     }
 
     // MARK: 利用記録
@@ -149,12 +160,15 @@ final class GameStore {
         Task {
             let snapshot = await scanner.scan(enabled: enabled, includeEstimated: includeEstimated)
             self.ledger = snapshot.ledger
+            for (id, status) in snapshot.statuses where status != self.sourceStatuses[id] {
+                if case .error(let message, _) = status { AppLog.error("読み取りエラー \(id): \(message)") }
+            }
             self.sourceStatuses = snapshot.statuses
             self.lastScanAt = snapshot.scannedAt
             self.isScanning = false
             self.detectedSources = scanner.detectedSources()
             let gained = snapshot.ledger.coinsEarned - before
-            if gained > 0 { self.toast = "AIの利用で \(gained) コイン増えました" }
+            if gained > 0 { self.toast = String(localized: "AIの利用で \(gained) コイン増えました") }
         }
     }
 
@@ -166,7 +180,7 @@ final class GameStore {
 
     func feed() {
         simulate()
-        guard !livingFish.isEmpty else { toast = "餌を食べる魚がいません"; return }
+        guard !livingFish.isEmpty else { toast = String(localized: "餌を食べる魚がいません"); return }
         Simulation.feed(&state, now: Date())
         engine.dropFood(count: min(24, 4 + livingFish.count * 2))
         save()
@@ -175,7 +189,7 @@ final class GameStore {
     func changeWater() {
         simulate()
         Simulation.changeWater(&state, now: Date())
-        toast = "水をきれいにしました"
+        toast = String(localized: "水をきれいにしました")
         save()
     }
 
@@ -200,10 +214,10 @@ final class GameStore {
         case notEnoughCoins, tankFull, tooManyDecorations, maxSize
         var errorDescription: String? {
             switch self {
-            case .notEnoughCoins: return "コインが足りません"
-            case .tankFull: return "水槽がいっぱいです。お店で水槽を大きくできます"
-            case .tooManyDecorations: return "これ以上は置けません。持ち物に入りました。お店で水槽を大きくできます"
-            case .maxSize: return "これ以上大きな水槽はありません"
+            case .notEnoughCoins: return String(localized: "コインが足りません")
+            case .tankFull: return String(localized: "水槽がいっぱいです。お店で水槽を大きくできます")
+            case .tooManyDecorations: return String(localized: "これ以上は置けません。持ち物に入りました。お店で水槽を大きくできます")
+            case .maxSize: return String(localized: "これ以上大きな水槽はありません")
             }
         }
     }
@@ -213,11 +227,11 @@ final class GameStore {
         guard coins >= sp.price else { return .notEnoughCoins }
         guard livingFish.count < state.tank.size.maxFish else { return .tankFull }
         let n = state.tank.fish.filter { $0.speciesID == sp.id }.count + 1
-        let fish = Fish(speciesID: sp.id, name: "\(sp.name) \(n)号", fullness: 70, purchasedAt: Date(),
+        let fish = Fish(speciesID: sp.id, name: String(localized: "\(sp.name) \(n)号"), fullness: 70, purchasedAt: Date(),
                         x: .random(in: 0.2...0.8), y: sp.zone == .bottom ? 0.82 : 0.15)
         state.tank.fish.append(fish)
         state.coinsSpent += sp.price
-        toast = "\(sp.name)を水槽に入れました"
+        toast = String(localized: "\(sp.name)を水槽に入れました")
         save()
         return nil
     }
@@ -232,7 +246,7 @@ final class GameStore {
         state.coinsSpent += kind.price
         save()
         if !d.isPlaced { return .tooManyDecorations }
-        toast = "\(kind.name)を置きました"
+        toast = String(localized: "\(kind.name)を置きました")
         return nil
     }
 
@@ -241,7 +255,7 @@ final class GameStore {
         guard coins >= Catalog.medicinePrice else { return .notEnoughCoins }
         state.coinsSpent += Catalog.medicinePrice
         state.medicine += 1
-        toast = "薬を買いました（持っている数: \(state.medicine)）"
+        toast = String(localized: "薬を買いました（持っている数: \(state.medicine)）")
         save()
         return nil
     }
@@ -257,7 +271,7 @@ final class GameStore {
         guard coins >= next.price else { return .notEnoughCoins }
         state.coinsSpent += next.price
         state.tank.level = next.level
-        toast = "\(next.name)になりました（魚 \(next.maxFish) 匹・装飾 \(next.maxDecorations) 個まで）"
+        toast = String(localized: "\(next.name)になりました（魚 \(next.maxFish) 匹・装飾 \(next.maxDecorations) 個まで）")
         save()
         return nil
     }
@@ -265,10 +279,10 @@ final class GameStore {
     func giveMedicine(_ id: UUID) {
         simulate()
         if Simulation.giveMedicine(&state, fish: id) {
-            toast = "薬をあげました"
+            toast = String(localized: "薬をあげました")
             save()
         } else if state.medicine == 0 {
-            toast = "薬がありません。お店で買えます"
+            toast = String(localized: "薬がありません。お店で買えます")
         }
     }
 
@@ -286,7 +300,7 @@ final class GameStore {
     func setDecoration(_ id: UUID, placed: Bool) {
         guard let i = state.tank.decorations.firstIndex(where: { $0.id == id }) else { return }
         if placed && state.tank.decorations.filter(\.isPlaced).count >= state.tank.size.maxDecorations {
-            toast = "これ以上は置けません"
+            toast = String(localized: "これ以上は置けません")
             return
         }
         state.tank.decorations[i].isPlaced = placed
@@ -317,12 +331,12 @@ final class GameStore {
             let old = before.first { $0.id == f.id }
             if f.condition.isDanger && !state.notifiedDangerFish.contains(f.id) {
                 state.notifiedDangerFish.insert(f.id)
-                post(title: "\(f.name)が危険な状態です", body: "餌やりと水換えをしてあげてください。")
+                post(title: String(localized: "\(f.name)が危険な状態です"), body: String(localized: "餌やりと水換えをしてあげてください。"))
             } else if f.condition != .critical && f.isAlive {
                 state.notifiedDangerFish.remove(f.id)
             }
             if old?.isAlive == true && !f.isAlive {
-                post(title: "\(f.name)が\((f.deathCause ?? .neglect).label)死んでしまいました", body: "お世話画面でお別れできます。")
+                post(title: (f.deathCause ?? .neglect).message(name: f.name), body: String(localized: "お世話画面でお別れできます。"))
             }
         }
     }
@@ -343,7 +357,7 @@ final class GameStore {
             do {
                 if newValue { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
             } catch {
-                toast = "ログイン時の起動を設定できませんでした: \(error.localizedDescription)"
+                toast = String(localized: "ログイン時の起動を設定できませんでした: \(error.localizedDescription)")
             }
         }
     }
@@ -368,7 +382,7 @@ final class GameStore {
             let data = try JSONEncoder.tokarium.encode(value)
             try data.write(to: dir.appendingPathComponent(name), options: .atomic)
         } catch {
-            NSLog("Tokarium: \(name) を保存できませんでした: \(error)")
+            AppLog.error("\(name) を保存できませんでした: \(error.localizedDescription)")
         }
     }
 

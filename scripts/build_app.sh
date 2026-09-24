@@ -11,12 +11,26 @@ if [[ "${UNIVERSAL:-0}" == "1" ]]; then
   ARCH_FLAGS=(--arch arm64 --arch x86_64)
 fi
 swift build -c "$CONFIG" "${ARCH_FLAGS[@]}"
-BIN="$(swift build -c "$CONFIG" "${ARCH_FLAGS[@]}" --show-bin-path)/Tokarium"
+BINDIR="$(swift build -c "$CONFIG" "${ARCH_FLAGS[@]}" --show-bin-path)"
 APP="build/Tokarium.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN" "$APP/Contents/MacOS/Tokarium"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
+cp "$BINDIR/Tokarium" "$APP/Contents/MacOS/Tokarium"
+# 自動アップデート用の Sparkle を同梱する
+ditto "$BINDIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
+install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/Tokarium" 2>/dev/null || true
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+# 翻訳（ja / en）
+for lproj in Resources/*.lproj(N); do
+  ditto "$lproj" "$APP/Contents/Resources/$(basename "$lproj")"
+done
+# アップデートの配信先と公開鍵（scripts/release.sh から渡す）
+if [[ -n "${SPARKLE_FEED_URL:-}" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :SUFeedURL $SPARKLE_FEED_URL" "$APP/Contents/Info.plist"
+fi
+if [[ -n "${SPARKLE_PUBLIC_KEY:-}" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :SUPublicEDKey $SPARKLE_PUBLIC_KEY" "$APP/Contents/Info.plist"
+fi
 if [[ -n "${VERSION:-}" ]]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
 fi
@@ -29,12 +43,18 @@ if [[ ! -f build/AppIcon.icns ]]; then
 fi
 cp build/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
 if [[ -n "${SIGN_IDENTITY:-}" ]]; then
-  # 公証に必要な Hardened Runtime とタイムスタンプを付けて署名する
-  codesign --force --options runtime --timestamp \
-    --entitlements Resources/Tokarium.entitlements --sign "$SIGN_IDENTITY" "$APP"
+  # 公証に必要な Hardened Runtime とタイムスタンプを付けて、内側から順に署名する
+  SIGN=(codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY")
+  "${SIGN[@]}" "$SPARKLE/Versions/B/XPCServices/Installer.xpc"
+  "${SIGN[@]}" --preserve-metadata=entitlements "$SPARKLE/Versions/B/XPCServices/Downloader.xpc"
+  "${SIGN[@]}" "$SPARKLE/Versions/B/Autoupdate"
+  "${SIGN[@]}" "$SPARKLE/Versions/B/Updater.app"
+  "${SIGN[@]}" "$SPARKLE"
+  "${SIGN[@]}" --entitlements Resources/Tokarium.entitlements "$APP"
 else
-  codesign --force --sign - "$APP"
+  codesign --force --deep --sign - "$APP"
 fi
 codesign --verify --strict "$APP"
 echo "作成しました: $APP ($(lipo -archs "$APP/Contents/MacOS/Tokarium"))"

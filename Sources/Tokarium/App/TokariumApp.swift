@@ -9,11 +9,22 @@ struct TokariumApp: App {
         Window("Tokarium", id: "main") {
             MainView()
                 .environment(delegate.store)
+                .environment(delegate.updater)
         }
         .defaultSize(width: 980, height: 660)
+        .commands {
+            CommandGroup(after: .appInfo) {
+                Button("アップデートを確認…") { delegate.updater.checkForUpdates() }
+                    .disabled(!delegate.updater.canCheckForUpdates)
+            }
+            CommandGroup(replacing: .help) {
+                Button("不具合を報告…") { delegate.store.bugReport = BugReportRequest() }
+                Button("ログをFinderで表示") { NSWorkspace.shared.activateFileViewerSelecting([AppLog.file]) }
+            }
+        }
 
         MenuBarExtra {
-            MenuBarContent().environment(delegate.store)
+            MenuBarContent().environment(delegate.store).environment(delegate.updater)
         } label: {
             Image(systemName: delegate.store.dangerFish.isEmpty ? "fish" : "exclamationmark.triangle.fill")
         }
@@ -23,9 +34,14 @@ struct TokariumApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let store = GameStore()
+    let updater = Updater()
     private var desktop: DesktopController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AppLog.info("起動 \(Diagnostics.appVersion) \(Diagnostics.systemSummary)")
+        if let crash = Diagnostics.startSession() {
+            store.bugReport = BugReportRequest(crash: crash)
+        }
         let desktop = DesktopController(store: store)
         self.desktop = desktop
         store.onDisplaySettingsChanged = { [weak desktop] in desktop?.update() }
@@ -41,11 +57,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         store.simulate()
         store.save()
+        Diagnostics.endSession()
     }
 }
 
 private struct MenuBarContent: View {
     @Environment(GameStore.self) private var store
+    @Environment(Updater.self) private var updater
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -68,6 +86,13 @@ private struct MenuBarContent: View {
             store.settings.displayMode = store.settings.displayMode == .desktop ? .window : .desktop
         }
         Button("AI利用記録を今すぐ読み取る") { store.scanNow() }
+        Divider()
+        Button("アップデートを確認…") { updater.checkForUpdates() }.disabled(!updater.canCheckForUpdates)
+        Button("不具合を報告…") {
+            store.bugReport = BugReportRequest()
+            openWindow(id: "main")
+            NSApp.activate(ignoringOtherApps: true)
+        }
         Divider()
         Button("Tokarium を終了") { NSApp.terminate(nil) }.keyboardShortcut("q")
     }

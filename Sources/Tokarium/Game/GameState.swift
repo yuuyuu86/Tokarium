@@ -7,9 +7,17 @@ enum DeathCause: String, Codable {
 
     var label: String {
         switch self {
-        case .neglect: return "弱ってしまい"
-        case .illness: return "病気が悪化して"
-        case .oldAge: return "寿命を迎えて"
+        case .neglect: return String(localized: "お世話不足")
+        case .illness: return String(localized: "病気")
+        case .oldAge: return String(localized: "寿命")
+        }
+    }
+
+    func message(name: String) -> String {
+        switch self {
+        case .neglect: return String(localized: "\(name)が弱って死んでしまいました")
+        case .illness: return String(localized: "\(name)が病気で死んでしまいました")
+        case .oldAge: return String(localized: "\(name)が寿命を迎えました")
         }
     }
 }
@@ -19,9 +27,9 @@ enum GrowthStage {
 
     var label: String {
         switch self {
-        case .fry: return "稚魚"
-        case .juvenile: return "若魚"
-        case .adult: return "成魚"
+        case .fry: return String(localized: "稚魚")
+        case .juvenile: return String(localized: "若魚")
+        case .adult: return String(localized: "成魚")
         }
     }
 }
@@ -180,7 +188,7 @@ struct GameState: Codable, Equatable {
         var state = GameState(createdAt: now, lastSimulatedAt: now)
         for (i, speciesID) in Catalog.initialFish.enumerated() {
             let sp = Catalog.species(speciesID)
-            state.tank.fish.append(Fish(speciesID: speciesID, name: "\(sp.name) \(i + 1)号", fullness: 80, purchasedAt: now, x: 0.4, y: 0.45))
+            state.tank.fish.append(Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(i + 1)号"), fullness: 80, purchasedAt: now, x: 0.4, y: 0.45))
         }
         for (kindID, x) in Catalog.initialDecorations {
             state.tank.decorations.append(Decoration(kindID: kindID, x: x))
@@ -195,12 +203,12 @@ enum FishCondition: Equatable {
 
     var label: String {
         switch self {
-        case .healthy: return "元気"
-        case .hungry: return "おなかがすいた"
-        case .sick: return "病気"
-        case .weak: return "弱っている"
-        case .critical: return "危険"
-        case .dead: return "死亡"
+        case .healthy: return String(localized: "元気")
+        case .hungry: return String(localized: "おなかがすいた")
+        case .sick: return String(localized: "病気")
+        case .weak: return String(localized: "弱っている")
+        case .critical: return String(localized: "危険")
+        case .dead: return String(localized: "死亡")
         }
     }
 
@@ -243,10 +251,10 @@ enum WaterCondition {
 
     var label: String {
         switch self {
-        case .clean: return "きれい"
-        case .slightlyDirty: return "少しにごっている"
-        case .dirty: return "よごれている（病気になりやすい）"
-        case .veryDirty: return "とてもよごれている（魚が弱ります）"
+        case .clean: return String(localized: "きれい")
+        case .slightlyDirty: return String(localized: "少しにごっている")
+        case .dirty: return String(localized: "よごれている（病気になりやすい）")
+        case .veryDirty: return String(localized: "とてもよごれている（魚が弱ります）")
         }
     }
 }

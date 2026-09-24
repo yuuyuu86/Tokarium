@@ -47,19 +47,19 @@ actor UsageScanner {
     private static func status(for error: Error) -> SourceStatus {
         let ns = error as NSError
         if ns.domain == NSCocoaErrorDomain && (ns.code == NSFileReadNoPermissionError) {
-            return .error(message: "読み取りの許可がありません。",
-                          hint: "システム設定 ＞ プライバシーとセキュリティ ＞ フルディスクアクセス で Tokarium を許可してください。")
+            return .error(message: String(localized: "読み取りの許可がありません。"),
+                          hint: String(localized: "システム設定 ＞ プライバシーとセキュリティ ＞ フルディスクアクセス で Tokarium を許可してください。"))
         }
         switch error {
         case ReaderError.permissionDenied(let m):
-            return .error(message: m, hint: "システム設定 ＞ プライバシーとセキュリティ ＞ フルディスクアクセス で Tokarium を許可してください。")
+            return .error(message: m, hint: String(localized: "システム設定 ＞ プライバシーとセキュリティ ＞ フルディスクアクセス で Tokarium を許可してください。"))
         case ReaderError.unsupportedFormat(let m):
-            return .error(message: "記録の形式が変わった可能性があります（\(m)）。",
-                          hint: "Tokarium のアップデートで対応します。水槽はそのまま遊べます。")
+            return .error(message: String(localized: "記録の形式が変わった可能性があります（\(m)）。"),
+                          hint: String(localized: "Tokarium のアップデートで対応します。水槽はそのまま遊べます。"))
         case ReaderError.unreadable(let m):
-            return .error(message: m, hint: "対象のアプリを終了してから「今すぐ読み取る」を押してください。")
+            return .error(message: m, hint: String(localized: "対象のアプリを終了してから「今すぐ読み取る」を押してください。"))
         default:
-            return .error(message: error.localizedDescription, hint: "しばらくしてから「今すぐ読み取る」を押してください。")
+            return .error(message: error.localizedDescription, hint: String(localized: "しばらくしてから「今すぐ読み取る」を押してください。"))
         }
     }
 
@@ -69,7 +69,7 @@ actor UsageScanner {
             let data = try JSONEncoder.tokarium.encode(ledger)
             try data.write(to: ledgerURL, options: .atomic)
         } catch {
-            NSLog("Tokarium: 帳簿を保存できませんでした: \(error)")
+            AppLog.error("帳簿を保存できませんでした: \(error.localizedDescription)")
         }
     }
 }

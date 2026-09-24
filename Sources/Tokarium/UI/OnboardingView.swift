@@ -41,12 +41,12 @@ struct OnboardingView: View {
                 .frame(height: 170)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 8) {
-                bullet("circle.hexagongrid", "AIを使うと、このMacに残る利用記録からコインが貯まります。コインで魚や装飾を買えます。")
-                bullet("clock", "コインになるのは、いまから後の利用だけです。これまでの利用は含みません。")
-                bullet("leaf", "餌やりと水換えを忘れると魚は弱り、さらに放っておくと死んでしまいます。餌は1日1〜2回が目安です。")
-                bullet("heart", "よくお世話すると魚は成長し、元気な成魚が2匹以上いると稚魚が生まれることも。汚れた水が続くと病気になります。魚には寿命もあります。")
-                bullet("moon.zzz", "Macを閉じている間も時間は進みますが、反映するのは最大48時間分で、それだけで死ぬことはありません。")
-                bullet("gift", "最初にネオンテトラ1匹と \(Catalog.initialCoins) コインをプレゼントします。")
+                bullet("circle.hexagongrid", String(localized: "AIを使うと、このMacに残る利用記録からコインが貯まります。コインで魚や装飾を買えます。"))
+                bullet("clock", String(localized: "コインになるのは、いまから後の利用だけです。これまでの利用は含みません。"))
+                bullet("leaf", String(localized: "餌やりと水換えを忘れると魚は弱り、さらに放っておくと死んでしまいます。餌は1日1〜2回が目安です。"))
+                bullet("heart", String(localized: "よくお世話すると魚は成長し、元気な成魚が2匹以上いると稚魚が生まれることも。汚れた水が続くと病気になります。魚には寿命もあります。"))
+                bullet("moon.zzz", String(localized: "Macを閉じている間も時間は進みますが、反映するのは最大48時間分で、それだけで死ぬことはありません。"))
+                bullet("gift", String(localized: "最初にネオンテトラ1匹と \(Catalog.initialCoins) コインをプレゼントします。"))
             }
         }
     }

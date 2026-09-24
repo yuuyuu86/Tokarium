@@ -5,11 +5,11 @@ enum Screen: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .tank: return "水槽"
-        case .care: return "お世話"
-        case .shop: return "お店"
-        case .usage: return "AI利用量"
-        case .settings: return "設定"
+        case .tank: return String(localized: "水槽")
+        case .care: return String(localized: "お世話")
+        case .shop: return String(localized: "お店")
+        case .usage: return String(localized: "AI利用量")
+        case .settings: return String(localized: "設定")
         }
     }
     var symbol: String {
@@ -59,6 +59,9 @@ struct MainView: View {
         .sheet(isPresented: Binding(get: { !store.settings.onboarded }, set: { _ in })) {
             OnboardingView().interactiveDismissDisabled()
         }
+        .sheet(item: Binding(get: { store.settings.onboarded ? store.bugReport : nil }, set: { store.bugReport = $0 })) { req in
+            BugReportView(crash: req.crash)
+        }
         .frame(minWidth: 760, minHeight: 500)
     }
 }
@@ -94,7 +97,7 @@ struct TankScreen: View {
                 banner(msg, symbol: "clock.arrow.circlepath", color: .blue) { store.resumeMessage = nil }
             }
             if !store.dangerFish.isEmpty {
-                banner("危険な状態の魚がいます：\(store.dangerFish.map(\.name).joined(separator: "、"))。餌やりと水換えをしてください。",
+                banner(String(localized: "危険な状態の魚がいます：\(store.dangerFish.map(\.name).joined(separator: ")、String(localized: "))。餌やりと水換えをしてください。"),
                        symbol: "exclamationmark.triangle.fill", color: .red, onClose: nil)
             }
             ZStack(alignment: .topLeading) {
@@ -166,8 +169,8 @@ private struct FishCard: View {
             }
             ConditionBadge(condition: fish.condition)
             if fish.isAlive {
-                StatBar(title: "満腹", value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? "空腹" : "十分")
-                StatBar(title: "体調", value: fish.health, word: fish.condition.label)
+                StatBar(title: String(localized: "満腹"), value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? String(localized: "空腹") : String(localized: "十分"))
+                StatBar(title: String(localized: "体調"), value: fish.health, word: fish.condition.label)
             }
         }
         .padding(12)

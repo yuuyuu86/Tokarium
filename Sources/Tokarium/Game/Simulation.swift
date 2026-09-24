@@ -194,7 +194,7 @@ enum Simulation {
             var n = state.tank.fish.filter { $0.speciesID == speciesID }.count
             for _ in 0..<count {
                 n += 1
-                let fry = Fish(speciesID: speciesID, name: "\(sp.name) \(n)号", fullness: 70, purchasedAt: time, bornAt: time,
+                let fry = Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(n)号"), fullness: 70, purchasedAt: time, bornAt: time,
                                growth: 0, x: min(0.95, max(0.05, parent.x + .random(in: -0.05...0.05, using: &rng))), y: parent.y)
                 state.tank.fish.append(fry)
                 report.births.append(fry)

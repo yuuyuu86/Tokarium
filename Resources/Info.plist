@@ -15,5 +15,13 @@
 	<key>LSApplicationCategoryType</key><string>public.app-category.simulation-games</string>
 	<key>NSHighResolutionCapable</key><true/>
 	<key>NSHumanReadableCopyright</key><string>Tokarium</string>
+	<key>CFBundleLocalizations</key>
+	<array><string>ja</string><string>en</string></array>
+	<!-- 自動アップデート（Sparkle）。公開鍵は scripts/release.sh が埋め込む。空のあいだは無効 -->
+	<key>SUFeedURL</key><string>https://yuuyuu86.github.io/Tokarium/appcast.xml</string>
+	<key>SUPublicEDKey</key><string></string>
+	<!-- 不具合報告の送り先 -->
+	<key>TKFeedbackURL</key><string>https://github.com/yuuyuu86/Tokarium/issues/new</string>
+	<key>TKFeedbackEmail</key><string></string>
 </dict>
 </plist>

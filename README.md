@@ -61,16 +61,44 @@ ChatGPT デスクトップ（会話が暗号化されている）、Claude デ�
 Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの累計の増分で重複を防ぐ。
 対応元を増やすときは `UsageReader` を実装して `UsageReaders.all` に追加する。
 
+## 画風・魚・装飾
+
+- 画風: ドット絵・アニメ調・リアル・絵本風（設定で切り替え。水槽の中身はそのまま）
+- 魚 33 種、装飾 34 種。`Game/Catalog.swift` に設計図（体形・ひれ・模様／形のパーツ）で定義し、
+  `Art/` の描画が全画風で共通に使う。ドット絵の一部は手描きのスプライト（`Render/PixelSprites.swift`）を優先する
+- 全部の見た目を確認するには:
+  `TOKARIUM_SHEET=/tmp swift test --filter renderContactSheet` で画風ごとの一覧画像ができる
+- 水槽は1つ。複数ディスプレイでは同じ水槽を表示する
+
+## 英語対応
+
+日本語の文言がそのまま翻訳キー。文言を足したら `scripts/translations_en.py` に英訳を追加して
+`scripts/make_strings.py` を実行する（訳が足りないと一覧を出して止まる）。
+表示言語は設定の「言語」で切り替えられる（再起動で反映）。
+
+## 自動アップデート（Sparkle）と不具合の報告
+
+- アップデートは Sparkle。`scripts/release.sh` が署名済み DMG と `appcast.xml` を作る。
+  公開鍵（`SUPublicEDKey`）が空のビルドではアップデートは無効になる
+- 配信先は `Resources/Info.plist` の `SUFeedURL`（初期値は GitHub Pages を想定）
+- 前回が異常終了だった場合、起動時に報告画面を出す。報告は内容を確認してから
+  GitHub Issues（`TKFeedbackURL`）かメール（`TKFeedbackEmail`、空なら非表示）で送る。自動送信はしない
+- ログ: `~/Library/Logs/Tokarium/tokarium.log`
+
 ## 構成
 
 - `Game/` 魚・装飾のカタログ、状態、育成シミュレーション、`GameStore`
 - `Usage/` 利用記録の読み取りと帳簿
-- `Render/` ドット絵スプライト、泳ぎの動き、画風（`AquariumStyle` で追加可能）
+- `Art/` 魚と装飾の設計図から形を作り、画風ごとに塗る（`ArtRenderer`）
+- `Render/` 泳ぎの動き、背景と水槽の描画（`AquariumStyle`）、手描きのドット絵
 - `Desktop/` デスクトップ表示（壁紙の上・アイコンの下に置く背景ウィンドウ）
-- `UI/` 水槽・お世話・お店・AI利用量・設定・初回設定の画面
+- `UI/` 水槽・お世話・お店・AI利用量・設定・初回設定・不具合報告の画面
+- `App/` 起動処理、アップデート（`Updater`）、ログとクラッシュ検出（`Diagnostics`）
 
 ## 公開前に残っていること
 
 - 「Developer ID Application」証明書の作成と、`scripts/release.sh` での署名・公証（手元確認用のビルドはアドホック署名）
+- Sparkle の鍵の作成（`generate_keys`）と、appcast.xml の置き場所（GitHub Pages など。リポジトリが非公開だと Pages は使えない）
+- 不具合報告の送り先: リポジトリが非公開のままだと一般の人は Issue を作れないので、公開するかメールアドレスを設定する
 - デスクトップ表示の実機確認（複数ディスプレイ、Spaces、Stage Manager、フルスクリーン、スリープ復帰）
 - Copilot CLI・OpenCode・Gemini CLI の実データでの形式確認（手元に記録がなく未確認）

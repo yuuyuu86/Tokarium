@@ -11,7 +11,7 @@ final class SQLiteReader {
         let rc = sqlite3_open_v2(uri, &handle, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, nil)
         guard rc == SQLITE_OK, let handle else {
             if let handle { sqlite3_close(handle) }
-            throw ReaderError.unreadable("データベースを開けませんでした（\(rc)）")
+            throw ReaderError.unreadable(String(localized: "データベースを開けませんでした（\(rc)）"))
         }
         sqlite3_busy_timeout(handle, 2000)
         db = handle

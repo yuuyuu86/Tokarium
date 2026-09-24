@@ -40,3 +40,18 @@ import Testing
         try rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: "\(dir)/sheet-\(style.id).png"))
     }
 }
+
+@Test func everyItemRendersInEveryStyle() {
+    for style in AquariumStyles.all {
+        for sp in Catalog.fish {
+            for dead in [false, true] {
+                #expect(style.fishImage(sp.id, dotPixels: 3, frame: 1, dead: dead) != nil, "\(style.id) \(sp.id)")
+            }
+        }
+        for d in Catalog.decorations {
+            #expect(style.decorationImage(d.id, dotPixels: 3) != nil, "\(style.id) \(d.id)")
+        }
+    }
+    #expect(Set(Catalog.fish.map(\.id)).count == Catalog.fish.count)
+    #expect(Set(Catalog.decorations.map(\.id)).count == Catalog.decorations.count)
+}

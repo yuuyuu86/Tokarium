@@ -23,9 +23,11 @@ struct UsageScreen: View {
                         }
                         Text("AIで得たコイン: \(store.ledger.coinsEarned)　／　はじめのコイン: \(store.state.initialCoins)　／　使ったコイン: \(store.state.coinsSpent)")
                             .font(.caption).foregroundStyle(.secondary)
-                        Text("\(store.state.createdAt.shortText) 以降の利用記録だけをコインにしています。"
-                             + (store.lastScanAt.map { "最終更新: \($0.relativeText)" } ?? ""))
+                        Text("\(store.state.createdAt.shortText) 以降の利用記録だけをコインにしています。")
                             .font(.caption).foregroundStyle(.secondary)
+                        if let last = store.lastScanAt {
+                            Text("最終更新: \(last.relativeText)").font(.caption).foregroundStyle(.secondary)
+                        }
                         Text("換算: 入力・出力 1、キャッシュ書き込み 0.25、キャッシュ読み込み 0.1 の重みで合計し、\(Int(CurrencyRule.tokensPerCoin)) トークンで 1 コイン。")
                             .font(.caption).foregroundStyle(.secondary)
                     }
@@ -44,10 +46,10 @@ struct UsageScreen: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 KindBadge(kind: .quota)
-                                Text("Codex の利用枠" + (quota.plan.map { "（\($0)）" } ?? "")).font(.subheadline.weight(.semibold))
+                                Text("Codex の利用枠（\(quota.plan ?? "-")）").font(.subheadline.weight(.semibold))
                             }
-                            if let p = quota.primary { quotaLine("主な枠", p) }
-                            if let s = quota.secondary { quotaLine("追加の枠", s) }
+                            if let p = quota.primary { quotaLine(String(localized: "主な枠"), p) }
+                            if let s = quota.secondary { quotaLine(String(localized: "追加の枠"), s) }
                             Text("利用枠の消費率です。トークン数ではないため、コインには換算しません。\(quota.observedAt.relativeText)時点。")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
@@ -78,7 +80,14 @@ struct UsageScreen: View {
             HStack {
                 Text(title).font(.caption)
                 Spacer()
-                Text("\(Int(w.usedPercent))% 使用" + (w.resetsAt.map { "・\($0.shortText) にリセット" } ?? "")).font(.caption).monospacedDigit()
+                Group {
+                    if let reset = w.resetsAt {
+                        Text("\(Int(w.usedPercent))% 使用・\(reset.shortText) にリセット")
+                    } else {
+                        Text("\(Int(w.usedPercent))% 使用")
+                    }
+                }
+                .font(.caption).monospacedDigit()
             }
             ProgressView(value: min(100, w.usedPercent), total: 100).tint(.teal)
         }
@@ -145,6 +154,68 @@ private struct SourceRow: View {
 }
 
 // MARK: - 設定
+
+private struct UpdateSettings: View {
+    @Environment(Updater.self) private var updater
+    @State private var auto = false
+
+    var body: some View {
+        if updater.isAvailable {
+            Toggle("アップデートを自動で確認する", isOn: Binding(get: { auto }, set: { auto = $0; updater.automaticallyChecks = $0 }))
+                .onAppear { auto = updater.automaticallyChecks }
+            Button("今すぐアップデートを確認…") { updater.checkForUpdates() }.disabled(!updater.canCheckForUpdates)
+        } else if let reason = updater.unavailableReason {
+            Text(reason).font(.caption).foregroundStyle(.secondary)
+        }
+        LabeledContent("バージョン", value: Diagnostics.appVersion)
+    }
+}
+
+/// 表示言語。変更はアプリの再起動後に反映される。
+private struct LanguagePicker: View {
+    @State private var selection: String = Self.current
+    @State private var changed = false
+
+    /// アプリ単位で上書きしている言語（なければ "system"）。
+    private static var current: String {
+        let domain = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "") ?? [:]
+        guard let lang = (domain["AppleLanguages"] as? [String])?.first else { return "system" }
+        return lang.hasPrefix("en") ? "en" : lang.hasPrefix("ja") ? "ja" : "system"
+    }
+
+    var body: some View {
+        Picker("表示言語", selection: $selection) {
+            Text("システムに合わせる").tag("system")
+            Text(verbatim: "日本語").tag("ja")
+            Text(verbatim: "English").tag("en")
+        }
+        .onChange(of: selection) { _, new in
+            if new == "system" {
+                UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+            } else {
+                UserDefaults.standard.set([new], forKey: "AppleLanguages")
+            }
+            changed = true
+        }
+        if changed {
+            HStack {
+                Text("再起動すると切り替わります。").font(.caption).foregroundStyle(.secondary)
+                Button("今すぐ再起動") { Relauncher.relaunch() }
+            }
+        }
+    }
+}
+
+enum Relauncher {
+    static func relaunch() {
+        let url = Bundle.main.bundleURL
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: url, configuration: config) { _, _ in
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
+    }
+}
 
 private struct StyleCard: View {
     let style: AquariumStyle
@@ -232,12 +303,22 @@ struct SettingsScreen: View {
                 Text("推定値（Ollama など）は実際のトークン数ではありません。オンにすると、オンにした後に読み取った推定値からコインに換算します。")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            Section("言語") {
+                LanguagePicker()
+            }
+            Section("アップデートとサポート") {
+                UpdateSettings()
+                Button("不具合を報告…") { store.bugReport = BugReportRequest() }
+                Button("ログをFinderで表示") { NSWorkspace.shared.activateFileViewerSelecting([AppLog.file]) }
+                Text("不具合の報告は、内容を確認してからブラウザやメールで送ります。自動では送信しません。")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             Section("データ") {
                 LabeledContent("コイン付与の開始", value: store.state.createdAt.shortText)
                 Text("保存するのは水槽・魚・装飾・コイン、利用記録の件数・時刻・取得元・重複判定用のID・トークン数だけです。AIとの会話本文・APIキー・Cookieは保存しません。")
                     .font(.caption).foregroundStyle(.secondary)
                 Button("保存フォルダを開く") {
-                    let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Tokarium")
+                    let url = GameStore.defaultDirectory
                     NSWorkspace.shared.open(url)
                 }
             }

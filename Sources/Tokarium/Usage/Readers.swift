@@ -62,7 +62,7 @@ struct ClaudeCodeReader: UsageReader {
     let info = SourceInfo(
         id: "claude-code", name: "Claude Code", kind: .measured,
         locations: ["~/.claude/projects", "~/.config/claude/projects"],
-        reads: "会話記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ")
+        reads: String(localized: "会話記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ"))
 
     func roots(_ ctx: ScanContext) -> [URL] {
         var r: [URL] = []
@@ -87,9 +87,9 @@ struct ClaudeCodeReader: UsageReader {
 
 struct ClaudeDesktopCoworkReader: UsageReader {
     let info = SourceInfo(
-        id: "claude-desktop-cowork", name: "Claude デスクトップ（Cowork）", kind: .measured,
+        id: "claude-desktop-cowork", name: String(localized: "Claude デスクトップ（Cowork）"), kind: .measured,
         locations: ["~/Library/Application Support/Claude/local-agent-mode-sessions"],
-        reads: "Cowork セッションの記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ")
+        reads: String(localized: "Cowork セッションの記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ"))
 
     func roots(_ ctx: ScanContext) -> [URL] {
         [ctx.home.appendingPathComponent("Library/Application Support/Claude/local-agent-mode-sessions")]
@@ -109,9 +109,9 @@ struct ClaudeDesktopCoworkReader: UsageReader {
 
 struct CodexReader: UsageReader {
     let info = SourceInfo(
-        id: "codex", name: "Codex（CLI・デスクトップ）", kind: .measured,
+        id: "codex", name: String(localized: "Codex（CLI・デスクトップ）"), kind: .measured,
         locations: ["~/.codex/sessions", "~/.codex/archived_sessions"],
-        reads: "セッション記録（JSONL）のうち、トークン数・時刻・セッションID・利用枠の消費率のみ")
+        reads: String(localized: "セッション記録（JSONL）のうち、トークン数・時刻・セッションID・利用枠の消費率のみ"))
 
     private func codexHome(_ ctx: ScanContext) -> URL {
         env("CODEX_HOME").map { URL(fileURLWithPath: $0) } ?? ctx.home.appendingPathComponent(".codex")
@@ -196,12 +196,12 @@ struct GeminiFamilyReader: UsageReader {
     static let gemini = GeminiFamilyReader(
         info: SourceInfo(id: "gemini-cli", name: "Gemini CLI", kind: .measured,
                          locations: ["~/.gemini/tmp/*/chats"],
-                         reads: "セッション記録（JSON）のうち、応答ごとのトークン数・時刻・IDのみ"),
+                         reads: String(localized: "セッション記録（JSON）のうち、応答ごとのトークン数・時刻・IDのみ")),
         dirName: ".gemini")
     static let qwen = GeminiFamilyReader(
         info: SourceInfo(id: "qwen-code", name: "Qwen Code", kind: .measured,
                          locations: ["~/.qwen/tmp/*/chats"],
-                         reads: "セッション記録（JSON）のうち、応答ごとのトークン数・時刻・IDのみ"),
+                         reads: String(localized: "セッション記録（JSON）のうち、応答ごとのトークン数・時刻・IDのみ")),
         dirName: ".qwen")
 
     func roots(_ ctx: ScanContext) -> [URL] { [ctx.home.appendingPathComponent("\(dirName)/tmp")] }
@@ -232,7 +232,7 @@ struct OpenCodeReader: UsageReader {
     let info = SourceInfo(
         id: "opencode", name: "OpenCode", kind: .measured,
         locations: ["~/.local/share/opencode"],
-        reads: "メッセージ記録のうち、トークン数・時刻・メッセージIDのみ")
+        reads: String(localized: "メッセージ記録のうち、トークン数・時刻・メッセージIDのみ"))
 
     func roots(_ ctx: ScanContext) -> [URL] {
         let base = env("XDG_DATA_HOME").map { URL(fileURLWithPath: $0) } ?? ctx.home.appendingPathComponent(".local/share")
@@ -284,7 +284,7 @@ struct CopilotCLIReader: UsageReader {
     let info = SourceInfo(
         id: "copilot-cli", name: "GitHub Copilot CLI", kind: .measured,
         locations: ["~/.copilot/session-state"],
-        reads: "セッションのイベント記録（JSONL）のうち、トークン数・時刻・イベントIDのみ",
+        reads: String(localized: "セッションのイベント記録（JSONL）のうち、トークン数・時刻・イベントIDのみ"),
         experimental: true)
 
     func roots(_ ctx: ScanContext) -> [URL] { [ctx.home.appendingPathComponent(".copilot/session-state")] }
@@ -326,9 +326,9 @@ struct CopilotCLIReader: UsageReader {
 
 struct OllamaReader: UsageReader {
     let info = SourceInfo(
-        id: "ollama", name: "Ollama（アプリ）", kind: .estimated,
+        id: "ollama", name: String(localized: "Ollama（アプリ）"), kind: .estimated,
         locations: ["~/Library/Application Support/Ollama/db.sqlite"],
-        reads: "チャット履歴の文字数・時刻・行番号のみ（本文は保存しません）。4文字＝1トークンとして推定")
+        reads: String(localized: "チャット履歴の文字数・時刻・行番号のみ（本文は保存しません）。4文字＝1トークンとして推定"))
 
     func roots(_ ctx: ScanContext) -> [URL] {
         [ctx.home.appendingPathComponent("Library/Application Support/Ollama/db.sqlite")]

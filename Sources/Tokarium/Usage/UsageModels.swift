@@ -8,9 +8,9 @@ enum MeasureKind: String, Codable {
 
     var label: String {
         switch self {
-        case .measured: return "実測"
-        case .estimated: return "推定"
-        case .quota: return "利用枠"
+        case .measured: return String(localized: "実測")
+        case .estimated: return String(localized: "推定")
+        case .quota: return String(localized: "利用枠")
         }
     }
 }
@@ -106,10 +106,10 @@ enum SourceStatus: Equatable {
 
     var label: String {
         switch self {
-        case .disabled: return "無効"
-        case .notFound: return "見つかりません"
-        case .ok: return "読み取り中"
-        case .error: return "読み取りエラー"
+        case .disabled: return String(localized: "無効")
+        case .notFound: return String(localized: "見つかりません")
+        case .ok: return String(localized: "読み取り中")
+        case .error: return String(localized: "読み取りエラー")
         }
     }
 }
@@ -134,14 +134,14 @@ struct UnsupportedSource: Identifiable {
 
 enum UnsupportedSources {
     static let all: [UnsupportedSource] = [
-        UnsupportedSource(id: "chatgpt-desktop", name: "ChatGPT デスクトップ",
-                          reason: "会話データが暗号化されて保存され、トークン数も記録されないため読み取れません。"),
-        UnsupportedSource(id: "claude-desktop-chat", name: "Claude デスクトップ（チャット）",
-                          reason: "チャットのトークン数はMac内に残りません。Claude デスクトップの Cowork と Code は対応しています。"),
+        UnsupportedSource(id: "chatgpt-desktop", name: String(localized: "ChatGPT デスクトップ"),
+                          reason: String(localized: "会話データが暗号化されて保存され、トークン数も記録されないため読み取れません。")),
+        UnsupportedSource(id: "claude-desktop-chat", name: String(localized: "Claude デスクトップ（チャット）"),
+                          reason: String(localized: "チャットのトークン数はMac内に残りません。Claude デスクトップの Cowork と Code は対応しています。")),
         UnsupportedSource(id: "cursor", name: "Cursor",
-                          reason: "トークン数がMac内に記録されないため読み取れません。"),
-        UnsupportedSource(id: "web", name: "ChatGPT／Claude のWeb版・他の端末",
-                          reason: "このMacに記録が残らないため集計できません。"),
+                          reason: String(localized: "トークン数がMac内に記録されないため読み取れません。")),
+        UnsupportedSource(id: "web", name: String(localized: "ChatGPT／Claude のWeb版・他の端末"),
+                          reason: String(localized: "このMacに記録が残らないため集計できません。")),
     ]
 }
 

@@ -66,8 +66,8 @@ struct AquariumView: View {
         let fish = store.state.tank.fish
         let alive = fish.filter(\.isAlive).count
         let danger = fish.filter { $0.condition.isDanger }.count
-        var s = "水槽。魚 \(alive) 匹。水質は\(WaterCondition(store.state.tank.waterQuality).label)。"
-        if danger > 0 { s += "危険な状態の魚が \(danger) 匹います。" }
+        var s = String(localized: "水槽。魚 \(alive) 匹。水質は\(WaterCondition(store.state.tank.waterQuality).label)。")
+        if danger > 0 { s += String(localized: "危険な状態の魚が \(danger) 匹います。") }
         return s
     }
 }

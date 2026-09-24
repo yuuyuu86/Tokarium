@@ -129,11 +129,11 @@ extension Int64 {
 extension Date {
     var relativeText: String {
         let f = RelativeDateTimeFormatter()
-        f.locale = Locale(identifier: "ja_JP")
+        f.locale = .autoupdatingCurrent
         return f.localizedString(for: self, relativeTo: Date())
     }
 
     var shortText: String {
-        formatted(.dateTime.month().day().hour().minute().locale(Locale(identifier: "ja_JP")))
+        formatted(.dateTime.month().day().hour().minute())
     }
 }

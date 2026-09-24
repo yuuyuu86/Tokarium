@@ -10,7 +10,7 @@ struct CareScreen: View {
             VStack(alignment: .leading, spacing: 16) {
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
-                        StatBar(title: "水質", value: store.state.tank.waterQuality,
+                        StatBar(title: String(localized: "水質"), value: store.state.tank.waterQuality,
                                 word: WaterCondition(store.state.tank.waterQuality).label)
                         HStack(spacing: 12) {
                             Button { store.feed() } label: { Label("餌をあげる", systemImage: "leaf") }
@@ -40,9 +40,9 @@ struct CareScreen: View {
 
     private var careHint: String {
         var parts: [String] = []
-        if let fed = store.state.lastFedAt { parts.append("最後の餌やり: \(fed.relativeText)") } else { parts.append("まだ餌をあげていません") }
-        if let w = store.state.lastWaterChangeAt { parts.append("最後の水換え: \(w.relativeText)") }
-        parts.append("餌は1日1〜2回、水換えは数日に1回が目安です。あげすぎると水が汚れます。汚れた水が続くと病気になりやすくなります。")
+        if let fed = store.state.lastFedAt { parts.append(String(localized: "最後の餌やり: \(fed.relativeText)")) } else { parts.append(String(localized: "まだ餌をあげていません")) }
+        if let w = store.state.lastWaterChangeAt { parts.append(String(localized: "最後の水換え: \(w.relativeText)")) }
+        parts.append(String(localized: "餌は1日1〜2回、水換えは数日に1回が目安です。あげすぎると水が汚れます。汚れた水が続くと病気になりやすくなります。"))
         return parts.joined(separator: "　")
     }
 }
@@ -76,12 +76,12 @@ private struct FishRow: View {
                 Text(lifeText).font(.caption).foregroundStyle(.secondary)
                 if fish.isAlive {
                     HStack(spacing: 16) {
-                        StatBar(title: "満腹", value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? "空腹" : "十分")
-                        StatBar(title: "体調", value: fish.health, word: healthWord)
+                        StatBar(title: String(localized: "満腹"), value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? String(localized: "空腹") : String(localized: "十分"))
+                        StatBar(title: String(localized: "体調"), value: fish.health, word: healthWord)
                     }
                 } else {
                     HStack {
-                        Text(fish.diedAt.map { "\($0.shortText) に\((fish.deathCause ?? .neglect).label)死んでしまいました" } ?? "死んでしまいました")
+                        Text(fish.diedAt.map { "\($0.shortText) に死んでしまいました（\((fish.deathCause ?? .neglect).label)）" } ?? "死んでしまいました")
                             .font(.caption).foregroundStyle(.secondary)
                         Spacer()
                         Button("お別れする") { confirmFarewell = true }
@@ -102,17 +102,17 @@ private struct FishRow: View {
 
     private var lifeText: String {
         let days = Int(fish.ageDays(at: fish.diedAt ?? Date()))
-        var parts = ["\(fish.stage.label)", "\(days)日齢", "寿命の目安 \(Int(fish.species.lifespanDays))日"]
-        if fish.stage != .adult && fish.isAlive { parts.append("成長 \(Int(fish.growth * 100))%") }
-        if fish.isElderly() { parts.append("老齢（ゆっくり過ごしています）") }
-        return parts.joined(separator: "・")
+        var parts = ["\(fish.stage.label)", String(localized: "\(days)日齢"), String(localized: "寿命の目安 \(Int(fish.species.lifespanDays))日")]
+        if fish.stage != .adult && fish.isAlive { parts.append(String(localized: "成長 \(Int(fish.growth * 100))%")) }
+        if fish.isElderly() { parts.append(String(localized: "老齢（ゆっくり過ごしています）")) }
+        return parts.joined(separator: String(localized: "・"))
     }
 
     private var healthWord: String {
         switch fish.condition {
-        case .critical: return "危険"
-        case .weak: return "弱っている"
-        default: return fish.health >= 90 ? "良好" : "ふつう"
+        case .critical: return String(localized: "危険")
+        case .weak: return String(localized: "弱っている")
+        default: return fish.health >= 90 ? String(localized: "良好") : String(localized: "ふつう")
         }
     }
 }
