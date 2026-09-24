@@ -1,6 +1,7 @@
 /* scripts/make_strings.py が生成。直接編集しない */
 "" = "";
 " お世話が必要な魚が %lld 匹います。" = " %lld fish need care.";
+"!" = "!";
 "%@ %lld号" = "%@ #%lld";
 "%@ に死んでしまいました（%@）" = "Died %1$@ (%2$@)";
 "%@ 以降の利用記録だけをコインにしています。" = "Only usage recorded after %@ is turned into coins.";
@@ -18,7 +19,6 @@
 "%@を水槽に入れました" = "Added a %@ to the tank";
 "%@を置きました" = "Placed the %@";
 "%@を読み取る" = "Read %@";
-"%@・%@%@" = "%@ · %@%@";
 "%@（%lld）" = "%@ (%lld)";
 "%@：ドラッグで移動、右クリックで奥/手前・しまう" = "%@: drag to move, right-click to change depth or put away";
 "%lld" = "%lld";
@@ -44,7 +44,9 @@
 "Cowork セッションの記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ" = "From Cowork session logs (JSONL): only per-response token counts, times, and response IDs";
 "GitHub で報告…" = "Report on GitHub…";
 "Macを閉じている間も時間は進みますが、反映するのは最大48時間分で、それだけで死ぬことはありません。" = "Time passes while your Mac is closed, but at most 48 hours are applied, and that alone will never kill a fish.";
+"OFF" = "OFF";
 "OK" = "OK";
+"ON" = "ON";
 "Ollama（アプリ）" = "Ollama (app)";
 "Tokarium" = "Tokarium";
 "Tokarium のアップデートで対応します。水槽はそのまま遊べます。" = "A Tokarium update will fix this. Your tank still works normally.";
@@ -54,6 +56,7 @@
 "[クラッシュ] Tokarium が予期せず終了した" = "[Crash] Tokarium quit unexpectedly";
 "[不具合] " = "[Bug] ";
 "×%lld" = "×%lld";
+"、" = ", ";
 "「対応」とは、このMacに残った利用記録を集計できることです。AIサービスのアカウント全体の利用量を示すものではありません。" = "“Supported” means the usage records left on this Mac can be counted. It doesn’t reflect total usage across your AI accounts.";
 "あざやかな黄色い円盤。" = "A vivid yellow disc.";
 "あとから設定でいつでも切り替えられます。魚や装飾はそのまま引き継がれます。" = "You can switch any time in Settings. Your fish and decorations carry over.";
@@ -329,6 +332,7 @@
 "縦長の体でゆったり泳ぐ。" = "A tall fish that glides gracefully.";
 "置いている装飾 %lld/%lld 個。置いた装飾は「水槽」画面の「配置を編集」で動かせます。" = "Decorations placed: %lld/%lld. Move them with “Edit Layout” on the Tank screen.";
 "置きもの" = "Ornaments";
+"老齢" = "Elderly";
 "老齢（ゆっくり過ごしています）" = "Elderly (taking it easy)";
 "自然な雰囲気の流木。" = "Natural-looking driftwood.";
 "良好" = "Great";

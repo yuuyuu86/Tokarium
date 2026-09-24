@@ -412,4 +412,9 @@ EN = {
 '（%@ を超えた分は反映していません）': '(Time beyond %@ was not applied)',
 '（クラッシュレポートは見つかりませんでした。強制終了や電源断の可能性があります）': '(No crash report was found. The app may have been force-quit or lost power.)',
 '（未記入）': '(not provided)',
+'!': '!',
+'OFF': 'OFF',
+'ON': 'ON',
+'、': ', ',
+'老齢': 'Elderly',
 }

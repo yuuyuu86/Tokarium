@@ -61,13 +61,15 @@ ChatGPT デスクトップ（会話が暗号化されている）、Claude デ�
 Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの累計の増分で重複を防ぐ。
 対応元を増やすときは `UsageReader` を実装して `UsageReaders.all` に追加する。
 
-## 画風・魚・装飾
+## 見た目
 
-- 画風: ドット絵・アニメ調・リアル・絵本風（設定で切り替え。水槽の中身はそのまま）
+- 画風はドット絵のみ（`AquariumStyle` は画風を後から足せる作り）
+- 窓いっぱいに水槽を出し、標準のタイトルバーやサイドバーは使わない。操作は下のバー、
+  お世話・お店・AI利用量・設定は水槽の上に重なるドット絵のパネル（`UI/PixelUI.swift` の部品を使う）
+- 文字は同梱のドット絵フォント DotGothic16（`Resources/Fonts`、SIL Open Font License 1.1、`OFL.txt` 参照）
 - 魚 33 種、装飾 34 種。`Game/Catalog.swift` に設計図（体形・ひれ・模様／形のパーツ）で定義し、
-  `Art/` の描画が全画風で共通に使う。ドット絵の一部は手描きのスプライト（`Render/PixelSprites.swift`）を優先する
-- 全部の見た目を確認するには:
-  `TOKARIUM_SHEET=/tmp swift test --filter renderContactSheet` で画風ごとの一覧画像ができる
+  `Art/` がドット絵にする。一部は手描きのスプライト（`Render/PixelSprites.swift`）を優先する
+- 全部の見た目を確認するには: `TOKARIUM_SHEET=/tmp swift test --filter renderContactSheet`
 - 水槽は1つ。複数ディスプレイでは同じ水槽を表示する
 
 ## 英語対応

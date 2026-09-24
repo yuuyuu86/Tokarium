@@ -18,17 +18,17 @@ struct CareScreen: View {
                         }
                         .controlSize(.large)
                         Label("持っている薬: \(store.state.medicine) 個", systemImage: "cross.case")
-                            .font(.callout)
-                        Text(careHint).font(.caption).foregroundStyle(.secondary)
+                            .font(.pixel(.callout))
+                        Text(careHint).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                     }
                     .padding(6)
                 } label: {
                     Label("水槽のお世話", systemImage: "drop")
                 }
 
-                Text("魚たち").font(.headline)
+                Text("魚たち").font(.pixel(.headline))
                 if store.state.tank.fish.isEmpty {
-                    Text("魚がいません。お店で迎えましょう。").foregroundStyle(.secondary)
+                    Text("魚がいません。お店で迎えましょう。").foregroundStyle(PixelPalette.dim)
                 }
                 ForEach(store.state.tank.fish.sorted { ($0.isAlive ? $0.health : 999) < ($1.isAlive ? $1.health : 999) }) { f in
                     FishRow(fish: f)
@@ -61,10 +61,10 @@ private struct FishRow: View {
                 HStack {
                     TextField("名前", text: $name)
                         .textFieldStyle(.plain)
-                        .font(.headline)
+                        .font(.pixel(.headline))
                         .frame(maxWidth: 200)
                         .onSubmit { store.rename(fish.id, to: name) }
-                    Text(fish.species.name).font(.caption).foregroundStyle(.secondary)
+                    Text(fish.species.name).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                     Spacer()
                     if fish.isSick && fish.isAlive {
                         Button { store.giveMedicine(fish.id) } label: { Label("薬をあげる", systemImage: "cross.case") }
@@ -73,7 +73,7 @@ private struct FishRow: View {
                     }
                     ConditionBadge(condition: fish.condition)
                 }
-                Text(lifeText).font(.caption).foregroundStyle(.secondary)
+                Text(lifeText).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                 if fish.isAlive {
                     HStack(spacing: 16) {
                         StatBar(title: String(localized: "満腹"), value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? String(localized: "空腹") : String(localized: "十分"))
@@ -82,7 +82,7 @@ private struct FishRow: View {
                 } else {
                     HStack {
                         Text(fish.diedAt.map { "\($0.shortText) に死んでしまいました（\((fish.deathCause ?? .neglect).label)）" } ?? "死んでしまいました")
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                         Spacer()
                         Button("お別れする") { confirmFarewell = true }
                     }
@@ -90,7 +90,7 @@ private struct FishRow: View {
             }
         }
         .padding(12)
-        .background(fish.condition.isDanger ? Color.red.opacity(0.08) : Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+        .pixelInset(highlight: fish.condition.isDanger)
         .onAppear { name = fish.name }
         .onChange(of: fish.name) { _, new in name = new }
         .confirmationDialog("\(fish.name)とお別れしますか？", isPresented: $confirmFarewell) {
@@ -142,17 +142,15 @@ struct ShopScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Picker("", selection: $tab) {
-                    ForEach(ShopTab.allCases) { Text($0.title).tag($0) }
+                ForEach(ShopTab.allCases) { t in
+                    Button(t.title) { tab = t }
+                        .buttonStyle(PixelButtonStyle(prominent: tab == t))
+                        .accessibilityAddTraits(tab == t ? .isSelected : [])
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .frame(maxWidth: 420)
-                Toggle("買えるものだけ", isOn: $affordableOnly).toggleStyle(.checkbox)
+                Toggle("買えるものだけ", isOn: $affordableOnly).toggleStyle(.checkbox).fixedSize()
                 Spacer()
-                CoinLabel(coins: store.coins).font(.title2)
+                CoinLabel(coins: store.coins).font(.pixel(.title2))
             }
-            .padding([.horizontal, .top], 20)
             .padding(.bottom, 8)
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
@@ -162,7 +160,7 @@ struct ShopScreen: View {
                     case .supplies: suppliesSection
                     }
                 }
-                .padding(20)
+                .padding(.vertical, 8)
             }
         }
         .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
@@ -173,11 +171,11 @@ struct ShopScreen: View {
     @ViewBuilder
     private var fishSection: some View {
         let size = store.state.tank.size
-        Text("水槽の魚 \(store.livingFish.count)/\(size.maxFish) 匹").font(.caption).foregroundStyle(.secondary)
+        Text("水槽の魚 \(store.livingFish.count)/\(size.maxFish) 匹").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
         ForEach([FishRarity.common, .uncommon, .rare], id: \.self) { rarity in
             let list = Catalog.fish.filter { $0.rarity == rarity && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
             if !list.isEmpty {
-                Text(rarity.label).font(.headline)
+                Text(rarity.label).font(.pixel(.headline))
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(list) { sp in
                         ShopCard(title: sp.name, blurb: sp.blurb, price: sp.price, canAfford: store.coins >= sp.price,
@@ -196,10 +194,10 @@ struct ShopScreen: View {
     private var decorationSection: some View {
         let size = store.state.tank.size
         Text("置いている装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個。置いた装飾は「水槽」画面の「配置を編集」で動かせます。")
-            .font(.caption).foregroundStyle(.secondary)
+            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
         let stored = store.state.tank.decorations.filter { !$0.isPlaced }
         if !stored.isEmpty {
-            Text("持ち物").font(.headline)
+            Text("持ち物").font(.pixel(.headline))
             ForEach(stored) { d in
                 HStack {
                     DecorationIcon(kindID: d.kindID).frame(width: 40, height: 30)
@@ -212,7 +210,7 @@ struct ShopScreen: View {
         ForEach(DecorationCategory.allCases, id: \.self) { category in
             let list = Catalog.decorations.filter { $0.category == category && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
             if !list.isEmpty {
-                Text(category.label).font(.headline)
+                Text(category.label).font(.pixel(.headline))
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(list) { kind in
                         ShopCard(title: kind.name, blurb: kind.blurb, price: kind.price, canAfford: store.coins >= kind.price,
@@ -248,7 +246,7 @@ struct ShopScreen: View {
         }
         let size = store.state.tank.size
         Text("いまの水槽: \(size.name)（魚 \(store.livingFish.count)/\(size.maxFish) 匹・装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個）")
-            .font(.caption).foregroundStyle(.secondary)
+            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
     }
 }
 
@@ -267,24 +265,26 @@ private struct ShopCard<Icon: View>: View {
                 .frame(height: 56)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
-                .background(Color(rgb: 0x2680B8).opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
+                .background(LinearGradient(colors: [Color(rgb: 0x3190C8), Color(rgb: 0x165D93)], startPoint: .top, endPoint: .bottom))
+                .overlay(Rectangle().strokeBorder(PixelPalette.deeper, lineWidth: 2))
             HStack(spacing: 4) {
-                Text(title).font(.headline)
+                Text(title).font(.pixel(.headline))
                 if owned > 0 {
-                    Text("×\(owned)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    Text("×\(owned)").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                         .help("水槽にいる数")
                 }
             }
-            Text(blurb).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
-                .frame(height: 32, alignment: .top)
+            Text(blurb).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim).multilineTextAlignment(.center)
+                .lineLimit(2, reservesSpace: true)
             Button(action: buy) {
                 Label("\(price) コインで買う", systemImage: "cart")
                     .frame(maxWidth: .infinity)
             }
+            .buttonStyle(PixelButtonStyle(prominent: canAfford))
             .disabled(!canAfford)
             .help(canAfford ? "" : "コインが足りません")
         }
         .padding(10)
-        .background(Color.secondary.opacity(0.07), in: RoundedRectangle(cornerRadius: 10))
+        .pixelInset()
     }
 }

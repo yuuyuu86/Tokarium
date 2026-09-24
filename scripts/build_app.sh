@@ -20,6 +20,8 @@ cp "$BINDIR/Tokarium" "$APP/Contents/MacOS/Tokarium"
 ditto "$BINDIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/Tokarium" 2>/dev/null || true
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+# ドット絵フォント（DotGothic16, SIL OFL）
+ditto Resources/Fonts "$APP/Contents/Resources/Fonts"
 # 翻訳（ja / en）
 for lproj in Resources/*.lproj(N); do
   ditto "$lproj" "$APP/Contents/Resources/$(basename "$lproj")"

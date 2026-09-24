@@ -35,11 +35,11 @@ struct OnboardingView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
                 FishIcon(speciesID: "neon").frame(width: 60, height: 30)
-                Text("Tokarium へようこそ").font(.largeTitle.bold())
+                Text("Tokarium へようこそ").font(.pixel(.largeTitle))
             }
             AquariumView(store: store)
                 .frame(height: 170)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(Rectangle().strokeBorder(PixelPalette.sand, lineWidth: 3))
             VStack(alignment: .leading, spacing: 8) {
                 bullet("circle.hexagongrid", String(localized: "AIを使うと、このMacに残る利用記録からコインが貯まります。コインで魚や装飾を買えます。"))
                 bullet("clock", String(localized: "コインになるのは、いまから後の利用だけです。これまでの利用は含みません。"))
@@ -53,9 +53,9 @@ struct OnboardingView: View {
 
     private var sources: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("読み取る利用記録を選んでください").font(.title2.bold())
+            Text("読み取る利用記録を選んでください").font(.pixel(.title2))
             Text("読み取り専用で、トークン数・時刻・重複判定用のIDだけを使います。会話の本文や認証情報は保存しません。")
-                .font(.callout).foregroundStyle(.secondary)
+                .font(.pixel(.callout)).foregroundStyle(PixelPalette.dim)
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(UsageReaders.all, id: \.info.id) { r in
@@ -66,11 +66,11 @@ struct OnboardingView: View {
                                 HStack {
                                     Text(r.info.name).fontWeight(.semibold)
                                     KindBadge(kind: r.info.kind)
-                                    Text(detected ? "見つかりました" : "未検出").font(.caption)
+                                    Text(detected ? "見つかりました" : "未検出").font(.pixel(.caption))
                                         .foregroundStyle(detected ? .green : .secondary)
                                 }
-                                Text("場所: \(r.info.locations.joined(separator: "、"))").font(.caption).foregroundStyle(.secondary)
-                                Text("内容: \(r.info.reads)").font(.caption).foregroundStyle(.secondary)
+                                Text("場所: \(r.info.locations.joined(separator: "、"))").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                                Text("内容: \(r.info.reads)").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                             }
                         }
                         .toggleStyle(.checkbox)
@@ -78,24 +78,24 @@ struct OnboardingView: View {
                 }
             }
             Text("ChatGPT デスクトップや Claude デスクトップのチャットは、トークン数がMac内に残らないため読み取れません。あとから設定で変更できます。")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
         }
     }
 
     private var display: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("水槽の表示方法").font(.title2.bold())
-            Picker("", selection: $mode) {
-                ForEach(DisplayMode.allCases) { Text($0.label).tag($0) }
+            Text("水槽の表示方法").font(.pixel(.title2))
+            HStack(spacing: 8) {
+                ForEach(DisplayMode.allCases) { m in
+                    Button(m.label) { mode = m }.buttonStyle(PixelButtonStyle(prominent: mode == m))
+                }
             }
-            .pickerStyle(.radioGroup)
-            .labelsHidden()
             Text(mode == .desktop
                  ? "デスクトップの壁紙の上に水槽が泳ぎます。Macの壁紙設定は変更しません。アイコンはそのまま使えます。お世話はウィンドウかメニューバーのアイコンから。"
                  : "サイズを変えられる普通のウィンドウで水槽を表示します。")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(PixelPalette.dim)
             Text("あとから設定でいつでも切り替えられます。魚や装飾はそのまま引き継がれます。")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
         }
     }
 

@@ -5,13 +5,19 @@ import SwiftUI
 struct TokariumApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
 
+    init() {
+        PixelFont.register()
+    }
+
     var body: some Scene {
         Window("Tokarium", id: "main") {
             MainView()
                 .environment(delegate.store)
                 .environment(delegate.updater)
         }
-        .defaultSize(width: 980, height: 660)
+        .defaultSize(width: 1080, height: 700)
+        // 標準のタイトルバーを消し、水槽を窓いっぱいに出す
+        .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(after: .appInfo) {
                 Button("アップデートを確認…") { delegate.updater.checkForUpdates() }
@@ -36,12 +42,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let store = GameStore()
     let updater = Updater()
     private var desktop: DesktopController?
+    private var termSource: DispatchSourceSignal?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppLog.info("起動 \(Diagnostics.appVersion) \(Diagnostics.systemSummary)")
         if let crash = Diagnostics.startSession() {
             store.bugReport = BugReportRequest(crash: crash)
         }
+        // kill などで終了を頼まれたときも、保存してから普通に終わる（異常終了と区別する）
+        signal(SIGTERM, SIG_IGN)
+        let term = DispatchSource.makeSignalSource(signal: SIGTERM, queue: .main)
+        term.setEventHandler { NSApp.terminate(nil) }
+        term.resume()
+        termSource = term
         let desktop = DesktopController(store: store)
         self.desktop = desktop
         store.onDisplaySettingsChanged = { [weak desktop] in desktop?.update() }

@@ -51,9 +51,9 @@ struct CoinLabel: View {
     let coins: Int
     var body: some View {
         Label {
-            Text("\(coins)").monospacedDigit().fontWeight(.semibold)
+            Text("\(coins)").monospacedDigit().foregroundStyle(PixelPalette.gold)
         } icon: {
-            Image(systemName: "circle.hexagongrid.circle.fill").foregroundStyle(.yellow)
+            Image(systemName: "circle.hexagongrid.circle.fill").foregroundStyle(PixelPalette.gold)
         }
         .accessibilityLabel("コイン \(coins)")
     }
@@ -68,12 +68,11 @@ struct StatBar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack {
-                Text(title).font(.caption).foregroundStyle(.secondary)
+                Text(title).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                 Spacer()
-                Text("\(word)（\(Int(value.rounded()))）").font(.caption).monospacedDigit()
+                Text("\(word)（\(Int(value.rounded()))）").font(.pixel(.caption)).monospacedDigit()
             }
-            ProgressView(value: value, total: 100)
-                .tint(value < 25 ? .red : value < 50 ? .orange : .green)
+            PixelBar(value: value, color: value < 25 ? PixelPalette.danger : value < 50 ? Color(rgb: 0xFFA030) : Color(rgb: 0x5FD068))
         }
         .accessibilityElement(children: .combine)
     }
@@ -83,19 +82,19 @@ struct ConditionBadge: View {
     let condition: FishCondition
     var body: some View {
         Label(condition.label, systemImage: condition.symbol)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 8).padding(.vertical, 3)
-            .background(color.opacity(0.18), in: Capsule())
+            .font(.pixel(.caption))
+            .padding(.horizontal, 8).padding(.vertical, 4)
+            .background(PixelFrame(fill: color.opacity(0.22), border: color, outline: .clear, step: 2))
             .foregroundStyle(color)
     }
     private var color: Color {
         switch condition {
-        case .healthy: return .green
-        case .hungry: return .orange
-        case .sick: return .purple
-        case .weak: return .orange
-        case .critical: return .red
-        case .dead: return .secondary
+        case .healthy: return Color(rgb: 0x5FD068)
+        case .hungry: return Color(rgb: 0xFFA030)
+        case .sick: return Color(rgb: 0xC77DFF)
+        case .weak: return Color(rgb: 0xFFA030)
+        case .critical: return PixelPalette.danger
+        case .dead: return PixelPalette.dim
         }
     }
 }
@@ -104,16 +103,16 @@ struct KindBadge: View {
     let kind: MeasureKind
     var body: some View {
         Text(kind.label)
-            .font(.caption2.weight(.bold))
-            .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(color.opacity(0.18), in: RoundedRectangle(cornerRadius: 4))
+            .font(.pixel(.caption2))
+            .padding(.horizontal, 6).padding(.vertical, 3)
+            .background(PixelFrame(fill: color.opacity(0.22), border: color, outline: .clear, step: 1))
             .foregroundStyle(color)
     }
     private var color: Color {
         switch kind {
-        case .measured: return .blue
-        case .estimated: return .purple
-        case .quota: return .teal
+        case .measured: return Color(rgb: 0x6FC8FF)
+        case .estimated: return Color(rgb: 0xC77DFF)
+        case .quota: return Color(rgb: 0x4FD8C8)
         }
     }
 }

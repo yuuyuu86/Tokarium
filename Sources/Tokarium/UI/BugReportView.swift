@@ -33,15 +33,15 @@ struct BugReportView: View {
         VStack(alignment: .leading, spacing: 14) {
             if crash != nil {
                 Label("前回、Tokarium が予期せず終了しました", systemImage: "exclamationmark.triangle.fill")
-                    .font(.title2.bold()).foregroundStyle(.orange)
+                    .font(.pixel(.title2)).foregroundStyle(.orange)
                 Text("ご迷惑をおかけしました。よければ報告を送って、改善に協力してください。水槽のデータはそのまま残っています。")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(PixelPalette.dim)
             } else {
-                Text("不具合を報告").font(.title2.bold())
+                Text("不具合を報告").font(.pixel(.title2))
             }
-            Text("何をしていたときに起きましたか？").font(.headline)
+            Text("何をしていたときに起きましたか？").font(.pixel(.headline))
             TextEditor(text: $details)
-                .font(.body)
+                .font(.pixel(.body))
                 .frame(minHeight: 90)
                 .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.secondary.opacity(0.3)))
             Toggle("最近のログを添える", isOn: $includeLog)
@@ -55,7 +55,7 @@ struct BugReportView: View {
                 .frame(height: 150)
             }
             Text("送るのはアプリの版、macOSの版、設定、水槽の数、エラーの内容だけです。AIとの会話本文やファイルの中身は含みません。送る前にブラウザやメールで内容を確認・編集できます。")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
             HStack {
                 Button(copied ? "コピーしました" : "内容をコピー") {
                     NSPasteboard.general.clearContents()
