@@ -79,7 +79,7 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 ## 自動アップデート（Sparkle）と不具合の報告
 
 - アップデートは Sparkle。`scripts/release.sh` が署名済み DMG と `appcast.xml` を作る。
-  公開鍵（`SUPublicEDKey`）が空のビルドではアップデートは無効になる
+  公開鍵は `Resources/Info.plist` の `SUPublicEDKey`、対になる秘密鍵は開発者のキーチェーンにある（なくすと更新を配れなくなるので `generate_keys -x` で書き出して保管する）
 - 配信先は `Resources/Info.plist` の `SUFeedURL`（初期値は GitHub Pages を想定）
 - 前回が異常終了だった場合、起動時に報告画面を出す。報告は内容を確認してから
   GitHub Issues（`TKFeedbackURL`）かメール（`TKFeedbackEmail`、空なら非表示）で送る。自動送信はしない
@@ -98,7 +98,7 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 ## 公開前に残っていること
 
 - 「Developer ID Application」証明書の作成と、`scripts/release.sh` での署名・公証（手元確認用のビルドはアドホック署名）
-- Sparkle の鍵の作成（`generate_keys`）と、appcast.xml の置き場所（GitHub Pages など。リポジトリが非公開だと Pages は使えない）
+- appcast.xml の置き場所（GitHub Pages など。リポジトリが非公開だと Pages は使えない）
 - 不具合報告の送り先: リポジトリが非公開のままだと一般の人は Issue を作れないので、公開するかメールアドレスを設定する
 - デスクトップ表示の実機確認（複数ディスプレイ、Spaces、Stage Manager、フルスクリーン、スリープ復帰）
 - Copilot CLI・OpenCode・Gemini CLI の実データでの形式確認（手元に記録がなく未確認）

@@ -8,11 +8,11 @@
 #          --apple-id "あなたのApple ID" --team-id "TEAMID" --password "App用パスワード"
 #
 # 使い方:
-#   3. 自動アップデート用の鍵を作る（秘密鍵はキーチェーンに入り、表示される公開鍵を控える）:
-#        .build/artifacts/sparkle/Sparkle/bin/generate_keys
+#   3. 自動アップデート用の鍵（作成済み。秘密鍵はキーチェーン、公開鍵は Resources/Info.plist の SUPublicEDKey）
+#      別のMacで配布するときは generate_keys -x / -f で秘密鍵を書き出し・読み込みする
 #
 #   SIGN_IDENTITY="Developer ID Application: 名前 (TEAMID)" NOTARY_PROFILE=tokarium-notary \
-#     SPARKLE_PUBLIC_KEY="控えた公開鍵" VERSION=0.2.0 BUILD_NUMBER=2 scripts/release.sh
+#     VERSION=0.2.0 BUILD_NUMBER=2 scripts/release.sh
 #
 # 終わると build/updates/ に DMG と appcast.xml ができる。
 #   - DMG を GitHub Releases（タグ v$VERSION）にアップロードする
@@ -24,9 +24,8 @@ cd "$(dirname "$0")/.."
 VERSION="${VERSION:-$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)}"
 
 swift test
-: "${SPARKLE_PUBLIC_KEY:?SPARKLE_PUBLIC_KEY に generate_keys で表示された公開鍵を指定してください}"
 DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/yuuyuu86/Tokarium/releases/download/v$VERSION/}"
-UNIVERSAL=1 SIGN_IDENTITY="$SIGN_IDENTITY" VERSION="$VERSION" SPARKLE_PUBLIC_KEY="$SPARKLE_PUBLIC_KEY" scripts/build_app.sh
+UNIVERSAL=1 SIGN_IDENTITY="$SIGN_IDENTITY" VERSION="$VERSION" scripts/build_app.sh
 
 DMG="build/Tokarium-$VERSION.dmg"
 STAGE="build/dmg"

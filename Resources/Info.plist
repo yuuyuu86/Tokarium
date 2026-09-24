@@ -2,26 +2,44 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleName</key><string>Tokarium</string>
-	<key>CFBundleDisplayName</key><string>Tokarium</string>
-	<key>CFBundleIdentifier</key><string>app.tokarium.Tokarium</string>
-	<key>CFBundleExecutable</key><string>Tokarium</string>
-	<key>CFBundlePackageType</key><string>APPL</string>
-	<key>CFBundleShortVersionString</key><string>0.1.0</string>
-	<key>CFBundleVersion</key><string>1</string>
-	<key>CFBundleIconFile</key><string>AppIcon</string>
-	<key>CFBundleDevelopmentRegion</key><string>ja</string>
-	<key>LSMinimumSystemVersion</key><string>14.0</string>
-	<key>LSApplicationCategoryType</key><string>public.app-category.simulation-games</string>
-	<key>NSHighResolutionCapable</key><true/>
-	<key>NSHumanReadableCopyright</key><string>Tokarium</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ja</string>
+	<key>CFBundleDisplayName</key>
+	<string>Tokarium</string>
+	<key>CFBundleExecutable</key>
+	<string>Tokarium</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>app.tokarium.Tokarium</string>
 	<key>CFBundleLocalizations</key>
-	<array><string>ja</string><string>en</string></array>
-	<!-- 自動アップデート（Sparkle）。公開鍵は scripts/release.sh が埋め込む。空のあいだは無効 -->
-	<key>SUFeedURL</key><string>https://yuuyuu86.github.io/Tokarium/appcast.xml</string>
-	<key>SUPublicEDKey</key><string></string>
-	<!-- 不具合報告の送り先 -->
-	<key>TKFeedbackURL</key><string>https://github.com/yuuyuu86/Tokarium/issues/new</string>
-	<key>TKFeedbackEmail</key><string></string>
+	<array>
+		<string>ja</string>
+		<string>en</string>
+	</array>
+	<key>CFBundleName</key>
+	<string>Tokarium</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.simulation-games</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Tokarium</string>
+	<key>SUFeedURL</key>
+	<string>https://yuuyuu86.github.io/Tokarium/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>b3TtRPt6vgAWJKIEeeb8hSEXDs1E2gmEizQ6L4wGMsE=</string>
+	<key>TKFeedbackEmail</key>
+	<string></string>
+	<key>TKFeedbackURL</key>
+	<string>https://github.com/yuuyuu86/Tokarium/issues/new</string>
 </dict>
 </plist>
