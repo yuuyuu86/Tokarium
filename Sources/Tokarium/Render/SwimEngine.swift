@@ -164,8 +164,8 @@ final class SwimEngine {
         bubbleClock += dt
         if bubbleClock > 0.35 {
             bubbleClock = 0
-            let sources = decorations.filter { $0.isPlaced && $0.kind.bubbles }
-            for d in sources where Double.random(in: 0...1) < (d.kindID == "airstone" ? 0.9 : 0.15) {
+            let sources = decorations.filter { $0.isPlaced && $0.kind.bubbles > 0 }
+            for d in sources where Double.random(in: 0...1) < d.kind.bubbles {
                 bubbles.append(Bubble(x: d.x + .random(in: -0.005...0.005), y: Self.sandTop - 0.02, speed: .random(in: 0.08...0.14), wobble: .random(in: 0...6)))
             }
             // どの水槽でもときどき泡が上がる

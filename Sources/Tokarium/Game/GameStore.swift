@@ -13,7 +13,7 @@ enum DisplayMode: String, Codable, CaseIterable, Identifiable {
 enum DesktopScreens: String, Codable, CaseIterable, Identifiable {
     case main, all
     var id: String { rawValue }
-    var label: String { self == .main ? "メインのディスプレイのみ" : "すべてのディスプレイ" }
+    var label: String { self == .main ? String(localized: "メインのディスプレイのみ") : String(localized: "すべてのディスプレイ（同じ水槽を表示）") }
 }
 
 struct AppSettings: Codable, Equatable {

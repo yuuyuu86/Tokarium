@@ -119,80 +119,136 @@ private struct FishRow: View {
 
 // MARK: - お店
 
+enum ShopTab: String, CaseIterable, Identifiable {
+    case fish, decorations, supplies
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .fish: return String(localized: "魚")
+        case .decorations: return String(localized: "装飾")
+        case .supplies: return String(localized: "お世話用品・水槽")
+        }
+    }
+}
+
 struct ShopScreen: View {
     @Environment(GameStore.self) private var store
     @State private var message: String?
+    @State private var tab: ShopTab = .fish
+    @State private var affordableOnly = false
 
     private let columns = [GridItem(.adaptive(minimum: 170), spacing: 12)]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Text("所持コイン").foregroundStyle(.secondary)
-                    CoinLabel(coins: store.coins).font(.title2)
-                    Spacer()
-                    Text("\(Int(CurrencyRule.tokensPerCoin)) トークン（重み付き）で 1 コイン").font(.caption).foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+            HStack {
+                Picker("", selection: $tab) {
+                    ForEach(ShopTab.allCases) { Text($0.title).tag($0) }
                 }
-                Text("魚").font(.headline)
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(maxWidth: 420)
+                Toggle("買えるものだけ", isOn: $affordableOnly).toggleStyle(.checkbox)
+                Spacer()
+                CoinLabel(coins: store.coins).font(.title2)
+            }
+            .padding([.horizontal, .top], 20)
+            .padding(.bottom, 8)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    switch tab {
+                    case .fish: fishSection
+                    case .decorations: decorationSection
+                    case .supplies: suppliesSection
+                    }
+                }
+                .padding(20)
+            }
+        }
+        .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
+            Button("OK") { message = nil }
+        }
+    }
+
+    @ViewBuilder
+    private var fishSection: some View {
+        let size = store.state.tank.size
+        Text("水槽の魚 \(store.livingFish.count)/\(size.maxFish) 匹").font(.caption).foregroundStyle(.secondary)
+        ForEach([FishRarity.common, .uncommon, .rare], id: \.self) { rarity in
+            let list = Catalog.fish.filter { $0.rarity == rarity && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
+            if !list.isEmpty {
+                Text(rarity.label).font(.headline)
                 LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(Catalog.fish) { sp in
-                        ShopCard(title: sp.name, blurb: sp.blurb, price: sp.price, canAfford: store.coins >= sp.price) {
+                    ForEach(list) { sp in
+                        ShopCard(title: sp.name, blurb: sp.blurb, price: sp.price, canAfford: store.coins >= sp.price,
+                                 owned: store.livingFish.filter { $0.speciesID == sp.id }.count) {
                             FishIcon(speciesID: sp.id)
                         } buy: {
                             message = store.buyFish(sp)?.errorDescription
                         }
                     }
                 }
-                Text("装飾").font(.headline)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var decorationSection: some View {
+        let size = store.state.tank.size
+        Text("置いている装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個。置いた装飾は「水槽」画面の「配置を編集」で動かせます。")
+            .font(.caption).foregroundStyle(.secondary)
+        let stored = store.state.tank.decorations.filter { !$0.isPlaced }
+        if !stored.isEmpty {
+            Text("持ち物").font(.headline)
+            ForEach(stored) { d in
+                HStack {
+                    DecorationIcon(kindID: d.kindID).frame(width: 40, height: 30)
+                    Text(d.kind.name)
+                    Spacer()
+                    Button("水槽に置く") { store.setDecoration(d.id, placed: true) }
+                }
+            }
+        }
+        ForEach(DecorationCategory.allCases, id: \.self) { category in
+            let list = Catalog.decorations.filter { $0.category == category && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
+            if !list.isEmpty {
+                Text(category.label).font(.headline)
                 LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(Catalog.decorations) { kind in
-                        ShopCard(title: kind.name, blurb: kind.blurb, price: kind.price, canAfford: store.coins >= kind.price) {
+                    ForEach(list) { kind in
+                        ShopCard(title: kind.name, blurb: kind.blurb, price: kind.price, canAfford: store.coins >= kind.price,
+                                 owned: store.state.tank.decorations.filter { $0.kindID == kind.id }.count) {
                             DecorationIcon(kindID: kind.id)
                         } buy: {
                             message = store.buyDecoration(kind)?.errorDescription
                         }
                     }
                 }
-                Text("お世話用品・水槽").font(.headline)
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ShopCard(title: "薬", blurb: "病気の魚を1匹治します。持っている数: \(store.state.medicine)",
-                             price: Catalog.medicinePrice, canAfford: store.coins >= Catalog.medicinePrice) {
-                        Image(systemName: "cross.case.fill").font(.system(size: 34)).foregroundStyle(.white)
-                    } buy: {
-                        message = store.buyMedicine()?.errorDescription
-                    }
-                    if let next = store.nextTankSize {
-                        ShopCard(title: "\(next.name)へ拡張", blurb: "魚 \(next.maxFish) 匹・装飾 \(next.maxDecorations) 個まで置けます。",
-                                 price: next.price, canAfford: store.coins >= next.price) {
-                            Image(systemName: "arrow.up.left.and.arrow.down.right").font(.system(size: 30)).foregroundStyle(.white)
-                        } buy: {
-                            message = store.buyTankUpgrade()?.errorDescription
-                        }
-                    }
-                }
-                let size = store.state.tank.size
-                Text("いまの水槽: \(size.name)（魚 \(store.livingFish.count)/\(size.maxFish) 匹・装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個）")
-                    .font(.caption).foregroundStyle(.secondary)
-                let stored = store.state.tank.decorations.filter { !$0.isPlaced }
-                if !stored.isEmpty {
-                    Text("持ち物").font(.headline)
-                    ForEach(stored) { d in
-                        HStack {
-                            DecorationIcon(kindID: d.kindID).frame(width: 40, height: 30)
-                            Text(d.kind.name)
-                            Spacer()
-                            Button("水槽に置く") { store.setDecoration(d.id, placed: true) }
-                        }
-                    }
-                }
-                Text("置いた装飾は「水槽」画面の「配置を編集」で動かせます。").font(.caption).foregroundStyle(.secondary)
             }
-            .padding(20)
         }
-        .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
-            Button("OK") { message = nil }
+    }
+
+    @ViewBuilder
+    private var suppliesSection: some View {
+        LazyVGrid(columns: columns, spacing: 12) {
+            ShopCard(title: String(localized: "薬"), blurb: String(localized: "病気の魚を1匹治します。持っている数: \(store.state.medicine)"),
+                     price: Catalog.medicinePrice, canAfford: store.coins >= Catalog.medicinePrice) {
+                Image(systemName: "cross.case.fill").font(.system(size: 34)).foregroundStyle(.white)
+            } buy: {
+                message = store.buyMedicine()?.errorDescription
+            }
+            if let next = store.nextTankSize {
+                ShopCard(title: String(localized: "\(next.name)へ拡張"),
+                         blurb: String(localized: "魚 \(next.maxFish) 匹・装飾 \(next.maxDecorations) 個まで置けます。"),
+                         price: next.price, canAfford: store.coins >= next.price) {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right").font(.system(size: 30)).foregroundStyle(.white)
+                } buy: {
+                    message = store.buyTankUpgrade()?.errorDescription
+                }
+            }
         }
+        let size = store.state.tank.size
+        Text("いまの水槽: \(size.name)（魚 \(store.livingFish.count)/\(size.maxFish) 匹・装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個）")
+            .font(.caption).foregroundStyle(.secondary)
     }
 }
 
@@ -201,6 +257,7 @@ private struct ShopCard<Icon: View>: View {
     let blurb: String
     let price: Int
     let canAfford: Bool
+    var owned = 0
     @ViewBuilder let icon: () -> Icon
     let buy: () -> Void
 
@@ -211,7 +268,13 @@ private struct ShopCard<Icon: View>: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
                 .background(Color(rgb: 0x2680B8).opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
-            Text(title).font(.headline)
+            HStack(spacing: 4) {
+                Text(title).font(.headline)
+                if owned > 0 {
+                    Text("×\(owned)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        .help("水槽にいる数")
+                }
+            }
             Text(blurb).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 .frame(height: 32, alignment: .top)
             Button(action: buy) {
