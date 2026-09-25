@@ -145,6 +145,7 @@
 "お正月" = "New Year";
 "お正月の縁起もの。桜色にかがやく。" = "A lucky New Year fish that shines cherry-blossom pink.";
 "お正月の飾り。" = "A New Year decoration.";
+"お気に入り" = "Favorite";
 "お気に入りを外す" = "Remove Favorite";
 "お気に入り（主役）にする" = "Make Favorite";
 "かざりつけた小さなツリー。" = "A little decorated tree.";
@@ -159,6 +160,7 @@
 "このMacでは読み取れないもの" = "Not readable on this Mac";
 "このMacに記録が残らないため集計できません。" = "No records are left on this Mac, so they can’t be counted.";
 "この時刻を削除" = "Remove this time";
+"この時点に戻す" = "Restore This";
 "この枠で %@ トークン・%lld 回の応答" = "%@ tokens in this window · %lld responses";
 "この版はアップデートの配信先が設定されていません。" = "This build has no update feed configured.";
 "これ以上は置けません" = "No more room";
@@ -197,6 +199,7 @@
 "ほんのり光るクリスタル。" = "Softly glowing crystals.";
 "ぼんやり光るハロウィンのかぼちゃ。" = "A softly glowing Halloween pumpkin.";
 "ぽってりした定番の人気者。" = "A plump, classic favorite.";
+"まだありません。" = "None yet.";
 "まだ餌をあげていません" = "Not fed yet";
 "まるっこい朱色のアイドル。" = "A round, vermilion idol.";
 "まんまるで好奇心旺盛。" = "Perfectly round and endlessly curious.";
@@ -301,6 +304,7 @@
 "バックアップから復元しました" = "Restored from backup";
 "バックアップから復元しますか？" = "Restore from backup?";
 "バックアップと同期" = "Backup & Sync";
+"バックアップを作りました" = "Backup created";
 "バックアップを書き出しました" = "Backup saved";
 "バックアップを書き出す…" = "Export Backup…";
 "バッテリーで動いているので、動きを控えめにしています" = "Running on battery, so animation is reduced";
@@ -345,6 +349,7 @@
 "中身はなにかな？" = "What could be inside?";
 "今すぐアップデートを確認…" = "Check for Updates Now…";
 "今すぐ再起動" = "Restart Now";
+"今すぐ自動バックアップを作る" = "Back Up Now";
 "今すぐ読み取る" = "Read Now";
 "今日はAIをたくさん使いました！ 宝箱が流れてきました" = "You used AI a lot today! A treasure chest drifted in";
 "付与開始後の利用記録はまだありません。" = "No usage recorded since coins started counting.";
@@ -352,6 +357,7 @@
 "会話記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ" = "From conversation logs (JSONL): only per-response token counts, times, and response IDs";
 "低電力モードなので、動きを控えめにしています" = "Low Power Mode is on, so animation is reduced";
 "体調" = "Health";
+"体調 %lld" = "Health %lld";
 "何をしていたときに起きましたか？" = "What were you doing when it happened?";
 "保存するのは水槽・魚・装飾・コイン、利用記録の件数・時刻・取得元・重複判定用のID・トークン数だけです。AIとの会話本文・APIキー・Cookieは保存しません。" = "Tokarium stores only your tank, fish, decorations, and coins, plus record counts, times, sources, de-duplication IDs, and token counts. It never stores AI conversations, API keys, or cookies.";
 "保存フォルダを開く" = "Open Data Folder";
@@ -479,6 +485,8 @@
 "水槽に置く" = "Place in Tank";
 "水槽のお世話" = "Tank Care";
 "水槽のアクセントになる赤。" = "A red accent for your tank.";
+"水槽のデータが読めず、バックアップもなかったため、新しい水槽で始めました。読めなかったデータは保存フォルダに残してあります。" = "Your tank data couldn’t be read and there was no backup, so a new tank was started. The unreadable data was kept in the data folder.";
+"水槽のデータが読めなかったため、%@ の自動バックアップから戻しました。" = "Your tank data couldn’t be read, so it was restored from the automatic backup from %@.";
 "水槽の主役になるお城。" = "A castle to be the star of your tank.";
 "水槽の写真を撮る（操作パネルは写りません）" = "Take a photo of the tank (controls aren’t included)";
 "水槽の演出" = "Tank Effects";
@@ -503,6 +511,7 @@
 "海の底のかわいいおうち。" = "A cute house under the sea.";
 "涼しげな音が聞こえてきそう。" = "You can almost hear it chime in the breeze.";
 "満腹" = "Fullness";
+"満腹 %lld" = "Fullness %lld";
 "溶岩石" = "Lava rock";
 "潜水ヘルメット" = "Diving helmet";
 "灯台" = "Lighthouse";
@@ -537,11 +546,13 @@
 "老齢" = "Elderly";
 "老齢（ゆっくり過ごしています）" = "Elderly (taking it easy)";
 "自動アップデート · MIT License" = "Automatic updates · MIT License";
+"自動バックアップ（1日1回・%lld世代）" = "Automatic backups (daily, %lld kept)";
 "自動給餌器" = "Auto feeder";
 "自動給餌器が餌をあげました（残り %lld 回分）" = "The auto feeder fed your fish (%lld servings left)";
 "自然な雰囲気の流木。" = "Natural-looking driftwood.";
 "良好" = "Great";
 "色とりどりの小石。" = "Colorful little stones.";
+"色違い" = "Rare color";
 "色違いの稚魚が生まれました！" = "A rare-colored fry was born!";
 "色違いの魚との出会いの記念。" = "Celebrates meeting a rare-colored fish.";
 "色違いの魚を迎えた" = "Welcomed a rare-colored fish";
@@ -603,6 +614,7 @@
 "門松" = "Kadomatsu";
 "閉じる" = "Close";
 "開く" = "Open";
+"開ける" = "Open";
 "離れていた間の %@ を水槽に反映しました。" = "Applied %@ of time that passed while you were away.";
 "電源につながっています（設定どおりの速さ）" = "Plugged in (full speed)";
 "青いしまで元気いっぱい。" = "Full of energy, with blue stripes.";

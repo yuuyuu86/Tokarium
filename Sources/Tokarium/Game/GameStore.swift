@@ -23,6 +23,8 @@ final class GameStore {
     var bugReport: BugReportRequest?
     /// 「このアプリについて」を表示中。
     var showAbout = false
+    /// メニューやショートカットからの画面操作（MainView が受け取って実行する）。
+    var command: UICommand?
     /// 置き場所を決めている最中の装飾（買った直後や持ち物から出したとき）。
     var placingDecoration: UUID?
 
@@ -61,10 +63,10 @@ final class GameStore {
         self.dir = dir
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
-        let loaded = (try? Data(contentsOf: dir.appendingPathComponent("game.json")))
-            .flatMap { try? JSONDecoder.tokarium.decode(GameState.self, from: $0) }
+        let (loaded, recovery) = Self.loadGame(in: dir)
         let state = loaded ?? GameState.newGame()
         self.state = state
+        self.resumeMessage = recovery
         self.settings = (try? Data(contentsOf: dir.appendingPathComponent("settings.json")))
             .flatMap { try? JSONDecoder.tokarium.decode(AppSettings.self, from: $0) } ?? AppSettings()
         let scanner = UsageScanner(ledgerURL: dir.appendingPathComponent("usage-ledger.json"), startDate: state.createdAt)
@@ -75,12 +77,37 @@ final class GameStore {
         Task { self.ledger = await scanner.currentLedger }
     }
 
+    /// 水槽のデータを読む。壊れていたら別名で残し、いちばん新しい自動バックアップから戻す。
+    private static func loadGame(in dir: URL) -> (GameState?, String?) {
+        let url = dir.appendingPathComponent("game.json")
+        guard let data = try? Data(contentsOf: url) else { return (nil, nil) }
+        if let state = try? JSONDecoder.tokarium.decode(GameState.self, from: data) { return (state, nil) }
+        // 読めないデータは消さずに残す
+        let f = DateFormatter()
+        f.dateFormat = "yyyyMMdd-HHmmss"
+        let broken = dir.appendingPathComponent("game.broken-\(f.string(from: Date())).json")
+        try? FileManager.default.moveItem(at: url, to: broken)
+        AppLog.error("水槽のデータを読めませんでした。\(broken.lastPathComponent) に残しました")
+        for backup in AutoBackup.list(in: dir) {
+            if let b = try? JSONDecoder.tokarium.decode(TokariumBackup.self, from: Data(contentsOf: backup.url)) {
+                AppLog.info("自動バックアップ \(backup.url.lastPathComponent) から戻しました")
+                return (b.game, String(localized: "水槽のデータが読めなかったため、\(backup.date.shortText) の自動バックアップから戻しました。"))
+            }
+        }
+        return (nil, String(localized: "水槽のデータが読めず、バックアップもなかったため、新しい水槽で始めました。読めなかったデータは保存フォルダに残してあります。"))
+    }
+
     // MARK: 起動・時間経過
 
     func start() {
         simulate()
+        autoBackupIfNeeded()
         timers.append(Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.simulate() }
+        })
+        // 1時間ごとに、前の自動バックアップから1日たったか確かめる
+        timers.append(Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.autoBackupIfNeeded() }
         })
         timers.append(Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.scanNow() }

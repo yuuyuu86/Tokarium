@@ -14,6 +14,8 @@ struct AquariumView: View {
     @State private var hoverPoint: CGPoint?
     /// 窓が完全に隠れているときは動かさない（省電力）。
     @State private var windowVisible = true
+    /// 「視差効果を減らす」がオンなら、ゆったりした動きにする。
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// 魚は泳いで動くので、カーソルが止まっていても定期的に判定し直す。
     private let hoverTimer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
@@ -38,13 +40,14 @@ struct AquariumView: View {
                 Canvas { ctx, size in
                     style.drawBackground(&ctx, size: size, tank: tank)
                 }
-                TimelineView(.animation(minimumInterval: 1.0 / Double(max(5, store.effectiveFPS)),
+                TimelineView(.animation(minimumInterval: 1.0 / Double(max(5, reduceMotion ? min(store.effectiveFPS, 15) : store.effectiveFPS)),
                                         paused: store.settings.autoPowerSaving && !windowVisible)) { timeline in
                     Canvas { ctx, size in
                         let ambient = store.settings.timeOfDay ? Ambient.at(timeline.date) : .day
                         store.engine.aspect = size.height > 0 ? size.width / size.height : 1.6
-                        store.engine.speedFactor = ambient.speed
-                        store.engine.season = store.settings.seasons ? .forSeason(timeline.date) : nil
+                        store.engine.speedFactor = ambient.speed * (reduceMotion ? 0.6 : 1)
+                        store.engine.calm = reduceMotion
+                        store.engine.season = store.settings.seasons && !reduceMotion ? .forSeason(timeline.date) : nil
                         store.engine.step(to: timeline.date, fish: tank.fish, decorations: tank.decorations)
                         style.drawLive(&ctx, size: size, tank: tank, engine: store.engine,
                                        selected: interactive ? (hoveredFish ?? selectedFish) : nil,
@@ -98,8 +101,28 @@ struct AquariumView: View {
                 if !now { hoverPoint = nil; hoveredFish = nil }
             }
         }
-        .accessibilityElement(children: .ignore)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel(accessibilitySummary)
+        .accessibilityChildren {
+            // VoiceOver で魚を1匹ずつ読めるようにし、操作もできるようにする
+            ForEach(interactive ? store.state.tank.fish : []) { f in
+                Text(fishDescription(f))
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityActions {
+                        if f.isAlive {
+                            Button("餌をあげる") { store.feed(fish: f.id) }
+                            if f.isSick { Button("薬をあげる") { store.giveMedicine(f.id) } }
+                        } else {
+                            Button("お別れする") { store.farewell(f.id) }
+                        }
+                        Button(f.isFavorite ? "お気に入りを外す" : "お気に入り（主役）にする") { store.toggleFavorite(f.id) }
+                    }
+            }
+            if interactive, store.state.treasureX != nil {
+                Text("宝箱").accessibilityAddTraits(.isButton)
+                    .accessibilityAction(named: "開ける") { store.openTreasure() }
+            }
+        }
     }
 
     /// 置き場所を決めている装飾をカーソルの横位置へ動かす。
@@ -129,6 +152,19 @@ struct AquariumView: View {
                              onLayer: { store.toggleDecorationLayer(d.id) },
                              onStore: { store.setDecoration(d.id, placed: false) })
         }
+    }
+
+    private func fishDescription(_ f: Fish) -> String {
+        var parts = [f.name, f.species.name, f.condition.label]
+        if f.isAlive {
+            parts.append(String(localized: "満腹 \(Int(f.fullness.rounded()))"))
+            parts.append(String(localized: "体調 \(Int(f.health.rounded()))"))
+            parts.append(f.stage.label)
+            if let mood = Ecology.mood(f, in: store.state.tank) { parts.append(mood) }
+        }
+        if f.isShiny { parts.append(String(localized: "色違い")) }
+        if f.isFavorite { parts.append(String(localized: "お気に入り")) }
+        return parts.joined(separator: String(localized: "、"))
     }
 
     private var accessibilitySummary: String {

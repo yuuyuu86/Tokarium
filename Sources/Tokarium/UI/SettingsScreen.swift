@@ -73,6 +73,24 @@ private struct BackupSettings: View {
             Button { chooseImport() } label: { Label("バックアップから復元…", systemImage: "square.and.arrow.down") }
         }
         Text("Mac を買いかえたときなどに、水槽・図鑑・実績・コインの記録をまとめて移せます。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        let autos = store.autoBackups
+        VStack(alignment: .leading, spacing: 6) {
+            Text("自動バックアップ（1日1回・\(AutoBackup.keep)世代）").font(.pixel(.callout))
+            if autos.isEmpty {
+                Text("まだありません。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+            }
+            ForEach(autos) { item in
+                HStack {
+                    Text(item.date.shortText).font(.pixel(.caption)).monospacedDigit()
+                    Spacer()
+                    Button("この時点に戻す") { confirmImport = item.url }
+                }
+            }
+            Button("今すぐ自動バックアップを作る") {
+                store.autoBackupIfNeeded(force: true)
+                store.toast = String(localized: "バックアップを作りました")
+            }
+        }
         Toggle("iCloud Drive で水槽を同期する", isOn: $store.settings.iCloudSync)
             .disabled(GameStore.iCloudFolder == nil)
         Text(GameStore.iCloudFolder == nil

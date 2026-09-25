@@ -66,3 +66,10 @@ struct BugReportRequest: Identifiable {
     let id = UUID()
     var crash: Diagnostics.CrashInfo?
 }
+
+/// メニューやキーボードショートカットから画面へ頼む操作。
+enum UICommand: Equatable {
+    case show(Screen)
+    case photo
+    case toggleEdit
+}

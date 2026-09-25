@@ -26,6 +26,23 @@ struct TokariumApp: App {
                 Button("アップデートを確認…") { delegate.updater.checkForUpdates() }
                     .disabled(!delegate.updater.canCheckForUpdates)
             }
+            // キーボードで遊べるように
+            CommandMenu("水槽") {
+                Button("餌をあげる") { delegate.store.feed() }
+                    .keyboardShortcut("f", modifiers: .command)
+                    .disabled(!delegate.store.canFeed)
+                Button("水換え") { delegate.store.changeWater() }
+                    .keyboardShortcut("w", modifiers: [.command, .shift])
+                Button("写真を撮る") { delegate.store.command = .photo }
+                    .keyboardShortcut("p", modifiers: .command)
+                Button("配置を編集") { delegate.store.command = .toggleEdit }
+                    .keyboardShortcut("l", modifiers: .command)
+                Divider()
+                ForEach(Array(Screen.allCases.enumerated()), id: \.offset) { i, screen in
+                    Button(screen.title) { delegate.store.command = .show(screen) }
+                        .keyboardShortcut(KeyEquivalent(Character(String(i + 1))), modifiers: .command)
+                }
+            }
             CommandGroup(replacing: .help) {
                 Button("不具合を報告…") { delegate.store.bugReport = BugReportRequest() }
                 Button("ログをFinderで表示") { NSWorkspace.shared.activateFileViewerSelecting([AppLog.file]) }

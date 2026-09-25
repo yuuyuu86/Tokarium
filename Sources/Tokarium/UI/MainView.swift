@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 enum Screen: String, CaseIterable, Identifiable {
@@ -66,6 +67,22 @@ struct MainView: View {
         }.ignoresSafeArea())
         .animation(.easeOut(duration: 0.15), value: screen)
         .onChange(of: screen) { _, _ in selected = nil }
+        .onChange(of: store.command) { _, command in
+            guard let command else { return }
+            store.command = nil
+            switch command {
+            case .show(let s): screen = s
+            case .toggleEdit:
+                screen = .tank
+                editing.toggle()
+            case .photo:
+                screen = .tank
+                if let url = Snapshot.take(store: store, size: windowSize) {
+                    store.toast = String(localized: "写真を保存しました（ピクチャ/Tokarium）。クリップボードにも入れました")
+                    NSWorkspace.shared.activateFileViewerSelecting([url])
+                }
+            }
+        }
         .onChange(of: editing) { _, now in
             if now { selected = nil } else if store.placingDecoration != nil { store.finishPlacing() }
         }

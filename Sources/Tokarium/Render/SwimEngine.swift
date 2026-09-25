@@ -65,6 +65,8 @@ final class SwimEngine {
     var season: DrifterKind?
     /// 時間帯による泳ぐ速さ（夜はゆっくり）。
     var speedFactor: Double = 1
+    /// 「視差効果を減らす」: 波紋を出さず、動きを控えめにする。
+    var calm = false
 
     /// 水槽を入れかえたとき（復元・同期）に動きをリセットする。
     func reset() {
@@ -78,7 +80,7 @@ final class SwimEngine {
     func touch(x: Double, y: Double) {
         attractPoint = (x, min(y, 0.84))
         attractUntil = time + 4
-        ripples.append(Ripple(x: x, y: y, start: time))
+        if !calm { ripples.append(Ripple(x: x, y: y, start: time)) }
     }
 
     /// 表示の縦横比（幅/高さ）。速度を画面比に合わせる。
