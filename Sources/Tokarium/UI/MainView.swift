@@ -36,6 +36,7 @@ struct MainView: View {
     @State private var editing = false
     @State private var windowSize = CGSize(width: 1080, height: 700)
     @State private var tutorialStep = 0
+    @State private var windowVisible = false
 
     var body: some View {
         ZStack {
@@ -66,7 +67,14 @@ struct MainView: View {
             Color.clear.onAppear { windowSize = geo.size }.onChange(of: geo.size) { _, new in windowSize = new }
         }.ignoresSafeArea())
         .animation(.easeOut(duration: 0.15), value: screen)
-        .onChange(of: screen) { _, _ in selected = nil }
+        .onChange(of: screen) { _, _ in
+            selected = nil
+            store.sfx(.click)
+        }
+        // BGM は水槽の窓が見えているときに流す
+        .background(WindowVisibilityReader(isVisible: $windowVisible))
+        .onChange(of: windowVisible) { _, visible in SoundPlayer.shared.tankVisible = visible }
+        .onDisappear { SoundPlayer.shared.tankVisible = false }
         .onChange(of: store.command) { _, command in
             guard let command else { return }
             store.command = nil

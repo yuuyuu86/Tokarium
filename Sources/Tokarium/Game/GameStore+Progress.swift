@@ -16,6 +16,7 @@ extension GameStore {
                 body += String(localized: "（ごほうび: \(kind.name) を持ち物に入れました）")
             }
             toast = String(localized: "実績「\(a.title)」を達成しました")
+            sfx(.fanfare, spontaneous: true)
             post(title: String(localized: "実績「\(a.title)」を達成"), body: body)
         }
 
@@ -27,6 +28,7 @@ extension GameStore {
                 state.addFish(Fish(speciesID: sp.id, name: sp.name, fullness: 80, purchasedAt: now, growth: 1,
                                    x: .random(in: 0.2...0.8), y: 0.3), at: now)
                 toast = String(localized: "\(m.label) の記念に「\(sp.name)」がやってきました")
+                sfx(.fanfare, spontaneous: true)
                 post(title: String(localized: "記念の魚がやってきました"), body: String(localized: "\(m.label) をたくさん使った記念に、\(sp.name)が水槽に入りました。"))
             } else {
                 // 水槽がいっぱいなら、空いたときにもう一度ためす
@@ -40,6 +42,7 @@ extension GameStore {
             state.lastTreasureDay = today
             state.treasureX = .random(in: 0.15...0.85)
             toast = String(localized: "今日はAIをたくさん使いました！ 宝箱が流れてきました")
+            sfx(.sparkle, spontaneous: true)
         }
     }
 
@@ -50,6 +53,7 @@ extension GameStore {
         state.food += TreasureRule.rewardFood
         state.medicine += TreasureRule.rewardMedicine
         state.stats.treasures += 1
+        sfx(.treasure)
         toast = String(localized: "宝箱から餌 \(TreasureRule.rewardFood) 回分と薬 \(TreasureRule.rewardMedicine) 個が出てきました")
         evaluateProgress()
         save()
@@ -58,14 +62,16 @@ extension GameStore {
     /// 水槽をたたく（魚が寄ってくる）。
     func touchWater(x: Double, y: Double) {
         engine.touch(x: x, y: y)
+        sfx(.tap)
         state.stats.touches += 1
     }
 
     @discardableResult
     func buyEquipment(_ e: Equipment) -> PurchaseError? {
         guard !state.equipment.contains(e.id) else { return nil }
-        guard coins >= e.price else { return .notEnoughCoins }
+        guard coins >= e.price else { return failed(.notEnoughCoins) }
         state.coinsSpent += e.price
+        sfx(.buy)
         state.equipment.insert(e.id)
         toast = String(localized: "\(e.name)を取りつけました")
         save()

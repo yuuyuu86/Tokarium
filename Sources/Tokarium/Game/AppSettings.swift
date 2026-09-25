@@ -36,6 +36,19 @@ struct AppSettings: Codable, Equatable {
     var autoPowerSaving = true
     /// 初回のチュートリアルを見終わった。
     var tutorialDone = false
+    /// BGM を流す。
+    var musicEnabled = true
+    var musicVolume = 0.5
+    /// 水槽の窓が見えているときだけ BGM を流す。
+    var musicOnlyWhenVisible = true
+    /// 効果音を鳴らす。
+    var effectsEnabled = true
+    var effectsVolume = 0.8
+
+    var soundConfig: SoundPlayer.Config {
+        SoundPlayer.Config(music: musicEnabled, musicVolume: musicVolume, effects: effectsEnabled, effectsVolume: effectsVolume,
+                           musicOnlyWhenVisible: musicOnlyWhenVisible, nightMusic: timeOfDay)
+    }
 
     init() {}
 
@@ -59,6 +72,11 @@ struct AppSettings: Codable, Equatable {
         autoPowerSaving = try c.decodeIfPresent(Bool.self, forKey: .autoPowerSaving) ?? d.autoPowerSaving
         // すでに遊んでいる人にはチュートリアルを出さない
         tutorialDone = try c.decodeIfPresent(Bool.self, forKey: .tutorialDone) ?? onboarded
+        musicEnabled = try c.decodeIfPresent(Bool.self, forKey: .musicEnabled) ?? d.musicEnabled
+        musicVolume = try c.decodeIfPresent(Double.self, forKey: .musicVolume) ?? d.musicVolume
+        musicOnlyWhenVisible = try c.decodeIfPresent(Bool.self, forKey: .musicOnlyWhenVisible) ?? d.musicOnlyWhenVisible
+        effectsEnabled = try c.decodeIfPresent(Bool.self, forKey: .effectsEnabled) ?? d.effectsEnabled
+        effectsVolume = try c.decodeIfPresent(Double.self, forKey: .effectsVolume) ?? d.effectsVolume
     }
 }
 

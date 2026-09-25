@@ -38,6 +38,12 @@ struct TokariumApp: App {
                 Button("配置を編集") { delegate.store.command = .toggleEdit }
                     .keyboardShortcut("l", modifiers: .command)
                 Divider()
+                Toggle("BGM を流す", isOn: Binding(get: { delegate.store.settings.musicEnabled },
+                                                  set: { delegate.store.settings.musicEnabled = $0 }))
+                    .keyboardShortcut("m", modifiers: [.command, .option])
+                Toggle("効果音を鳴らす", isOn: Binding(get: { delegate.store.settings.effectsEnabled },
+                                                   set: { delegate.store.settings.effectsEnabled = $0 }))
+                Divider()
                 ForEach(Array(Screen.allCases.enumerated()), id: \.offset) { i, screen in
                     Button(screen.title) { delegate.store.command = .show(screen) }
                         .keyboardShortcut(KeyEquivalent(Character(String(i + 1))), modifiers: .command)

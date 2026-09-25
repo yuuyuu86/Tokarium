@@ -72,6 +72,8 @@
 "AI利用記録" = "AI usage records";
 "AI利用記録を今すぐ読み取る" = "Read AI usage now";
 "AI利用量" = "AI Usage";
+"BGM の音量" = "Music volume";
+"BGM を流す" = "Play music";
 "ChatGPT デスクトップ" = "ChatGPT desktop";
 "ChatGPT デスクトップや Claude デスクトップのチャットは、トークン数がMac内に残らないため読み取れません。あとから設定で変更できます。" = "ChatGPT desktop and Claude desktop chats can’t be read because their token counts aren’t stored on your Mac. You can change this later in Settings.";
 "ChatGPT／Claude のWeb版・他の端末" = "ChatGPT / Claude on the web or other devices";
@@ -118,6 +120,7 @@
 "♥ %@・%@" = "♥ %@ · %@";
 "、" = ", ";
 "「対応」とは、このMacに残った利用記録を集計できることです。AIサービスのアカウント全体の利用量を示すものではありません。" = "“Supported” means the usage records left on this Mac can be counted. It doesn’t reflect total usage across your AI accounts.";
+"「時間帯で明るさを変える」をオンにすると、夜は夜の曲になります。" = "Turn on \"Change brightness by time of day\" to hear the night song at night.";
 "あざやかな黄色い円盤。" = "A vivid yellow disc.";
 "あとから設定でいつでも切り替えられます。魚や装飾はそのまま引き継がれます。" = "You can switch any time in Settings. Your fish and decorations carry over.";
 "いかり" = "Anchor";
@@ -252,6 +255,7 @@
 "コードフィッシュ（記念）" = "Codefish (commemorative)";
 "サイケデリックな模様の人気者。" = "A popular fish with psychedelic patterns.";
 "サイズを変えられる普通のウィンドウで水槽を表示します。" = "Shows the tank in a regular, resizable window.";
+"サウンド" = "Sound";
 "サンゴ" = "Coral";
 "サンゴ・貝" = "Corals & Shells";
 "サンタテトラ" = "Santa tetra";
@@ -374,6 +378,8 @@
 "利用上限に達しています。%@ごろにリセット" = "Usage limit reached. Resets around %@";
 "利用枠" = "Limit";
 "前回、Tokarium が予期せず終了しました" = "Tokarium quit unexpectedly last time";
+"効果音の音量" = "Sound effects volume";
+"効果音を鳴らす" = "Play sound effects";
 "十分" = "Full";
 "危険" = "Critical";
 "危険な状態の魚が %lld 匹います。" = "%lld fish are in danger.";
@@ -449,8 +455,10 @@
 "日ごとのAI利用" = "Daily AI Usage";
 "星のランプ" = "Star lamp";
 "昼" = "Day";
+"昼（朝5時〜夕方7時）と夜で曲が変わります。" = "The song changes between day (5 AM to 7 PM) and night.";
 "時刻を追加" = "Add Time";
 "時間帯で明るさを変える（夜は魚もゆっくり）" = "Change lighting with the time of day (fish slow down at night)";
+"曲と効果音は Tokarium のために作ったオリジナルです。稚魚の誕生やコインなど、ひとりでに起きたことの音は、水槽の窓が見えているときだけ鳴ります。" = "The music and sound effects were made for Tokarium. Sounds for things that happen on their own, such as newborn fry or coins, play only while the tank window is visible.";
 "最初にネオンテトラ1匹と %lld コイン、餌 %lld 回分をプレゼントします。餌はお店で買い足せます。" = "You start with one neon tetra, %lld coins, and %lld servings of food. You can buy more food at the Shop.";
 "最大 %lld 代目・天寿 %lld" = "Up to gen %lld · full lives %lld";
 "最後の水換え: %@" = "Last water change: %@";
@@ -491,6 +499,7 @@
 "水槽の写真を撮る（操作パネルは写りません）" = "Take a photo of the tank (controls aren’t included)";
 "水槽の演出" = "Tank Effects";
 "水槽の画面に戻ると、案内が始まります" = "The tour starts when you return to the tank";
+"水槽の窓が見えているときだけ BGM を流す" = "Play music only while the tank window is visible";
 "水槽の表示方法" = "How to show your tank";
 "水槽の魚 %lld/%lld 匹" = "Fish in tank: %lld/%lld";
 "水槽の魚たちが待っています。" = "Your fish are waiting.";
@@ -582,6 +591,7 @@
 "記録の形式が変わった可能性があります（%@）。" = "The record format may have changed (%@).";
 "設定" = "Settings";
 "診断情報" = "Diagnostics";
+"試しに鳴らす" = "Test";
 "試験対応" = "Experimental";
 "読み取りの許可がありません。" = "Tokarium doesn’t have permission to read this.";
 "読み取りエラー" = "Read error";

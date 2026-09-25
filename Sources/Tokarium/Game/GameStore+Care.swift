@@ -21,6 +21,7 @@ extension GameStore {
             return true
         }
         guard state.food > 0 else {
+            sfx(.error)
             toast = String(localized: "餌がありません。お店で買えます")
             return false
         }
@@ -40,6 +41,7 @@ extension GameStore {
         Simulation.feed(&state, now: Date())
         state.stats.feedings += 1
         engine.dropFood(count: min(24, 4 + livingFish.count * 2))
+        sfx(.feed)
         save()
     }
 
@@ -51,6 +53,7 @@ extension GameStore {
         Simulation.feed(&state, fish: id, now: Date())
         state.stats.feedings += 1
         engine.dropFood(count: 4, near: engine.position(of: id)?.x ?? f.x)
+        sfx(.feed)
         toast = String(localized: "\(f.name)に餌をあげました")
         save()
     }
@@ -60,6 +63,7 @@ extension GameStore {
         Simulation.changeWater(&state, now: Date())
         state.stats.waterChanges += 1
         toast = String(localized: "水をきれいにしました")
+        sfx(.water)
         save()
     }
 
@@ -78,12 +82,16 @@ extension GameStore {
     func toggleFavorite(_ id: UUID) {
         let wasFavorite = state.tank.fish.first { $0.id == id }?.isFavorite ?? false
         for i in state.tank.fish.indices { state.tank.fish[i].isFavorite = !wasFavorite && state.tank.fish[i].id == id }
-        if let f = favoriteFish { toast = String(localized: "\(f.name)をお気に入り（主役）にしました") }
+        if let f = favoriteFish {
+            toast = String(localized: "\(f.name)をお気に入り（主役）にしました")
+            sfx(.sparkle)
+        }
         save()
     }
 
     /// 死んだ魚とお別れする（水槽から取り出す）。
     func farewell(_ id: UUID) {
+        if state.tank.fish.contains(where: { $0.id == id && !$0.isAlive }) { sfx(.farewell) }
         state.tank.fish.removeAll { $0.id == id && !$0.isAlive }
         state.notifiedDangerFish.remove(id)
         save()

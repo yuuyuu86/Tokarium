@@ -67,6 +67,8 @@ final class SwimEngine {
     var speedFactor: Double = 1
     /// 「視差効果を減らす」: 波紋を出さず、動きを控えめにする。
     var calm = false
+    /// 魚が餌を食べたとき（効果音に使う）。
+    var onEat: (() -> Void)?
 
     /// 水槽を入れかえたとき（復元・同期）に動きをリセットする。
     func reset() {
@@ -216,7 +218,10 @@ final class SwimEngine {
             s.targetY = min(p.y, 0.84)
             chasing = true
             speed *= 1.8
-            if hypot((p.x - s.x) * aspect, p.y - s.y) < 0.025 { pellets.remove(at: i) }
+            if hypot((p.x - s.x) * aspect, p.y - s.y) < 0.025 {
+                pellets.remove(at: i)
+                onEat?()
+            }
         } else if let leader, let l = swimmers[leader.id] {
             // 群れ: 先頭の魚の少し後ろを、ずらして並んで泳ぐ
             let back = l.facingRight ? -1.0 : 1.0

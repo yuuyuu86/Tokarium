@@ -100,6 +100,9 @@ final class GameStore {
     // MARK: 起動・時間経過
 
     func start() {
+        SoundPlayer.shared.config = settings.soundConfig
+        // 魚が餌を食べたら「ぱくっ」
+        engine.onEat = { SoundPlayer.shared.play(.eat, spontaneous: true) }
         simulate()
         autoBackupIfNeeded()
         timers.append(Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
@@ -149,6 +152,9 @@ final class GameStore {
     }
 
     func announce(_ report: Simulation.Report) {
+        if !report.births.isEmpty { sfx(.birth, spontaneous: true) }
+        else if !report.newlyDead.isEmpty { sfx(.sad, spontaneous: true) }
+        else if !report.grownUp.isEmpty { sfx(.sparkle, spontaneous: true) }
         if report.autoFed > 0 {
             toast = String(localized: "自動給餌器が餌をあげました（残り \(state.food) 回分）")
         }
@@ -194,7 +200,10 @@ final class GameStore {
             self.isScanning = false
             self.detectedSources = scanner.detectedSources()
             let gained = snapshot.ledger.coinsEarned - before
-            if gained > 0 { self.toast = String(localized: "AIの利用で \(gained) コイン増えました") }
+            if gained > 0 {
+                self.toast = String(localized: "AIの利用で \(gained) コイン増えました")
+                self.sfx(.coin, spontaneous: true)
+            }
             self.evaluateProgress()
             self.save()
         }
@@ -275,5 +284,11 @@ final class GameStore {
             scheduleReminders()
         }
         if settings.iCloudSync && !old.iCloudSync { startICloudSync() }
+        SoundPlayer.shared.config = settings.soundConfig
+    }
+
+    /// 効果音を鳴らす。`spontaneous` は操作によらず起きたことで、水槽の窓が見えているときだけ鳴らす。
+    func sfx(_ effect: SoundEffect, spontaneous: Bool = false) {
+        SoundPlayer.shared.play(effect, spontaneous: spontaneous)
     }
 }

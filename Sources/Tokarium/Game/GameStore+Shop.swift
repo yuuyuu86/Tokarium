@@ -16,10 +16,16 @@ extension GameStore {
         }
     }
 
+    /// 買えなかったときの音を鳴らして、理由を返す。
+    func failed(_ error: PurchaseError) -> PurchaseError {
+        sfx(.error)
+        return error
+    }
+
     @discardableResult
     func buyFish(_ sp: FishSpecies) -> PurchaseError? {
-        guard coins >= sp.price else { return .notEnoughCoins }
-        guard livingFish.count < state.tank.size.maxFish else { return .tankFull }
+        guard coins >= sp.price else { return failed(.notEnoughCoins) }
+        guard livingFish.count < state.tank.size.maxFish else { return failed(.tankFull) }
         let n = state.tank.fish.filter { $0.speciesID == sp.id }.count + 1
         let fish = Fish(speciesID: sp.id, name: String(localized: "\(sp.name) \(n)号"), fullness: 70, purchasedAt: Date(),
                         x: .random(in: 0.2...0.8), y: sp.zone == .bottom ? 0.82 : 0.15)
@@ -27,19 +33,22 @@ extension GameStore {
         state.stats.fishBought += 1
         state.coinsSpent += sp.price
         toast = String(localized: "\(sp.name)を水槽に入れました")
+        sfx(.buy)
+        sfx(.tap)
         save()
         return nil
     }
 
     @discardableResult
     func buyDecoration(_ kind: DecorationKind) -> PurchaseError? {
-        guard coins >= kind.price else { return .notEnoughCoins }
+        guard coins >= kind.price else { return failed(.notEnoughCoins) }
         let placed = state.tank.decorations.filter(\.isPlaced).count
         let d = Decoration(kindID: kind.id, isPlaced: placed < state.tank.size.maxDecorations,
                            x: .random(in: 0.1...0.9), layer: Int.random(in: 0...1))
         state.tank.decorations.append(d)
         state.coinsSpent += kind.price
         state.stats.decorationsBought += 1
+        sfx(.buy)
         save()
         if !d.isPlaced { return .tooManyDecorations }
         // 置き場所はユーザーが水槽で決める
@@ -49,9 +58,10 @@ extension GameStore {
 
     @discardableResult
     func buyMedicine() -> PurchaseError? {
-        guard coins >= Catalog.medicinePrice else { return .notEnoughCoins }
+        guard coins >= Catalog.medicinePrice else { return failed(.notEnoughCoins) }
         state.coinsSpent += Catalog.medicinePrice
         state.medicine += 1
+        sfx(.buy)
         toast = String(localized: "薬を買いました（持っている数: \(state.medicine)）")
         save()
         return nil
@@ -59,9 +69,10 @@ extension GameStore {
 
     @discardableResult
     func buyFood(_ pack: FoodPack) -> PurchaseError? {
-        guard coins >= pack.price else { return .notEnoughCoins }
+        guard coins >= pack.price else { return failed(.notEnoughCoins) }
         state.coinsSpent += pack.price
         state.food += pack.servings
+        sfx(.buy)
         toast = String(localized: "餌を買いました（残り \(state.food) 回分）")
         save()
         return nil
@@ -74,11 +85,12 @@ extension GameStore {
 
     @discardableResult
     func buyTankUpgrade() -> PurchaseError? {
-        guard let next = nextTankSize else { return .maxSize }
-        guard coins >= next.price else { return .notEnoughCoins }
+        guard let next = nextTankSize else { return failed(.maxSize) }
+        guard coins >= next.price else { return failed(.notEnoughCoins) }
         state.coinsSpent += next.price
         state.tank.level = next.level
         toast = String(localized: "\(next.name)になりました（魚 \(next.maxFish) 匹・装飾 \(next.maxDecorations) 個まで）")
+        sfx(.fanfare)
         save()
         return nil
     }
@@ -87,8 +99,10 @@ extension GameStore {
         simulate()
         if Simulation.giveMedicine(&state, fish: id) {
             toast = String(localized: "薬をあげました")
+            sfx(.medicine)
             save()
         } else if state.medicine == 0 {
+            sfx(.error)
             toast = String(localized: "薬がありません。お店で買えます")
         }
     }
@@ -120,6 +134,7 @@ extension GameStore {
         guard let id = placingDecoration, let d = state.tank.decorations.first(where: { $0.id == id }) else { return }
         placingDecoration = nil
         toast = String(localized: "\(d.kind.name)を置きました")
+        sfx(.place)
         save()
     }
 

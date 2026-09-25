@@ -132,6 +132,41 @@ private struct BackupSettings: View {
     }
 }
 
+private struct SoundSettings: View {
+    @Environment(GameStore.self) private var store
+
+    var body: some View {
+        @Bindable var store = store
+        Toggle("BGM を流す", isOn: $store.settings.musicEnabled)
+        if store.settings.musicEnabled {
+            volume(String(localized: "BGM の音量"), $store.settings.musicVolume)
+            Toggle("水槽の窓が見えているときだけ BGM を流す", isOn: $store.settings.musicOnlyWhenVisible)
+            Text(store.settings.timeOfDay
+                 ? "昼（朝5時〜夕方7時）と夜で曲が変わります。"
+                 : "「時間帯で明るさを変える」をオンにすると、夜は夜の曲になります。")
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        }
+        Toggle("効果音を鳴らす", isOn: $store.settings.effectsEnabled)
+        if store.settings.effectsEnabled {
+            HStack {
+                volume(String(localized: "効果音の音量"), $store.settings.effectsVolume)
+                Button("試しに鳴らす") { store.sfx(.coin) }
+            }
+        }
+        Text("曲と効果音は Tokarium のために作ったオリジナルです。稚魚の誕生やコインなど、ひとりでに起きたことの音は、水槽の窓が見えているときだけ鳴ります。")
+            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+    }
+
+    private func volume(_ title: String, _ value: Binding<Double>) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+            Image(systemName: "speaker.fill").foregroundStyle(PixelPalette.dim)
+            Slider(value: value, in: 0...1).frame(maxWidth: 220).accessibilityLabel(title)
+            Image(systemName: "speaker.wave.3.fill").foregroundStyle(PixelPalette.dim)
+        }
+    }
+}
+
 private struct UpdateSettings: View {
     @Environment(Updater.self) private var updater
     @State private var auto = false
@@ -235,6 +270,9 @@ struct SettingsScreen: View {
             PixelSection("水槽の演出") {
                 Toggle("時間帯で明るさを変える（夜は魚もゆっくり）", isOn: $store.settings.timeOfDay)
                 Toggle("季節の浮遊物（春は花びら・秋は葉・冬はマリンスノー）", isOn: $store.settings.seasons)
+            }
+            PixelSection("サウンド") {
+                SoundSettings()
             }
             PixelSection("スクリーンセーバー") {
                 SaverSettings()

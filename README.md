@@ -85,6 +85,19 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 - ウィジェット（`Widget/`、WidgetKit の拡張）。アプリが `~/Library/Application Support/Tokarium/widget/` に
   書き出した画像と状態を、サンドボックスの一時的な例外で読む
 
+## 音
+
+- BGM は昼の曲（F メジャー・72BPM・約107秒）と夜の曲（A マイナー・60BPM・128秒）。
+  「時間帯で明るさを変える」がオンなら夜7時〜朝5時は夜の曲。切りかえはゆっくり重ねる
+- 効果音16種（餌・食べる・水換え・水をたたく・コイン・購入・配置・薬・宝箱・実績・稚魚・死・お別れなど）
+- 既定では、水槽の窓が見えているときだけ BGM を流す。稚魚やコインなど、操作によらず起きたことの音も窓が見えているときだけ
+- 何も鳴っていないときは音のエンジンを止める（電池のため）。設定の「サウンド」とメニューの「水槽」でオン・オフ（⌥⌘M で BGM）
+- 音はすべてオリジナル。Python で MIDI として作曲し（`scripts/audio/compose.py` → `Audio/midi/`）、
+  サンプルを使わない自作のシンセで音にする（`scripts/audio/render.py` → `Resources/Sounds/*.m4a`）。
+  曲はループの区切りからはみ出した残響を頭に重ねて、つなぎ目なく繰り返す
+- 作り直すには: `pip3 install mido numpy` のあと `python3 scripts/audio/compose.py && python3 scripts/audio/render.py`。
+  MIDI はふつうの MIDI ファイルなので、DAW で開いて編集してから `render.py` だけ実行してもよい
+
 ## 省電力と記録の整理
 
 - 窓が完全に隠れているときは水槽を止める。バッテリー・低電力モードでは 15fps、Mac が熱いときは 10fps（設定でオフにできる）
@@ -125,7 +138,8 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 - `Render/` 泳ぎの動き、背景と水槽の描画（`AquariumStyle`）、手描きのドット絵
 - `Desktop/` デスクトップ表示（壁紙の上・アイコンの下に置く背景ウィンドウ）
 - `UI/` 水槽・お世話・お店・AI利用量・設定・初回設定・不具合報告の画面
-- `App/` 起動処理、アップデート（`Updater`）、ログとクラッシュ検出（`Diagnostics`）
+- `App/` 起動処理、アップデート（`Updater`）、ログとクラッシュ検出（`Diagnostics`）、BGM と効果音（`SoundPlayer`）
+- `Audio/midi/` BGM と効果音の MIDI（`scripts/audio/` で作曲・音にする）
 
 ## 公開前に残っていること
 
@@ -137,7 +151,7 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 
 ## ライセンス
 
-MIT License（`LICENSE`）。同梱しているソフトウェア:
+MIT License（`LICENSE`）。BGM と効果音もこのリポジトリで作ったもので、同じ MIT License。同梱しているソフトウェア:
 - Sparkle — MIT License（`Resources/Licenses/Sparkle.txt`）
 - DotGothic16 — SIL Open Font License 1.1（`Resources/Licenses/DotGothic16-OFL.txt`）
 

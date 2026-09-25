@@ -22,6 +22,8 @@ install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/Mac
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 # ドット絵フォント（DotGothic16, SIL OFL）
 ditto Resources/Fonts "$APP/Contents/Resources/Fonts"
+# BGM と効果音（scripts/audio/ で MIDI から作ったオリジナル）
+ditto Resources/Sounds "$APP/Contents/Resources/Sounds"
 # 同梱しているソフトウェアのライセンス
 ditto Resources/Licenses "$APP/Contents/Resources/Licenses"
 # 翻訳（ja / en）
