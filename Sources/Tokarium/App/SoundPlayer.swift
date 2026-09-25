@@ -104,7 +104,7 @@ final class SoundPlayer {
         let node = effectNodes[nextEffectNode]
         nextEffectNode = (nextEffectNode + 1) % effectNodes.count
         node.stop()
-        node.volume = Float(config.effectsVolume)
+        node.volume = effectsGain
         node.scheduleBuffer(buffer, at: nil, options: [])
         node.play()
         let length = Double(buffer.frameLength) / Self.sampleRate
@@ -121,6 +121,8 @@ final class SoundPlayer {
     }
 
     private var musicVolume: Float { Float(config.musicVolume) * 0.8 }
+    /// 効果音の音量。BGM より前に出すぎないよう、素の音量を半分（約 -6dB）にしている。
+    private var effectsGain: Float { Float(config.effectsVolume) * 0.5 }
 
     /// 設定・窓の見え方・時間帯に合わせて、曲を始める・切りかえる・止める。
     private func update() {

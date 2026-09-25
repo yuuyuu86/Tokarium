@@ -699,4 +699,7 @@ EN = {
 '曲と効果音は Tokarium のために作ったオリジナルです。稚魚の誕生やコインなど、ひとりでに起きたことの音は、水槽の窓が見えているときだけ鳴ります。': 'The music and sound effects were made for Tokarium. Sounds for things that happen on their own, such as newborn fry or coins, play only while the tank window is visible.',
 '水槽の窓が見えているときだけ BGM を流す': 'Play music only while the tank window is visible',
 '試しに鳴らす': 'Test',
+'サポート': 'Support',
+'一般': 'General',
+'水槽と音': 'Tank & Sound',
 }

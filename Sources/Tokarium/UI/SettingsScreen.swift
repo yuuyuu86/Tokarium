@@ -161,7 +161,7 @@ private struct SoundSettings: View {
         HStack(spacing: 8) {
             Text(title)
             Image(systemName: "speaker.fill").foregroundStyle(PixelPalette.dim)
-            Slider(value: value, in: 0...1).frame(maxWidth: 220).accessibilityLabel(title)
+            Slider(value: value, in: 0...1).tint(PixelPalette.sand).frame(maxWidth: 220).accessibilityLabel(title)
             Image(systemName: "speaker.wave.3.fill").foregroundStyle(PixelPalette.dim)
         }
     }
@@ -226,91 +226,149 @@ enum Relauncher {
     }
 }
 
+/// 設定のタブ。
+enum SettingsTab: String, CaseIterable, Identifiable {
+    case general, tank, usage, data, support
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .general: return String(localized: "一般")
+        case .tank: return String(localized: "水槽と音")
+        case .usage: return String(localized: "AI利用記録")
+        case .data: return String(localized: "データ")
+        case .support: return String(localized: "サポート")
+        }
+    }
+}
+
 struct SettingsScreen: View {
     @Environment(GameStore.self) private var store
+    @State private var tab: SettingsTab
+
+    init(tab: SettingsTab = .general) {
+        _tab = State(initialValue: tab)
+    }
 
     var body: some View {
-        @Bindable var store = store
-        ScrollView {
-        VStack(alignment: .leading, spacing: 18) {
-            PixelSection("表示") {
-                PixelChoice(title: "表示方法", selection: $store.settings.displayMode,
-                            options: DisplayMode.allCases.map { ($0, $0.label) })
-                if store.settings.displayMode == .desktop {
-                    PixelChoice(title: "表示するディスプレイ", selection: $store.settings.desktopScreens,
-                                options: DesktopScreens.allCases.map { ($0, $0.label) })
-                    Text("デスクトップ表示は、Macの壁紙を変えずに壁紙の上へ水槽を重ねます。デスクトップのアイコンはそのまま使えます。お世話はこのウィンドウかメニューバーから行います。")
-                        .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
-                }
-                Toggle("省電力（窓が隠れているときは止め、バッテリーや低電力モードでは控えめに）", isOn: $store.settings.autoPowerSaving)
-                if store.settings.autoPowerSaving {
-                    Text("\(store.power.statusText)・いまは \(store.effectiveFPS) fps").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
-                }
-                PixelChoice(title: "アニメーション", selection: $store.settings.fps,
-                            options: [(60, String(localized: "なめらか（60fps）")), (30, String(localized: "標準（30fps）")), (15, String(localized: "省電力（15fps）"))])
-            }
-            PixelSection("起動") {
-                Toggle("ログイン時に Tokarium を開く", isOn: Binding(get: { store.launchAtLogin }, set: { store.launchAtLogin = $0 }))
-                Toggle("魚が危険なときに通知する", isOn: $store.settings.notificationsEnabled)
-            }
-            PixelSection("AI利用記録") {
-                ForEach(UsageReaders.all, id: \.info.id) { r in
-                    Toggle(isOn: Binding(get: { store.settings.enabledSources.contains(r.info.id) },
-                                         set: { store.setSource(r.info.id, enabled: $0) })) {
-                        VStack(alignment: .leading) {
-                            Text(r.info.name)
-                            Text(r.info.locations.joined(separator: "、")).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
-                        }
+        VStack(spacing: 0) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(SettingsTab.allCases) { t in
+                        Button(t.title) { tab = t }
+                            .buttonStyle(PixelButtonStyle(prominent: tab == t))
+                            .accessibilityAddTraits(tab == t ? .isSelected : [])
                     }
                 }
-                Toggle("推定値もコインに含める", isOn: $store.settings.includeEstimated)
-                Text("推定値（Ollama など）は実際のトークン数ではありません。オンにすると、オンにした後に読み取った推定値からコインに換算します。")
-                    .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
             }
-            PixelSection("水槽の演出") {
-                Toggle("時間帯で明るさを変える（夜は魚もゆっくり）", isOn: $store.settings.timeOfDay)
-                Toggle("季節の浮遊物（春は花びら・秋は葉・冬はマリンスノー）", isOn: $store.settings.seasons)
-            }
-            PixelSection("サウンド") {
-                SoundSettings()
-            }
-            PixelSection("スクリーンセーバー") {
-                SaverSettings()
-            }
-            PixelSection("お世話のリマインド") {
-                ReminderSettings()
-            }
-            PixelSection("バックアップと同期") {
-                BackupSettings()
-            }
-            PixelSection("言語") {
-                LanguagePicker()
-            }
-            PixelSection("アップデートとサポート") {
-                UpdateSettings()
-                Button("Tokarium について（ライセンス）") { store.showAbout = true }
-                Button("チュートリアルをもう一度見る") {
-                    store.settings.tutorialDone = false
-                    store.toast = String(localized: "水槽の画面に戻ると、案内が始まります")
+            .padding(.bottom, 8)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    switch tab {
+                    case .general: general
+                    case .tank: tankAndSound
+                    case .usage: usage
+                    case .data: data
+                    case .support: support
+                    }
                 }
-                Button("不具合を報告…") { store.bugReport = BugReportRequest() }
-                Button("ログをFinderで表示") { NSWorkspace.shared.activateFileViewerSelecting([AppLog.file]) }
-                Text("不具合の報告は、内容を確認してからブラウザやメールで送ります。自動では送信しません。")
-                    .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                .padding(4)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            PixelSection("データ") {
-                LabeledContent("コイン付与の開始", value: store.state.createdAt.shortText)
-                Text("保存するのは水槽・魚・装飾・コイン、利用記録の件数・時刻・取得元・重複判定用のID・トークン数だけです。AIとの会話本文・APIキー・Cookieは保存しません。")
-                    .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
-                Button("保存フォルダを開く") {
-                    let url = GameStore.defaultDirectory
-                    NSWorkspace.shared.open(url)
-                }
-            }
-        }
-        .padding(4)
+            .id(tab)
         }
         .toggleStyle(.pixel)
         .buttonStyle(.pixel)
+    }
+
+    @ViewBuilder private var general: some View {
+        @Bindable var store = store
+        PixelSection("表示") {
+            PixelChoice(title: "表示方法", selection: $store.settings.displayMode,
+                        options: DisplayMode.allCases.map { ($0, $0.label) })
+            if store.settings.displayMode == .desktop {
+                PixelChoice(title: "表示するディスプレイ", selection: $store.settings.desktopScreens,
+                            options: DesktopScreens.allCases.map { ($0, $0.label) })
+                Text("デスクトップ表示は、Macの壁紙を変えずに壁紙の上へ水槽を重ねます。デスクトップのアイコンはそのまま使えます。お世話はこのウィンドウかメニューバーから行います。")
+                    .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+            }
+            Toggle("省電力（窓が隠れているときは止め、バッテリーや低電力モードでは控えめに）", isOn: $store.settings.autoPowerSaving)
+            if store.settings.autoPowerSaving {
+                Text("\(store.power.statusText)・いまは \(store.effectiveFPS) fps").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+            }
+            PixelChoice(title: "アニメーション", selection: $store.settings.fps,
+                        options: [(60, String(localized: "なめらか（60fps）")), (30, String(localized: "標準（30fps）")), (15, String(localized: "省電力（15fps）"))])
+        }
+        PixelSection("起動") {
+            Toggle("ログイン時に Tokarium を開く", isOn: Binding(get: { store.launchAtLogin }, set: { store.launchAtLogin = $0 }))
+            Toggle("魚が危険なときに通知する", isOn: $store.settings.notificationsEnabled)
+        }
+        PixelSection("お世話のリマインド") {
+            ReminderSettings()
+        }
+        PixelSection("言語") {
+            LanguagePicker()
+        }
+    }
+
+    @ViewBuilder private var tankAndSound: some View {
+        @Bindable var store = store
+        PixelSection("サウンド") {
+            SoundSettings()
+        }
+        PixelSection("水槽の演出") {
+            Toggle("時間帯で明るさを変える（夜は魚もゆっくり）", isOn: $store.settings.timeOfDay)
+            Toggle("季節の浮遊物（春は花びら・秋は葉・冬はマリンスノー）", isOn: $store.settings.seasons)
+        }
+        PixelSection("スクリーンセーバー") {
+            SaverSettings()
+        }
+    }
+
+    @ViewBuilder private var usage: some View {
+        @Bindable var store = store
+        PixelSection("AI利用記録") {
+            ForEach(UsageReaders.all, id: \.info.id) { r in
+                Toggle(isOn: Binding(get: { store.settings.enabledSources.contains(r.info.id) },
+                                     set: { store.setSource(r.info.id, enabled: $0) })) {
+                    VStack(alignment: .leading) {
+                        Text(r.info.name)
+                        Text(r.info.locations.joined(separator: "、")).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    }
+                }
+            }
+            Toggle("推定値もコインに含める", isOn: $store.settings.includeEstimated)
+            Text("推定値（Ollama など）は実際のトークン数ではありません。オンにすると、オンにした後に読み取った推定値からコインに換算します。")
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        }
+    }
+
+    @ViewBuilder private var data: some View {
+        PixelSection("バックアップと同期") {
+            BackupSettings()
+        }
+        PixelSection("データ") {
+            LabeledContent("コイン付与の開始", value: store.state.createdAt.shortText)
+            Text("保存するのは水槽・魚・装飾・コイン、利用記録の件数・時刻・取得元・重複判定用のID・トークン数だけです。AIとの会話本文・APIキー・Cookieは保存しません。")
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+            Button("保存フォルダを開く") {
+                let url = GameStore.defaultDirectory
+                NSWorkspace.shared.open(url)
+            }
+        }
+    }
+
+    @ViewBuilder private var support: some View {
+        PixelSection("アップデートとサポート") {
+            UpdateSettings()
+            Button("Tokarium について（ライセンス）") { store.showAbout = true }
+            Button("チュートリアルをもう一度見る") {
+                store.settings.tutorialDone = false
+                store.toast = String(localized: "水槽の画面に戻ると、案内が始まります")
+            }
+            Button("不具合を報告…") { store.bugReport = BugReportRequest() }
+            Button("ログをFinderで表示") { NSWorkspace.shared.activateFileViewerSelecting([AppLog.file]) }
+            Text("不具合の報告は、内容を確認してからブラウザやメールで送ります。自動では送信しません。")
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        }
     }
 }

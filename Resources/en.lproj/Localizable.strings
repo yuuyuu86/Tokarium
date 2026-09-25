@@ -256,6 +256,7 @@
 "サイケデリックな模様の人気者。" = "A popular fish with psychedelic patterns.";
 "サイズを変えられる普通のウィンドウで水槽を表示します。" = "Shows the tank in a regular, resizable window.";
 "サウンド" = "Sound";
+"サポート" = "Support";
 "サンゴ" = "Coral";
 "サンゴ・貝" = "Corals & Shells";
 "サンタテトラ" = "Santa tetra";
@@ -346,6 +347,7 @@
 "・%@にリセット" = " · resets %@";
 "・推定値のため換算していない分: %@" = " · Not converted (estimates): %@";
 "・最新の記録: %@" = " · Latest record: %@";
+"一般" = "General";
 "三代目" = "Third Generation";
 "不具合の報告は、内容を確認してからブラウザやメールで送ります。自動では送信しません。" = "Bug reports open in your browser or email so you can review them first. Nothing is sent automatically.";
 "不具合を報告" = "Report a Problem";
@@ -489,6 +491,7 @@
 "水槽から取り出します。元には戻せません。" = "It will be removed from the tank. This can’t be undone.";
 "水槽がいっぱいです。お店で水槽を大きくできます" = "The tank is full. You can upgrade it in the Shop.";
 "水槽で稚魚が生まれた" = "Fry were born in your tank";
+"水槽と音" = "Tank & Sound";
 "水槽にいる数" = "Number in your tank";
 "水槽に置く" = "Place in Tank";
 "水槽のお世話" = "Tank Care";
