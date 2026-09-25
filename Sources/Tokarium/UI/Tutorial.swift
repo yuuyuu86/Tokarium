@@ -24,7 +24,7 @@ struct TutorialStep {
         TutorialStep(anchor: nil, title: String(localized: "Tokarium へようこそ！"),
                      body: String(localized: "魚にカーソルを重ねるとようすが、クリックすると餌やりなどのメニューが出ます。水をクリックすると魚が寄ってきます。")),
         TutorialStep(anchor: "coins", title: String(localized: "コイン"),
-                     body: String(localized: "AIを使うと、このMacの利用記録からコインが貯まります。5万トークン（重み付き）で1コインです。")),
+                     body: String(localized: "AIを使うと、このMacの利用記録からコインが貯まります。50万トークン（重み付き）で1コインです。")),
         TutorialStep(anchor: "feed", title: String(localized: "餌やり"),
                      body: String(localized: "1日1〜2回が目安です。餌はお店で買えます（はじめに20回分あります）。")),
         TutorialStep(anchor: "water", title: String(localized: "水換え"),

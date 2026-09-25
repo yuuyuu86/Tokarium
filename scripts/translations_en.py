@@ -934,7 +934,7 @@ EN = {
 '？？？（見つけるとレシピがわかります）': '??? (find it to learn the recipe)',
 '%@を里親に出しました。新しいおうちで元気に暮らします': '%@ went to a new home. It will live happily there',
 '%@を里親に出しますか？': 'Send %@ to a new home?',
-'AIを使うと、このMacの利用記録からコインが貯まります。5万トークン（重み付き）で1コインです。': 'Using AI earns coins from the usage records on this Mac. 50,000 tokens (weighted) make 1 coin.',
+'AIを使うと、このMacの利用記録からコインが貯まります。50万トークン（重み付き）で1コインです。': 'Using AI earns coins from the usage records on this Mac. 500,000 tokens (weighted) make 1 coin.',
 '今日の入荷（品種の魚）': "Today's Arrivals (Variety Fish)",
 '出やすい色: %@': 'Common colors: %@',
 '売り切れ': 'Sold out',

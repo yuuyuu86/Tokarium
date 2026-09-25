@@ -18,7 +18,7 @@ enum MeasureKind: String, Codable {
 /// 通貨換算（確定: 重み付き換算）。
 enum CurrencyRule {
     /// 重み付きトークンいくつで1コインか。
-    static let tokensPerCoin = 50_000.0
+    static let tokensPerCoin = 500_000.0
     /// 以前のレート。レートを変える前に得たコインは、このレートのまま残す。
     static let legacyTokensPerCoin = 10_000.0
     static let inputWeight = 1.0
