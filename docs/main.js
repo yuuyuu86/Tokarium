@@ -43,7 +43,7 @@
     "play.sound.p": "Songs that change between day and night, plus sounds for feeding and water changes. All made for this app. Try ♪ at the top.",
     "play.secret.t": "Hidden fish you can't buy",
     "play.secret.p": "When conditions are right, they wander into your tank. The encyclopedia gives only hints. Memorial fish come in 3 tiers per AI at 100, 1,000 and 5,000 coins.",
-    "features.eyebrow": "Features", "features.title": "Everything it can do",
+    "features.title": "Features",
     "screens.eyebrow": "Screens", "screens.title": "Pixel-art panels over the water",
     "screens.tank": "Tank", "screens.care": "Care", "screens.shop": "Shop", "screens.missions": "Missions", "screens.variants": "Varieties",
     "sources.eyebrow": "Supported AI", "sources.title": "Reads records already on your Mac",
