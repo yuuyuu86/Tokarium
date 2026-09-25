@@ -112,11 +112,24 @@ struct PixelFrame: View {
     var step: CGFloat = 3
 
     var body: some View {
+        // 枠は輪の形で塗る（地が半透明でも、下の枠の色が透けないように）
         ZStack {
-            PixelFrameShape(step: step).fill(outline)
-            PixelFrameShape(step: step, inset: step).fill(border)
+            PixelRingShape(step: step, inset: 0).fill(outline, style: FillStyle(eoFill: true))
+            PixelRingShape(step: step, inset: step).fill(border, style: FillStyle(eoFill: true))
             PixelFrameShape(step: step, inset: step * 2).fill(fill)
         }
+    }
+}
+
+/// 角を段にした枠の、幅1段分の輪。
+struct PixelRingShape: Shape {
+    var step: CGFloat
+    var inset: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var p = PixelFrameShape(step: step, inset: inset).path(in: rect)
+        p.addPath(PixelFrameShape(step: step, inset: inset + step).path(in: rect))
+        return p
     }
 }
 
@@ -135,7 +148,7 @@ extension View {
 
     /// 金色の枠の区切り（ランク・記録・選んでいる称号など、よいことを目立たせる）。
     func pixelInsetGold(_ on: Bool = true) -> some View {
-        self.background(PixelFrame(fill: on ? PixelPalette.gold.opacity(0.1) : PixelPalette.inset,
+        self.background(PixelFrame(fill: on ? Color(rgb: 0x1E2B42) : PixelPalette.inset,
                                    border: on ? PixelPalette.gold.opacity(0.85) : PixelPalette.sea, outline: .clear, step: 2))
     }
 }
