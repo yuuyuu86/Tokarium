@@ -1,4 +1,5 @@
 import AppKit
+import UniformTypeIdentifiers
 import SwiftUI
 
 // MARK: - AI利用量
@@ -34,6 +35,12 @@ struct UsageScreen: View {
                     .padding(6)
                 } label: {
                     Label("通貨残高", systemImage: "circle.hexagongrid")
+                }
+
+                GroupBox {
+                    UsageChart()
+                } label: {
+                    Label("日ごとのAI利用", systemImage: "chart.bar")
                 }
 
                 Text("対応元").font(.pixel(.headline))
@@ -155,6 +162,92 @@ private struct SourceRow: View {
 
 // MARK: - 設定
 
+private struct ReminderSettings: View {
+    @Environment(GameStore.self) private var store
+
+    var body: some View {
+        @Bindable var store = store
+        Toggle("決まった時刻に「そろそろ餌の時間です」と知らせる", isOn: $store.settings.remindersEnabled)
+        if store.settings.remindersEnabled {
+            ForEach(Array(store.settings.reminderTimes.enumerated()), id: \.offset) { i, minutes in
+                HStack(spacing: 8) {
+                    Text(String(format: "%02d:%02d", minutes / 60, minutes % 60)).font(.pixel(.title3)).monospacedDigit()
+                    Button("−30分") { change(i, by: -30) }
+                    Button("+30分") { change(i, by: 30) }
+                    Spacer()
+                    Button { store.settings.reminderTimes.remove(at: i) } label: { Image(systemName: "trash") }
+                        .accessibilityLabel("この時刻を削除")
+                }
+            }
+            if store.settings.reminderTimes.count < 6 {
+                Button { store.settings.reminderTimes.append(12 * 60) } label: { Label("時刻を追加", systemImage: "plus") }
+            }
+            if !store.settings.notificationsEnabled {
+                Text("通知がオフになっています。「起動」の通知をオンにしてください。").font(.pixel(.caption)).foregroundStyle(PixelPalette.danger)
+            }
+        }
+    }
+
+    private func change(_ i: Int, by delta: Int) {
+        var t = store.settings.reminderTimes[i] + delta
+        t = (t % 1440 + 1440) % 1440
+        store.settings.reminderTimes[i] = t
+    }
+}
+
+private struct BackupSettings: View {
+    @Environment(GameStore.self) private var store
+    @State private var confirmImport: URL?
+    @State private var error: String?
+
+    var body: some View {
+        @Bindable var store = store
+        HStack {
+            Button { exportBackup() } label: { Label("バックアップを書き出す…", systemImage: "square.and.arrow.up") }
+            Button { chooseImport() } label: { Label("バックアップから復元…", systemImage: "square.and.arrow.down") }
+        }
+        Text("Mac を買いかえたときなどに、水槽・図鑑・実績・コインの記録をまとめて移せます。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        Toggle("iCloud Drive で水槽を同期する", isOn: $store.settings.iCloudSync)
+            .disabled(GameStore.iCloudFolder == nil)
+        Text(GameStore.iCloudFolder == nil
+             ? "iCloud Drive が見つかりません。システム設定で iCloud Drive をオンにすると使えます。"
+             : "同じ Apple アカウントの Mac で同じ水槽を育てられます。コインは Mac ごとのAI利用を合計します。2台で同時に操作すると、ほぼ同時の操作は片方だけが残ることがあります。")
+            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        .alert("バックアップから復元しますか？", isPresented: Binding(get: { confirmImport != nil }, set: { if !$0 { confirmImport = nil } })) {
+            Button("復元する", role: .destructive) {
+                if let url = confirmImport {
+                    do { try store.importBackup(from: url) } catch { self.error = error.localizedDescription }
+                }
+                confirmImport = nil
+            }
+            Button("キャンセル", role: .cancel) { confirmImport = nil }
+        } message: {
+            Text("いまの水槽は、バックアップの内容に置きかわります。")
+        }
+        .alert(error ?? "", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
+            Button("OK") { error = nil }
+        }
+    }
+
+    private func exportBackup() {
+        let panel = NSSavePanel()
+        let f = DateFormatter()
+        f.dateFormat = "yyyyMMdd"
+        panel.nameFieldStringValue = "Tokarium-backup-\(f.string(from: Date())).json"
+        panel.allowedContentTypes = [.json]
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do { try store.exportBackup(to: url) } catch { self.error = error.localizedDescription }
+    }
+
+    private func chooseImport() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        confirmImport = url
+    }
+}
+
 private struct UpdateSettings: View {
     @Environment(Updater.self) private var updater
     @State private var auto = false
@@ -250,6 +343,16 @@ struct SettingsScreen: View {
                 Toggle("推定値もコインに含める", isOn: $store.settings.includeEstimated)
                 Text("推定値（Ollama など）は実際のトークン数ではありません。オンにすると、オンにした後に読み取った推定値からコインに換算します。")
                     .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+            }
+            PixelSection("水槽の演出") {
+                Toggle("時間帯で明るさを変える（夜は魚もゆっくり）", isOn: $store.settings.timeOfDay)
+                Toggle("季節の浮遊物（春は花びら・秋は葉・冬はマリンスノー）", isOn: $store.settings.seasons)
+            }
+            PixelSection("お世話のリマインド") {
+                ReminderSettings()
+            }
+            PixelSection("バックアップと同期") {
+                BackupSettings()
             }
             PixelSection("言語") {
                 LanguagePicker()

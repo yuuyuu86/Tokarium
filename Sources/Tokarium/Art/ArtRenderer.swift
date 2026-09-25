@@ -105,6 +105,43 @@ enum ArtRenderer {
     }
 }
 
+extension ArtRenderer {
+    /// 色違い: 色相をずらし、少しあざやかにする（灰色の輪郭や目はそのまま）。
+    static func shinyVariant(_ image: CGImage, hueShift: Double = 0.42) -> CGImage? {
+        let w = image.width, h = image.height
+        var px = [UInt8](repeating: 0, count: w * h * 4)
+        guard let ctx = CGContext(data: &px, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
+                                  space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        else { return nil }
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+        for i in stride(from: 0, to: px.count, by: 4) where px[i + 3] > 0 {
+            let r = Double(px[i]) / 255, g = Double(px[i + 1]) / 255, b = Double(px[i + 2]) / 255
+            let mx = max(r, g, b), mn = min(r, g, b), d = mx - mn
+            guard d > 0.08 else { continue }
+            var hue: Double
+            if mx == r { hue = ((g - b) / d).truncatingRemainder(dividingBy: 6) } else if mx == g { hue = (b - r) / d + 2 } else { hue = (r - g) / d + 4 }
+            hue = (hue / 6 + hueShift).truncatingRemainder(dividingBy: 1)
+            if hue < 0 { hue += 1 }
+            let sat = min(1, d / mx * 1.15), v = mx
+            let hh = hue * 6, c = v * sat, x = c * (1 - abs(hh.truncatingRemainder(dividingBy: 2) - 1)), m = v - c
+            let (r2, g2, b2): (Double, Double, Double)
+            switch Int(hh) {
+            case 0: (r2, g2, b2) = (c, x, 0)
+            case 1: (r2, g2, b2) = (x, c, 0)
+            case 2: (r2, g2, b2) = (0, c, x)
+            case 3: (r2, g2, b2) = (0, x, c)
+            case 4: (r2, g2, b2) = (x, 0, c)
+            default: (r2, g2, b2) = (c, 0, x)
+            }
+            px[i] = UInt8((r2 + m) * 255); px[i + 1] = UInt8((g2 + m) * 255); px[i + 2] = UInt8((b2 + m) * 255)
+        }
+        return px.withUnsafeMutableBytes { buf in
+            CGContext(data: buf.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
+                      space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage()
+        }
+    }
+}
+
 /// 描いた画像の置き場。同じ形・画風・大きさは一度しか描かない。
 final class ArtCache {
     static let shared = ArtCache()

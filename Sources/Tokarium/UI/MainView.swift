@@ -1,13 +1,14 @@
 import SwiftUI
 
 enum Screen: String, CaseIterable, Identifiable {
-    case tank, care, shop, usage, settings
+    case tank, care, shop, dex, usage, settings
     var id: String { rawValue }
     var title: String {
         switch self {
         case .tank: return String(localized: "水槽")
         case .care: return String(localized: "お世話")
         case .shop: return String(localized: "お店")
+        case .dex: return String(localized: "図鑑")
         case .usage: return String(localized: "AI利用量")
         case .settings: return String(localized: "設定")
         }
@@ -17,6 +18,7 @@ enum Screen: String, CaseIterable, Identifiable {
         case .tank: return "fish.fill"
         case .care: return "heart.fill"
         case .shop: return "cart.fill"
+        case .dex: return "book.fill"
         case .usage: return "chart.bar.fill"
         case .settings: return "gearshape.fill"
         }
@@ -31,6 +33,7 @@ struct MainView: View {
     @State private var selectedPoint: CGPoint?
     @State private var hovered: UUID?
     @State private var editing = false
+    @State private var windowSize = CGSize(width: 1080, height: 700)
 
     var body: some View {
         ZStack {
@@ -54,9 +57,12 @@ struct MainView: View {
                 TopHUD(screen: screen, hovered: screen == .tank ? hovered : nil)
                 if screen == .tank { TankOverlays(editing: $editing) }
                 Spacer(minLength: 0)
-                BottomBar(screen: $screen, editing: $editing)
+                BottomBar(screen: $screen, editing: $editing, tankSize: windowSize)
             }
         }
+        .background(GeometryReader { geo in
+            Color.clear.onAppear { windowSize = geo.size }.onChange(of: geo.size) { _, new in windowSize = new }
+        }.ignoresSafeArea())
         .animation(.easeOut(duration: 0.15), value: screen)
         .onChange(of: screen) { _, _ in selected = nil }
         .onChange(of: editing) { _, now in
@@ -118,6 +124,7 @@ struct MainView: View {
                 case .tank: EmptyView()
                 case .care: CareScreen()
                 case .shop: ShopScreen()
+                case .dex: DexScreen()
                 case .usage: UsageScreen()
                 case .settings: SettingsScreen()
                 }
@@ -180,7 +187,7 @@ private struct FishHoverStatus: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive).frame(width: 40, height: 26)
+            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny).frame(width: 40, height: 26)
             VStack(alignment: .leading, spacing: 2) {
                 Text(fish.name).font(.pixel(.callout)).lineLimit(1)
                 Text(subtitle).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim).lineLimit(1)
@@ -275,36 +282,13 @@ private struct BottomBar: View {
     @Environment(GameStore.self) private var store
     @Binding var screen: Screen
     @Binding var editing: Bool
+    var tankSize: CGSize
 
     var body: some View {
-        HStack(spacing: 8) {
-            ForEach(Screen.allCases) { s in
-                Button {
-                    screen = s
-                    if s != .tank { editing = false }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: s.symbol)
-                        Text(s.title)
-                        if s == .care && !store.dangerFish.isEmpty {
-                            Text("!").foregroundStyle(PixelPalette.danger)
-                        }
-                    }
-                }
-                .buttonStyle(PixelButtonStyle(prominent: screen == s))
-                .accessibilityAddTraits(screen == s ? .isSelected : [])
-            }
-            Spacer(minLength: 12)
-            Button { store.feed() } label: { Label("餌をあげる（\(store.state.food)）", systemImage: "leaf.fill") }
-                .buttonStyle(.pixel)
-                .disabled(store.state.food == 0)
-                .help(store.state.food == 0 ? "餌がありません。お店で買えます" : "水槽の魚みんなに餌をあげます（餌を1つ使います）")
-            Button { store.changeWater() } label: { Label("水換え", systemImage: "drop.triangle.fill") }
-                .buttonStyle(.pixel)
-            if screen == .tank {
-                Button { editing.toggle() } label: { Label("配置を編集", systemImage: "square.and.pencil") }
-                    .buttonStyle(PixelButtonStyle(prominent: editing))
-            }
+        // 幅が足りないときは、文字を省いてアイコンだけにする
+        ViewThatFits(in: .horizontal) {
+            bar(compact: false)
+            bar(compact: true)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -316,6 +300,73 @@ private struct BottomBar: View {
             }
             .ignoresSafeArea()
         )
+    }
+
+    private func bar(compact: Bool) -> some View {
+        HStack(spacing: 8) {
+            ForEach(Screen.allCases) { s in
+                Button {
+                    screen = s
+                    if s != .tank { editing = false }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: s.symbol)
+                        if !compact { Text(s.title) }
+                        if s == .care && !store.dangerFish.isEmpty {
+                            Text("!").foregroundStyle(PixelPalette.danger)
+                        }
+                    }
+                    .fixedSize()
+                }
+                .buttonStyle(PixelButtonStyle(prominent: screen == s))
+                .help(s.title)
+                .accessibilityLabel(s.title)
+                .accessibilityAddTraits(screen == s ? .isSelected : [])
+            }
+            Spacer(minLength: 12)
+            Button { store.feed() } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "leaf.fill")
+                    Text(compact ? "\(store.state.food)" : String(localized: "餌をあげる（\(store.state.food)）"))
+                }
+                .fixedSize()
+            }
+            .buttonStyle(.pixel)
+            .disabled(store.state.food == 0)
+            .help(store.state.food == 0 ? "餌がありません。お店で買えます" : "水槽の魚みんなに餌をあげます（餌を1つ使います）")
+            .accessibilityLabel("餌をあげる")
+            Button { store.changeWater() } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "drop.triangle.fill")
+                    if !compact { Text("水換え") }
+                }
+                .fixedSize()
+            }
+            .buttonStyle(.pixel)
+            .help("水換え")
+            .accessibilityLabel("水換え")
+            if screen == .tank {
+                Button { editing.toggle() } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "square.and.pencil")
+                        if !compact { Text("配置を編集") }
+                    }
+                    .fixedSize()
+                }
+                .buttonStyle(PixelButtonStyle(prominent: editing))
+                .help("配置を編集")
+                .accessibilityLabel("配置を編集")
+                Button {
+                    if let url = Snapshot.take(store: store, size: tankSize) {
+                        store.toast = String(localized: "写真を保存しました（ピクチャ/Tokarium）。クリップボードにも入れました")
+                        NSWorkspace.shared.activateFileViewerSelecting([url])
+                    }
+                } label: { Image(systemName: "camera.fill") }
+                    .buttonStyle(.pixel)
+                    .help("水槽の写真を撮る（操作パネルは写りません）")
+                    .accessibilityLabel("写真を撮る")
+            }
+        }
     }
 }
 
@@ -352,7 +403,7 @@ private struct FishActionMenu: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive).frame(width: 34, height: 22)
+                FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny).frame(width: 34, height: 22)
                 Text(fish.name).font(.pixel(.callout)).lineLimit(1)
                 Spacer(minLength: 0)
                 Button(action: onClose) { Image(systemName: "xmark") }

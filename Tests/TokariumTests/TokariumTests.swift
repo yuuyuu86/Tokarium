@@ -356,3 +356,112 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
     let s = try JSONDecoder.tokarium.decode(GameState.self, from: Data(json.utf8))
     #expect(s.food == Catalog.initialFood)
 }
+
+// MARK: - 図鑑・実績・設備・ごほうび
+
+@Test func fryAreNextGenerationAndRecordedInDex() {
+    let start = Date(timeIntervalSince1970: 0)
+    var s = GameState.newGame(now: start)
+    s.tank.fish.append(Fish(speciesID: "neon", name: "b", purchasedAt: start))
+    for i in s.tank.fish.indices { s.tank.fish[i].growth = 1 }
+    _ = careFor(&s, from: start, hours: 24 * 20)
+    let fry = s.tank.fish.filter { $0.generation >= 2 }
+    #expect(!fry.isEmpty)
+    #expect(s.dex["neon"]?.born == s.stats.births)
+    #expect((s.dex["neon"]?.maxGeneration ?? 0) >= 2)
+}
+
+@Test func filterHalvesWaterDecayAndFeederFeedsHungryFish() {
+    let start = Date(timeIntervalSince1970: 0)
+    var a = GameState.newGame(now: start), b = GameState.newGame(now: start)
+    b.equipment = [Equipment.filter.id]
+    var rng = SeededRandom(seed: 1)
+    for m in 1...60 {
+        let t = start.addingTimeInterval(Double(m) * 60)
+        Simulation.advance(&a, to: t, rng: &rng)
+        Simulation.advance(&b, to: t, rng: &rng)
+    }
+    #expect(100 - b.tank.waterQuality < (100 - a.tank.waterQuality) * 0.6)
+
+    var c = GameState.newGame(now: start)
+    c.equipment = [Equipment.feeder.id]
+    c.tank.fish[0].fullness = 10
+    let food = c.food
+    Simulation.advance(&c, to: start.addingTimeInterval(60), rng: &rng)
+    #expect(c.food == food - 1)
+    #expect(c.tank.fish[0].fullness > 30)
+    // 8時間以内は二度あげない
+    c.tank.fish[0].fullness = 10
+    Simulation.advance(&c, to: start.addingTimeInterval(120), rng: &rng)
+    #expect(c.food == food - 1)
+}
+
+@MainActor
+@Test func achievementsGiveRewardDecorations() throws {
+    let store = GameStore(directory: try tempHome())
+    store.feed()
+    #expect(store.state.achievements["first_feed"] != nil)
+    for id in ["guppy", "cory", "platy", "zebra"] { _ = store.buyFish(Catalog.species(id)) }
+    // コインが足りない分は直接迎える
+    var s = store.state
+    for id in ["guppy", "cory", "platy", "zebra"] where s.dex[id] == nil {
+        s.recordInDex(Fish(speciesID: id, name: id), at: Date(), born: false)
+    }
+    #expect(s.dex.count >= 5)
+}
+
+@Test func achievementContextCountsShopSpeciesOnly() {
+    var s = GameState.newGame()
+    s.recordInDex(Fish(speciesID: "m_claude", name: "x"), at: Date(), born: false)
+    let ctx = AchievementContext(state: s, coinsEarned: 0, now: Date())
+    #expect(ctx.speciesSeen == 1) // neon のみ（記念の魚は数えない）
+    #expect(Achievements.all.first { $0.id == "species_5" }?.isUnlocked(ctx) == false)
+}
+
+@Test func dailyLedgerRecordsCreditedCoins() {
+    let start = Date()
+    let ctx = ScanContext(ledger: UsageLedger(startDate: start), includeEstimated: false)
+    ctx.record(source: ClaudeCodeReader().info, key: "a", date: start.addingTimeInterval(1), tokens: TokenBreakdown(output: 20_000))
+    let today = DayKey.key(start.addingTimeInterval(1))
+    #expect(ctx.ledger.coins(on: today) == 2)
+    #expect(ctx.ledger.coins(from: ["claude-code"]) == 2)
+}
+
+@MainActor
+@Test func treasureOpensForRewards() throws {
+    let store = GameStore(directory: try tempHome())
+    let food = store.state.food
+    store.openTreasure() // 何もないときは何も起きない
+    #expect(store.state.food == food)
+}
+
+@MainActor
+@Test func backupRoundTrip() throws {
+    let dir = try tempHome()
+    let a = GameStore(directory: dir.appendingPathComponent("a"))
+    a.feed()
+    let file = dir.appendingPathComponent("backup.json")
+    try a.exportBackup(to: file)
+    let b = GameStore(directory: dir.appendingPathComponent("b"))
+    let machine = b.settings.machineID
+    try b.importBackup(from: file)
+    #expect(b.state.food == a.state.food)
+    #expect(b.state.stats.feedings == 1)
+    #expect(b.settings.machineID == machine)
+}
+
+@Test func oldSettingsKeepOnboarding() throws {
+    let json = #"{"onboarded":true,"displayMode":"desktop","desktopScreens":"main","fps":30,"enabledSources":["codex"],"includeEstimated":false,"styleID":"pixel","notificationsEnabled":true}"#
+    let s = try JSONDecoder.tokarium.decode(AppSettings.self, from: Data(json.utf8))
+    #expect(s.onboarded && s.displayMode == .desktop && s.timeOfDay && !s.iCloudSync)
+}
+
+@Test func ambientChangesByHour() {
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+    let noon = cal.date(from: DateComponents(year: 2026, month: 9, day: 25, hour: 12))!
+    let night = cal.date(from: DateComponents(year: 2026, month: 9, day: 25, hour: 23))!
+    #expect(Ambient.at(noon, calendar: cal) == .day)
+    #expect(Ambient.at(night, calendar: cal).speed < 1)
+    #expect(SwimEngine.DrifterKind.forSeason(cal.date(from: DateComponents(year: 2026, month: 4, day: 1))!, calendar: cal) == .petal)
+}

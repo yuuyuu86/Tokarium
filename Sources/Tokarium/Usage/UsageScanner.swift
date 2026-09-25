@@ -19,6 +19,12 @@ actor UsageScanner {
 
     var currentLedger: UsageLedger { ledger }
 
+    /// バックアップから復元した帳簿に置きかえる。
+    func replaceLedger(_ new: UsageLedger) {
+        ledger = new
+        save()
+    }
+
     /// 検出できた対応元のID。
     nonisolated func detectedSources() -> Set<String> {
         let ctx = ScanContext(ledger: UsageLedger(startDate: Date()), includeEstimated: false)

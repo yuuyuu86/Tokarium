@@ -22,9 +22,10 @@ struct FishIcon: View {
     @Environment(GameStore.self) private var store
     let speciesID: String
     var dead = false
+    var shiny = false
     var body: some View {
         let style = store.style
-        if let art = style.fishImage(speciesID, frame: 0, dead: dead) {
+        if let art = style.fishImage(speciesID, frame: 0, dead: dead, shiny: shiny) {
             Image(decorative: art.image, scale: 1).interpolation(.none)
                 .resizable()
                 .aspectRatio(contentMode: .fit)

@@ -51,6 +51,10 @@ struct Fish: Codable, Identifiable, Equatable {
     /// 成長 0〜1（1=成魚）。
     var growth: Double = 0.4
     var isSick: Bool = false
+    /// 何代目か（お店の魚は1代目）。
+    var generation: Int = 1
+    /// まれに生まれる色違い。
+    var isShiny: Bool = false
     /// 水槽内の位置（0〜1 の正規化座標）。
     var x: Double = 0.5
     var y: Double = 0.5
@@ -107,6 +111,8 @@ struct Fish: Codable, Identifiable, Equatable {
             ?? purchasedAt.addingTimeInterval(-Catalog.species(speciesID).lifespanDays * 0.1 * 86400)
         growth = try c.decodeIfPresent(Double.self, forKey: .growth) ?? 0.4
         isSick = try c.decodeIfPresent(Bool.self, forKey: .isSick) ?? false
+        generation = try c.decodeIfPresent(Int.self, forKey: .generation) ?? 1
+        isShiny = try c.decodeIfPresent(Bool.self, forKey: .isShiny) ?? false
         x = try c.decodeIfPresent(Double.self, forKey: .x) ?? 0.5
         y = try c.decodeIfPresent(Double.self, forKey: .y) ?? 0.5
     }
@@ -165,6 +171,23 @@ struct GameState: Codable, Equatable {
     var lastBirthAt: Date?
     /// 危険通知を送った魚（重複通知を防ぐ）。
     var notifiedDangerFish: Set<UUID> = []
+    /// 図鑑（種類ID → 記録）。
+    var dex: [String: DexEntry] = [:]
+    /// 達成した実績（ID → 日時）。
+    var achievements: [String: Date] = [:]
+    var stats = PlayStats()
+    /// 持っている設備。
+    var equipment: Set<String> = []
+    var lastAutoFeedAt: Date?
+    /// もらった記念の魚（AIのグループ）。
+    var memorialsGiven: Set<String> = []
+    /// 流れてきてまだ開けていない宝箱の横位置。
+    var treasureX: Double?
+    /// 宝箱が最後に流れてきた日。
+    var lastTreasureDay: String?
+    /// 最後に保存した日時と Mac（iCloud Drive 同期で新しい方を選ぶ）。
+    var savedAt: Date?
+    var savedBy: String?
 
     init(createdAt: Date = Date(), lastSimulatedAt: Date = Date()) {
         self.createdAt = createdAt
@@ -185,13 +208,43 @@ struct GameState: Codable, Equatable {
         food = try c.decodeIfPresent(Int.self, forKey: .food) ?? Catalog.initialFood
         lastBirthAt = try c.decodeIfPresent(Date.self, forKey: .lastBirthAt)
         notifiedDangerFish = try c.decodeIfPresent(Set<UUID>.self, forKey: .notifiedDangerFish) ?? []
+        dex = try c.decodeIfPresent([String: DexEntry].self, forKey: .dex) ?? [:]
+        achievements = try c.decodeIfPresent([String: Date].self, forKey: .achievements) ?? [:]
+        stats = try c.decodeIfPresent(PlayStats.self, forKey: .stats) ?? PlayStats()
+        equipment = try c.decodeIfPresent(Set<String>.self, forKey: .equipment) ?? []
+        lastAutoFeedAt = try c.decodeIfPresent(Date.self, forKey: .lastAutoFeedAt)
+        memorialsGiven = try c.decodeIfPresent(Set<String>.self, forKey: .memorialsGiven) ?? []
+        treasureX = try c.decodeIfPresent(Double.self, forKey: .treasureX)
+        lastTreasureDay = try c.decodeIfPresent(String.self, forKey: .lastTreasureDay)
+        savedAt = try c.decodeIfPresent(Date.self, forKey: .savedAt)
+        savedBy = try c.decodeIfPresent(String.self, forKey: .savedBy)
+        // 図鑑ができる前のデータは、いまいる魚から図鑑を作る
+        if dex.isEmpty {
+            for f in tank.fish { recordInDex(f, at: f.purchasedAt, born: false) }
+        }
+    }
+
+    /// 魚を迎えたことを図鑑に書く。
+    mutating func recordInDex(_ f: Fish, at date: Date, born: Bool) {
+        var e = dex[f.speciesID] ?? DexEntry(firstSeenAt: date)
+        e.owned += 1
+        if born { e.born += 1 }
+        e.maxGeneration = max(e.maxGeneration, f.generation)
+        if f.isShiny { e.shiny += 1 }
+        dex[f.speciesID] = e
+    }
+
+    /// 魚を水槽に入れる（図鑑にも書く）。
+    mutating func addFish(_ f: Fish, at date: Date, born: Bool = false) {
+        tank.fish.append(f)
+        recordInDex(f, at: date, born: born)
     }
 
     static func newGame(now: Date = Date()) -> GameState {
         var state = GameState(createdAt: now, lastSimulatedAt: now)
         for (i, speciesID) in Catalog.initialFish.enumerated() {
             let sp = Catalog.species(speciesID)
-            state.tank.fish.append(Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(i + 1)号"), fullness: 80, purchasedAt: now, x: 0.4, y: 0.45))
+            state.addFish(Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(i + 1)号"), fullness: 80, purchasedAt: now, x: 0.4, y: 0.45), at: now)
         }
         for (kindID, x) in Catalog.initialDecorations {
             state.tank.decorations.append(Decoration(kindID: kindID, x: x))

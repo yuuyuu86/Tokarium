@@ -32,6 +32,8 @@ struct FishSpecies: Identifiable {
     /// 寿命（日）。
     let lifespanDays: Double
     let design: FishDesign
+    /// お店に並ばない（記念の魚など）。
+    var hidden = false
 
     var rarity: FishRarity { price >= 300 ? .rare : price >= 120 ? .uncommon : .common }
 }
@@ -47,6 +49,8 @@ struct DecorationKind: Identifiable {
     let size: CGSize
     let design: DecoDesign
     let category: DecorationCategory
+    /// お店に並ばない（実績のごほうびなど）。
+    var hidden = false
 }
 
 enum DecorationCategory: CaseIterable {
@@ -279,6 +283,38 @@ enum Catalog {
                         $0.back = 0x5A9A30; $0.body = 0x7CC242; $0.bellyColor = 0xF4F0C0; $0.fin = 0x9CD262
                         $0.patterns = [.spots(count: 6, size: 0.05, color: 0x1E3A12)]
                     }),
+    ] + memorialSpecies
+
+    /// AIの利用でもらえる記念の魚（お店には並ばない）。
+    static let memorialSpecies: [FishSpecies] = [
+        FishSpecies(id: "m_claude", name: String(localized: "アンバーテトラ（Claude 記念）"), price: 0,
+                    blurb: String(localized: "Claude をたくさん使った記念の魚。あたたかな琥珀色。"),
+                    speed: 0.08, zone: .any, lifespanDays: 400, design: fishDesign {
+                        $0.length = 14; $0.aspect = 0.5; $0.tail = .fan; $0.tailFrac = 0.3; $0.depth = 0.64
+                        $0.back = 0xB5552F; $0.body = 0xD97757; $0.bellyColor = 0xF4D9C6; $0.fin = 0xF0B090
+                        $0.patterns = [.spots(count: 4, size: 0.04, color: 0xFFF0E0)]
+                    }, hidden: true),
+        FishSpecies(id: "m_codex", name: String(localized: "ターミナルグッピー（Codex 記念）"), price: 0,
+                    blurb: String(localized: "Codex をたくさん使った記念の魚。黒い体に緑の光。"),
+                    speed: 0.08, zone: .upper, lifespanDays: 400, design: fishDesign {
+                        $0.length = 14; $0.aspect = 0.55; $0.tail = .fan; $0.tailFrac = 0.36; $0.tailSpread = 0.95; $0.depth = 0.45
+                        $0.back = 0x101418; $0.body = 0x1E2630; $0.bellyColor = 0x2E3A46; $0.fin = 0x3CE06A; $0.iris = 0x3CE06A
+                        $0.patterns = [.hBand(y: -0.1, thickness: 0.22, color: 0x3CE06A)]
+                    }, hidden: true),
+        FishSpecies(id: "m_gemini", name: String(localized: "ツインスター（Gemini 記念）"), price: 0,
+                    blurb: String(localized: "Gemini や Qwen をたくさん使った記念の魚。青から紫へ。"),
+                    speed: 0.07, zone: .any, lifespanDays: 400, design: fishDesign {
+                        $0.length = 15; $0.aspect = 0.7; $0.tail = .double; $0.tailFrac = 0.3; $0.depth = 0.7; $0.blunt = 0.7
+                        $0.back = 0x3050D0; $0.body = 0x5A6CF0; $0.bellyColor = 0xB090F0; $0.fin = 0x9A7CF0
+                        $0.patterns = [.rear(color: 0x8A5CE0, from: 0.4), .spots(count: 3, size: 0.05, color: 0xFFFFFF)]
+                    }, hidden: true),
+        FishSpecies(id: "m_other", name: String(localized: "コードフィッシュ（記念）"), price: 0,
+                    blurb: String(localized: "OpenCode・Copilot・Ollama をたくさん使った記念の魚。金色にかがやく。"),
+                    speed: 0.07, zone: .any, lifespanDays: 400, design: fishDesign {
+                        $0.length = 15; $0.aspect = 0.6; $0.tail = .crescent; $0.depth = 0.75
+                        $0.back = 0xC08A10; $0.body = 0xF0C030; $0.bellyColor = 0xFFF0A0; $0.fin = 0xFFD860
+                        $0.patterns = [.vStripes(count: 2, width: 0.06, color: 0xFFFFFF, from: 0.3, to: 0.6)]
+                    }, hidden: true),
     ]
 
     private static func deco(_ id: String, _ name: String, _ price: Int, _ blurb: String, _ category: DecorationCategory,
@@ -360,7 +396,40 @@ enum Catalog {
                      .p([(0, 0.48), (1, 0.34), (0.9, 1), (0.1, 1)], 0x6A4A30, texture: .wood), .r(0.02, 0.44, 0.96, 0.05, 0x4A3020, role: .detail),
                      .e(0.25, 0.6, 0.06, 0.12, 0x1C1410, role: .dark), .e(0.45, 0.58, 0.06, 0.12, 0x1C1410, role: .dark),
                      .e(0.65, 0.56, 0.06, 0.12, 0x1C1410, role: .dark), .p([(0.75, 0.4), (0.85, 0.5), (0.8, 0.75), (0.72, 0.6)], 0x1C1410, role: .dark)])),
-    ]
+    ] + rewardDecorations
+
+    /// 実績のごほうびでもらえる限定の装飾（お店には並ばない）。
+    static let rewardDecorations: [DecorationKind] = {
+        var list: [DecorationKind] = [
+            deco("goldshell", String(localized: "金の貝がら"), 0, String(localized: "にぎやかな水槽のあかし。"), .sea, 10, 8, .scallop(color: 0xF0C840)),
+            deco("flowercoral", String(localized: "花サンゴ"), 0, String(localized: "はじめての稚魚の記念。"), .sea, 20, 20, .anemone(color: 0xF08AB0, tip: 0xFFF0A0)),
+            deco("rainbowcoral", String(localized: "にじいろサンゴ"), 0, String(localized: "30日間だれも死なせなかったあかし。"), .sea, 22, 18,
+                 .parts([.r(0.02, 0.4, 0.14, 0.6, 0xE84040, radius: 0.06), .r(0.2, 0.2, 0.14, 0.8, 0xF09030, radius: 0.06),
+                         .r(0.38, 0.05, 0.14, 0.95, 0xF0D040, radius: 0.06), .r(0.56, 0.25, 0.14, 0.75, 0x50C860, radius: 0.06),
+                         .r(0.74, 0.35, 0.12, 0.65, 0x4080E0, radius: 0.06), .r(0.88, 0.5, 0.11, 0.5, 0x9050D0, radius: 0.06)])),
+            deco("familystone", String(localized: "家族の石"), 0, String(localized: "3代続いた家族の記念。"), .stone, 16, 22, .stack(color: 0xB09070)),
+            deco("memorial", String(localized: "記念の石碑"), 0, String(localized: "寿命をまっとうした魚をしのぶ石。"), .stone, 14, 20,
+                 .parts([.r(0.1, 0.12, 0.8, 0.88, 0x9A9CA4, radius: 0.35, texture: .stone), .r(0.3, 0.35, 0.4, 0.06, 0x6A6C74, role: .detail),
+                         .r(0.3, 0.5, 0.4, 0.06, 0x6A6C74, role: .detail), .r(0, 0.88, 1, 0.12, 0x7A7C84)])),
+            deco("starlamp", String(localized: "星のランプ"), 0, String(localized: "色違いの魚との出会いの記念。"), .structure, 12, 16,
+                 .parts([.r(0.44, 0.45, 0.12, 0.55, 0x707A88), .p([(0.5, 0), (0.62, 0.28), (0.95, 0.3), (0.68, 0.48), (0.78, 0.8), (0.5, 0.6),
+                                                                    (0.22, 0.8), (0.32, 0.48), (0.05, 0.3), (0.38, 0.28)], 0xFFE070, role: .glow)])),
+            deco("treasurepile", String(localized: "金貨の山"), 0, String(localized: "魚博士へのごほうび。"), .structure, 24, 12,
+                 .parts([.p([(0, 1), (0.2, 0.45), (0.5, 0.15), (0.8, 0.45), (1, 1)], 0xE8B830, smooth: true),
+                         .e(0.2, 0.55, 0.16, 0.14, 0xFFE070, role: .detail), .e(0.5, 0.35, 0.16, 0.14, 0xFFE070, role: .detail),
+                         .e(0.65, 0.65, 0.16, 0.14, 0xFFE070, role: .detail), .p([(0.38, 0.6), (0.44, 0.45), (0.5, 0.6)], 0x40E0FF, role: .glow)])),
+            deco("goldcastle", String(localized: "黄金の城"), 0, String(localized: "図鑑コンプリートのあかし。"), .structure, 50, 40,
+                 .parts([.r(0, 0.22, 0.24, 0.78, 0xE8C040), .r(0.76, 0.22, 0.24, 0.78, 0xE8C040), .r(0.2, 0.42, 0.6, 0.58, 0xD8B030),
+                         .p([(0, 0.22), (0.12, 0), (0.24, 0.22)], 0xC03060), .p([(0.76, 0.22), (0.88, 0), (1, 0.22)], 0xC03060),
+                         .a(0.07, 0.35, 0.1, 0.16), .a(0.83, 0.35, 0.1, 0.16), .a(0.41, 0.62, 0.18, 0.38),
+                         .e(0.45, 0.45, 0.1, 0.1, 0x40E0FF, role: .glow)])),
+            deco("aimonument", String(localized: "AIのモニュメント"), 0, String(localized: "AIと一緒に1000コインを得た記念。"), .structure, 14, 34,
+                 .parts([.p([(0.3, 1), (0.7, 1), (0.6, 0.12), (0.5, 0), (0.4, 0.12)], 0x5A6478, texture: .stone),
+                         .e(0.38, 0.3, 0.24, 0.12, 0x6FE0FF, role: .glow), .r(0.15, 0.9, 0.7, 0.1, 0x4A5264)])),
+        ]
+        for i in list.indices { list[i].hidden = true }
+        return list
+    }()
 
     static func species(_ id: String) -> FishSpecies {
         fish.first { $0.id == id } ?? fish[0]

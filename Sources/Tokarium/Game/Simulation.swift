@@ -44,6 +44,14 @@ enum Simulation {
     static let breedingCooldown: TimeInterval = 24 * 3600
     static let breedingWaterThreshold = 60.0
 
+    // 色違い
+    static let shinyChance = 0.03
+    static let shinyChanceFromShinyParent = 0.15
+
+    // 設備
+    static let autoFeedInterval: TimeInterval = 8 * 3600
+    static let autoFeedBelow = 30.0
+
     // 寿命
     /// 寿命のこの割合を過ぎると「老齢」。
     static let elderlyFraction = 0.85
@@ -63,6 +71,7 @@ enum Simulation {
         var newlySick: [Fish] = []
         var births: [Fish] = []
         var grownUp: [Fish] = []
+        var autoFed = 0
     }
 
     /// `state.lastSimulatedAt` から `now` まで時間を進める。
@@ -118,7 +127,8 @@ enum Simulation {
     private static func tick<R: RandomNumberGenerator>(_ state: inout GameState, hours h: Double, at time: Date,
                                                         floors: [UUID: Double], rng: inout R, report: inout Report) {
         let living = state.tank.fish.filter(\.isAlive).count
-        let waterLoss = (waterDecayBasePerHour + waterDecayPerFishPerHour * Double(living)) * h
+        var waterLoss = (waterDecayBasePerHour + waterDecayPerFishPerHour * Double(living)) * h
+        if state.equipment.contains(Equipment.filter.id) { waterLoss *= 0.5 }
         state.tank.waterQuality = clamp(state.tank.waterQuality - waterLoss)
         let water = state.tank.waterQuality
 
@@ -169,9 +179,14 @@ enum Simulation {
             if !f.isAlive {
                 f.isSick = false
                 report.newlyDead.append(f)
+                state.stats.deaths += 1
+                state.stats.lastDeathAt = time
+                if f.deathCause == .oldAge { state.dex[f.speciesID, default: DexEntry(firstSeenAt: time)].oldAge += 1 }
             }
             state.tank.fish[i] = f
         }
+
+        autoFeed(&state, at: time, report: &report)
 
         breed(&state, hours: h, at: time, rng: &rng, report: &report)
     }
@@ -191,17 +206,33 @@ enum Simulation {
             let sp = Catalog.species(speciesID)
             let count = min(room, Int.random(in: 1...3, using: &rng))
             let parent = group[0]
+            let generation = (group.map(\.generation).max() ?? 1) + 1
+            let shinyChance = group.contains(where: \.isShiny) ? shinyChanceFromShinyParent : Self.shinyChance
             var n = state.tank.fish.filter { $0.speciesID == speciesID }.count
             for _ in 0..<count {
                 n += 1
-                let fry = Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(n)号"), fullness: 70, purchasedAt: time, bornAt: time,
+                var fry = Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(n)号"), fullness: 70, purchasedAt: time, bornAt: time,
                                growth: 0, x: min(0.95, max(0.05, parent.x + .random(in: -0.05...0.05, using: &rng))), y: parent.y)
-                state.tank.fish.append(fry)
+                fry.generation = generation
+                fry.isShiny = Double.random(in: 0..<1, using: &rng) < shinyChance
+                state.addFish(fry, at: time, born: true)
+                state.stats.births += 1
                 report.births.append(fry)
             }
             state.lastBirthAt = time
             return
         }
+    }
+
+    /// 自動給餌器: おなかをすかせた魚がいれば、決まった間隔で餌をあげる（餌を使う）。
+    private static func autoFeed(_ state: inout GameState, at time: Date, report: inout Report) {
+        guard state.equipment.contains(Equipment.feeder.id), state.food > 0 else { return }
+        if let last = state.lastAutoFeedAt, time.timeIntervalSince(last) < autoFeedInterval { return }
+        guard state.tank.fish.contains(where: { $0.isAlive && $0.fullness < autoFeedBelow }) else { return }
+        feed(&state, now: time)
+        state.food -= 1
+        state.lastAutoFeedAt = time
+        report.autoFed += 1
     }
 
     /// 餌やり。生きている魚すべての満腹度を上げ、食べ残しは水を汚す。

@@ -38,10 +38,14 @@ struct AquariumView: View {
                 }
                 TimelineView(.animation(minimumInterval: 1.0 / Double(max(5, store.settings.fps)))) { timeline in
                     Canvas { ctx, size in
+                        let ambient = store.settings.timeOfDay ? Ambient.at(timeline.date) : .day
                         store.engine.aspect = size.height > 0 ? size.width / size.height : 1.6
+                        store.engine.speedFactor = ambient.speed
+                        store.engine.season = store.settings.seasons ? .forSeason(timeline.date) : nil
                         store.engine.step(to: timeline.date, fish: tank.fish, decorations: tank.decorations)
                         style.drawLive(&ctx, size: size, tank: tank, engine: store.engine,
-                                       selected: interactive ? (hoveredFish ?? selectedFish) : nil)
+                                       selected: interactive ? (hoveredFish ?? selectedFish) : nil,
+                                       treasureX: store.state.treasureX, ambient: ambient)
                     }
                 }
                 if interactive && editingLayout && store.placingDecoration == nil {
@@ -58,8 +62,17 @@ struct AquariumView: View {
                     return
                 }
                 guard !editingLayout else { return }
+                // 宝箱 → 魚 → 水（たたくと魚が寄ってくる）の順に調べる
+                if let tx = store.state.treasureX,
+                   style.treasureFrame(x: tx, tank: tank, engine: store.engine, size: size).insetBy(dx: -8, dy: -8).contains(point) {
+                    store.openTreasure()
+                    return
+                }
                 selectedFish = hitFish(at: point, size: size, tank: tank, style: style)
                 selectedPoint = selectedFish == nil ? nil : point
+                if selectedFish == nil, size.width > 0, size.height > 0 {
+                    store.touchWater(x: point.x / size.width, y: point.y / size.height)
+                }
             }
             .onContinuousHover(coordinateSpace: .local) { phase in
                 guard interactive else { return }

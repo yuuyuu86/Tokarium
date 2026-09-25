@@ -90,6 +90,32 @@ struct UsageLedger: Codable {
     var ollamaLastRowID: Int64 = 0
     var sources: [String: SourceTotals] = [:]
     var quotas: [String: QuotaInfo] = [:]
+    /// 日ごと・取得元ごとの、コインに換算した重み付きトークン（日付はその Mac の時刻）。
+    var daily: [String: [String: Double]] = [:]
+
+    init(startDate: Date) { self.startDate = startDate }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        startDate = try c.decode(Date.self, forKey: .startDate)
+        seenKeys = try c.decodeIfPresent(Set<String>.self, forKey: .seenKeys) ?? []
+        files = try c.decodeIfPresent([String: FileState].self, forKey: .files) ?? [:]
+        codexSessionTotals = try c.decodeIfPresent([String: TokenBreakdown].self, forKey: .codexSessionTotals) ?? [:]
+        ollamaLastRowID = try c.decodeIfPresent(Int64.self, forKey: .ollamaLastRowID) ?? 0
+        sources = try c.decodeIfPresent([String: SourceTotals].self, forKey: .sources) ?? [:]
+        quotas = try c.decodeIfPresent([String: QuotaInfo].self, forKey: .quotas) ?? [:]
+        daily = try c.decodeIfPresent([String: [String: Double]].self, forKey: .daily) ?? [:]
+    }
+
+    /// その日にAIで得たコイン。
+    func coins(on day: String) -> Double {
+        (daily[day] ?? [:]).values.reduce(0, +) / CurrencyRule.tokensPerCoin
+    }
+
+    /// 取得元ごとの、これまでに得たコイン。
+    func coins(from sourceIDs: [String]) -> Int {
+        Int(sourceIDs.reduce(0) { $0 + (sources[$1]?.creditedWeighted ?? 0) } / CurrencyRule.tokensPerCoin)
+    }
 
     var creditedWeighted: Double {
         sources.values.reduce(0) { $0 + $1.creditedWeighted }

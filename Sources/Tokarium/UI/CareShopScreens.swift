@@ -56,7 +56,7 @@ private struct FishRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
-            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive)
+            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny)
                 .frame(width: 56, height: 36)
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
@@ -174,7 +174,7 @@ struct ShopScreen: View {
         let size = store.state.tank.size
         Text("水槽の魚 \(store.livingFish.count)/\(size.maxFish) 匹").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
         ForEach([FishRarity.common, .uncommon, .rare], id: \.self) { rarity in
-            let list = Catalog.fish.filter { $0.rarity == rarity && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
+            let list = Catalog.fish.filter { !$0.hidden && $0.rarity == rarity && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
             if !list.isEmpty {
                 Text(rarity.label).font(.pixel(.headline))
                 LazyVGrid(columns: columns, spacing: 12) {
@@ -209,7 +209,7 @@ struct ShopScreen: View {
             }
         }
         ForEach(DecorationCategory.allCases, id: \.self) { category in
-            let list = Catalog.decorations.filter { $0.category == category && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
+            let list = Catalog.decorations.filter { !$0.hidden && $0.category == category && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
             if !list.isEmpty {
                 Text(category.label).font(.pixel(.headline))
                 LazyVGrid(columns: columns, spacing: 12) {
@@ -237,6 +237,17 @@ struct ShopScreen: View {
                     FoodIcon(servings: pack.servings)
                 } buy: {
                     message = store.buyFood(pack)?.errorDescription
+                }
+            }
+            ForEach(Equipment.all) { e in
+                let owned = store.state.equipment.contains(e.id)
+                ShopCard(title: e.name, blurb: e.blurb, price: e.price, canAfford: !owned && store.coins >= e.price) {
+                    Image(systemName: owned ? "checkmark.seal.fill" : e.symbol).font(.system(size: 30)).foregroundStyle(.white)
+                } buy: {
+                    message = store.buyEquipment(e)?.errorDescription
+                }
+                .overlay(alignment: .topTrailing) {
+                    if owned { Text("取りつけ済み").font(.pixel(.caption2)).padding(6).foregroundStyle(PixelPalette.gold) }
                 }
             }
             ShopCard(title: String(localized: "薬"), blurb: String(localized: "病気の魚を1匹治します。持っている数: \(store.state.medicine)"),

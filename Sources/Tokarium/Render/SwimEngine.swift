@@ -38,6 +38,49 @@ final class SwimEngine {
     private var lastDate: Date?
     private var bubbleClock: Double = 0
 
+    // MARK: 触れ合い・季節
+
+    struct Ripple {
+        var x: Double
+        var y: Double
+        var start: Double
+    }
+
+    enum DrifterKind { case petal, leaf, snow }
+
+    struct Drifter {
+        var kind: DrifterKind
+        var x: Double
+        var y: Double
+        var phase: Double
+    }
+
+    /// 水槽をたたいた場所（魚が寄ってくる）。
+    private(set) var attractPoint: (x: Double, y: Double)?
+    private var attractUntil: Double = 0
+    private(set) var ripples: [Ripple] = []
+    private(set) var drifters: [Drifter] = []
+    private var drifterClock: Double = 0
+    /// 季節の浮遊物（nil なら出さない）。
+    var season: DrifterKind?
+    /// 時間帯による泳ぐ速さ（夜はゆっくり）。
+    var speedFactor: Double = 1
+
+    /// 水槽を入れかえたとき（復元・同期）に動きをリセットする。
+    func reset() {
+        swimmers.removeAll()
+        pellets.removeAll()
+        ripples.removeAll()
+        attractPoint = nil
+    }
+
+    /// 水槽をたたく。近くの魚がしばらく寄ってくる。
+    func touch(x: Double, y: Double) {
+        attractPoint = (x, min(y, 0.84))
+        attractUntil = time + 4
+        ripples.append(Ripple(x: x, y: y, start: time))
+    }
+
     /// 表示の縦横比（幅/高さ）。速度を画面比に合わせる。
     var aspect: Double = 16.0 / 10.0
 
@@ -69,6 +112,32 @@ final class SwimEngine {
         for f in fish { if var s = swimmers[f.id] { move(&s, fish: f, dt: dt); swimmers[f.id] = s } }
         updatePellets(dt)
         updateBubbles(dt, decorations: decorations)
+        ripples.removeAll { time - $0.start > 1.2 }
+        if time > attractUntil { attractPoint = nil }
+        updateDrifters(dt)
+    }
+
+    private func updateDrifters(_ dt: Double) {
+        guard let season else { drifters.removeAll(); return }
+        drifterClock += dt
+        if drifterClock > 1.4 && drifters.count < 14 {
+            drifterClock = 0
+            // 花びらと葉は水面をただよい、雪（マリンスノー）はゆっくり沈む
+            drifters.append(Drifter(kind: season, x: .random(in: 0.02...0.98), y: season == .snow ? 0.02 : .random(in: 0.01...0.04),
+                                    phase: .random(in: 0...6)))
+        }
+        for i in drifters.indices {
+            drifters[i].phase += dt
+            switch drifters[i].kind {
+            case .snow:
+                drifters[i].y += 0.012 * dt
+                drifters[i].x += sin(drifters[i].phase) * 0.002 * dt
+            case .petal, .leaf:
+                drifters[i].x += 0.01 * dt
+                drifters[i].y = 0.015 + sin(drifters[i].phase * 1.3) * 0.006
+            }
+        }
+        drifters.removeAll { $0.x > 1.02 || $0.y > SwimEngine.sandTop }
     }
 
     private func sync(_ fish: [Fish]) {
@@ -113,10 +182,17 @@ final class SwimEngine {
         if f.isElderly() { speed *= 0.75 }
         // 稚魚はちょこまか、成魚はゆったり
         speed *= 1.15 - 0.3 * f.growth
+        speed *= speedFactor
 
         // 近くに餌があれば向かう
         var chasing = false
-        if f.condition != .critical, let (i, p) = nearestPellet(to: s), hypot((p.x - s.x) * aspect, p.y - s.y) < 0.6 {
+        if f.condition != .critical, let a = attractPoint, hypot((a.x - s.x) * aspect, a.y - s.y) < 0.5 {
+            // たたいた場所に寄ってくる
+            s.targetX = a.x + sin(s.phase) * 0.03
+            s.targetY = f.species.zone == .bottom ? s.targetY : a.y + cos(s.phase) * 0.03
+            chasing = true
+            speed *= 1.5
+        } else if f.condition != .critical, let (i, p) = nearestPellet(to: s), hypot((p.x - s.x) * aspect, p.y - s.y) < 0.6 {
             s.targetX = p.x
             s.targetY = min(p.y, 0.84)
             chasing = true

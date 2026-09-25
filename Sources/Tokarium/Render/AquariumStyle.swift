@@ -34,6 +34,14 @@ extension AquariumStyle {
     }
 
     /// 魚の画像と、ドット単位の大きさ。手描きのスプライトがあればそれを使う。
+    func fishImage(_ speciesID: String, frame: Int, dead: Bool, shiny: Bool) -> (image: CGImage, dots: CGSize)? {
+        guard shiny && !dead else { return fishImage(speciesID, frame: frame, dead: dead) }
+        guard let base = fishImage(speciesID, frame: frame, dead: false),
+              let img = ArtCache.shared.image("shiny-\(speciesID)-\(frame % 2)", make: { ArtRenderer.shinyVariant(base.image) })
+        else { return nil }
+        return (img, base.dots)
+    }
+
     func fishImage(_ speciesID: String, frame: Int, dead: Bool) -> (image: CGImage, dots: CGSize)? {
         if let sprite = SpriteLibrary.fish[speciesID],
            let img = SpriteLibrary.image(for: sprite, key: "fish-\(speciesID)", frame: frame % 2, dead: dead) {
@@ -62,6 +70,51 @@ extension AquariumStyle {
     }
 
     func snap(_ v: CGFloat, _ p: CGFloat) -> CGFloat { (v / p).rounded() * p }
+}
+
+// MARK: - 時間帯と季節
+
+/// 時間帯の光の色。
+struct Ambient: Equatable {
+    var color: Color
+    var opacity: Double
+    /// 夜は魚がゆっくり泳ぐ。
+    var speed: Double
+
+    static let day = Ambient(color: .clear, opacity: 0, speed: 1)
+
+    static func at(_ date: Date, calendar: Calendar = .current) -> Ambient {
+        let c = calendar.dateComponents([.hour, .minute], from: date)
+        let h = Double(c.hour ?? 12) + Double(c.minute ?? 0) / 60
+        switch h {
+        case 5..<7: return Ambient(color: Color(rgb: 0xFF9A50), opacity: 0.14, speed: 0.85)     // 朝焼け
+        case 7..<17: return .day
+        case 17..<19: return Ambient(color: Color(rgb: 0xE0604A), opacity: 0.16, speed: 0.9)   // 夕焼け
+        case 19..<21: return Ambient(color: Color(rgb: 0x2A2A70), opacity: 0.3, speed: 0.7)    // 宵
+        default: return Ambient(color: Color(rgb: 0x0A0F30), opacity: 0.42, speed: 0.55)       // 夜
+        }
+    }
+
+    var label: String {
+        switch opacity {
+        case 0: return String(localized: "昼")
+        case 0.42: return String(localized: "夜")
+        case 0.3: return String(localized: "宵")
+        default: return speed == 0.85 ? String(localized: "朝") : String(localized: "夕方")
+        }
+    }
+}
+
+extension SwimEngine.DrifterKind {
+    /// 季節ごとの浮遊物（春は花びら、秋は葉、冬はマリンスノー、夏はなし）。
+    static func forSeason(_ date: Date, calendar: Calendar = .current) -> SwimEngine.DrifterKind? {
+        switch calendar.component(.month, from: date) {
+        case 3...5: return .petal
+        case 9...11: return .leaf
+        case 12, 1, 2: return .snow
+        default: return nil
+        }
+    }
 }
 
 // MARK: - 配置
@@ -167,7 +220,16 @@ extension AquariumStyle {
 // MARK: - 動くもの（魚・餌・泡・水面）
 
 extension AquariumStyle {
-    func drawLive(_ ctx: inout GraphicsContext, size: CGSize, tank: Tank, engine: SwimEngine, selected: UUID?) {
+    /// 宝箱の画面上の枠（クリックの判定にも使う）。
+    func treasureFrame(x: Double, tank: Tank, engine: SwimEngine, size: CGSize) -> CGRect {
+        let p = dot(size, level: tank.level)
+        let w = p * 14, h = p * 10
+        let bob = CGFloat(sin(engine.time * 1.5)) * p
+        return CGRect(x: snap(CGFloat(x) * size.width - w / 2, p), y: snap(size.height * SwimEngine.sandTop - h + p * 3 + bob, p), width: w, height: h)
+    }
+
+    func drawLive(_ ctx: inout GraphicsContext, size: CGSize, tank: Tank, engine: SwimEngine, selected: UUID?,
+                  treasureX: Double? = nil, ambient: Ambient = .day) {
         let p = dot(size, level: tank.level)
         let t = engine.time
 
@@ -198,7 +260,7 @@ extension AquariumStyle {
         for f in tank.fish.sorted(by: { ($0.isAlive ? 1 : 0) < ($1.isAlive ? 1 : 0) }) {
             guard let s = engine.swimmers[f.id], let rect = fishFrame(f, tank: tank, engine: engine, size: size) else { continue }
             let frame = f.isAlive ? Int(s.phase) % 2 : 0
-            guard let art = fishImage(f.speciesID, frame: frame, dead: !f.isAlive) else { continue }
+            guard let art = fishImage(f.speciesID, frame: frame, dead: !f.isAlive, shiny: f.isShiny) else { continue }
             var layer = ctx
             if !s.facingRight || !f.isAlive {
                 layer.translateBy(x: rect.midX, y: rect.midY)
@@ -207,9 +269,66 @@ extension AquariumStyle {
             }
             draw(&layer, art.image, in: rect)
 
+            if f.isShiny && f.isAlive {
+                // 色違いはきらきら光る
+                var sparkle = Path()
+                for k in 0..<3 {
+                    let a = t * 2 + Double(k) * 2.1
+                    guard sin(a * 1.7) > 0.2 else { continue }
+                    let sx = snap(rect.midX + CGFloat(cos(a)) * rect.width * 0.6, p), sy = snap(rect.midY + CGFloat(sin(a)) * rect.height * 0.7, p)
+                    sparkle.addRect(CGRect(x: sx, y: sy - p, width: p, height: p * 3)); sparkle.addRect(CGRect(x: sx - p, y: sy, width: p * 3, height: p))
+                }
+                ctx.fill(sparkle, with: .color(Color(rgb: 0xFFF6B0)))
+            }
             if f.id == selected { drawSelection(&ctx, rect.insetBy(dx: -p * 2, dy: -p * 2), p: p) }
             if f.isSick && !f.condition.isDanger { drawMarker(&ctx, above: rect, p: p, color: 0x8E24AA, symbol: "+") }
             if f.condition.isDanger { drawMarker(&ctx, above: rect, p: p, color: 0xE53935, symbol: "!") }
+        }
+
+        // 宝箱
+        if let tx = treasureX {
+            let r = treasureFrame(x: tx, tank: tank, engine: engine, size: size)
+            if let art = decorationImage("chest") { draw(&ctx, art.image, in: r) }
+            var glint = Path()
+            for k in 0..<4 where sin(t * 3 + Double(k) * 1.6) > 0.3 {
+                let gx = snap(r.minX + r.width * CGFloat([0.1, 0.9, 0.3, 0.7][k]), p), gy = snap(r.minY - p * CGFloat(2 + k % 2 * 3), p)
+                glint.addRect(CGRect(x: gx, y: gy - p, width: p, height: p * 3)); glint.addRect(CGRect(x: gx - p, y: gy, width: p * 3, height: p))
+            }
+            ctx.fill(glint, with: .color(Color(rgb: 0xFFE070)))
+        }
+
+        // たたいた場所の波紋
+        for r in engine.ripples {
+            let age = (t - r.start) / 1.2
+            let radius = snap(CGFloat(age) * p * 12 + p * 2, p)
+            let cx = snap(CGFloat(r.x) * size.width, p), cy = snap(CGFloat(r.y) * size.height, p)
+            var ring = Path()
+            let steps = 16
+            for k in 0..<steps {
+                let a = Double(k) / Double(steps) * .pi * 2
+                ring.addRect(CGRect(x: snap(cx + CGFloat(cos(a)) * radius, p), y: snap(cy + CGFloat(sin(a)) * radius * 0.6, p), width: p, height: p))
+            }
+            ctx.fill(ring, with: .color(.white.opacity(0.6 * (1 - age))))
+        }
+
+        // 季節の浮遊物
+        for d in engine.drifters {
+            let dx = snap(CGFloat(d.x) * size.width, p), dy = snap(CGFloat(d.y) * size.height, p)
+            switch d.kind {
+            case .petal:
+                ctx.fill(Path(CGRect(x: dx, y: dy, width: p * 2, height: p)), with: .color(Color(rgb: 0xFFB7C8)))
+                ctx.fill(Path(CGRect(x: dx + p, y: dy + p, width: p, height: p)), with: .color(Color(rgb: 0xF890A8)))
+            case .leaf:
+                ctx.fill(Path(CGRect(x: dx, y: dy, width: p * 2, height: p * 2)), with: .color(Color(rgb: 0xE06A28)))
+                ctx.fill(Path(CGRect(x: dx + p, y: dy + p, width: p, height: p)), with: .color(Color(rgb: 0xB04018)))
+            case .snow:
+                ctx.fill(Path(CGRect(x: dx, y: dy, width: p, height: p)), with: .color(.white.opacity(0.7)))
+            }
+        }
+
+        // 時間帯の光
+        if ambient.opacity > 0 {
+            ctx.fill(Path(CGRect(origin: .zero, size: size)), with: .color(ambient.color.opacity(ambient.opacity)))
         }
     }
 
