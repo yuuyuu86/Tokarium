@@ -19,6 +19,9 @@ struct TokariumApp: App {
         // 標準のタイトルバーを消し、水槽を窓いっぱいに出す
         .windowStyle(.hiddenTitleBar)
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("Tokarium について") { delegate.store.showAbout = true }
+            }
             CommandGroup(after: .appInfo) {
                 Button("アップデートを確認…") { delegate.updater.checkForUpdates() }
                     .disabled(!delegate.updater.canCheckForUpdates)

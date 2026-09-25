@@ -86,6 +86,7 @@
 "Cowork セッションの記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ" = "From Cowork session logs (JSONL): only per-response token counts, times, and response IDs";
 "Gemini CLI・OpenCode・Copilot CLI・Ollama は、利用枠の情報がMac内に残らないため表示できません。" = "Gemini CLI, OpenCode, Copilot CLI, and Ollama don’t leave usage-limit data on your Mac, so it can’t be shown.";
 "Gemini や Qwen をたくさん使った記念の魚。青から紫へ。" = "A commemorative fish for heavy Gemini or Qwen use, blue fading to purple.";
+"GitHub" = "GitHub";
 "GitHub で報告…" = "Report on GitHub…";
 "Mac が熱くなっているので、動きを控えめにしています" = "Your Mac is running hot, so animation is reduced";
 "Mac のスクリーンセーバーとして、あなたの水槽が泳ぎます。水槽の中身は数分おきに新しくなります。" = "Your tank swims as your Mac’s screen saver. Its contents update every few minutes.";
@@ -98,6 +99,8 @@
 "Ollama（アプリ）" = "Ollama (app)";
 "OpenCode・Copilot・Ollama をたくさん使った記念の魚。金色にかがやく。" = "A commemorative fish for heavy OpenCode, Copilot, or Ollama use. It shines gold.";
 "Tokarium" = "Tokarium";
+"Tokarium について" = "About Tokarium";
+"Tokarium について（ライセンス）" = "About Tokarium (Licenses)";
 "Tokarium のアップデートで対応します。水槽はそのまま遊べます。" = "A Tokarium update will fix this. Your tank still works normally.";
 "Tokarium へようこそ" = "Welcome to Tokarium";
 "Tokarium へようこそ！" = "Welcome to Tokarium!";
@@ -108,6 +111,7 @@
 "iCloud Drive が見つかりません。システム設定で iCloud Drive をオンにすると使えます。" = "iCloud Drive isn’t available. Turn it on in System Settings to use this.";
 "iCloud Drive で水槽を同期する" = "Sync the tank with iCloud Drive";
 "iCloud Drive の水槽を読み込みました" = "Loaded the tank from iCloud Drive";
+"© 2026 yuuyuu86 · MIT License" = "© 2026 yuuyuu86 · MIT License";
 "×%lld" = "×%lld";
 "−30分" = "−30 min";
 "♥ %@" = "♥ %@";
@@ -283,6 +287,7 @@
 "データベースを開けませんでした（%d）" = "Couldn’t open the database (%d)";
 "トークン数がMac内に記録されないため読み取れません。" = "Token counts aren’t recorded on your Mac, so they can’t be read.";
 "ドット絵" = "Pixel Art";
+"ドット絵フォント · SIL Open Font License 1.1 · © The DotGothic16 Project Authors" = "Pixel font · SIL Open Font License 1.1 · © The DotGothic16 Project Authors";
 "ドレスのようなひれを持つ。" = "Fins flowing like a gown.";
 "ドワーフグラミー" = "Dwarf gourami";
 "ナンヨウハギ" = "Blue tang";
@@ -302,12 +307,14 @@
 "バランスよく積んだ石。" = "Carefully balanced stones.";
 "バリスネリア" = "Vallisneria";
 "バージョン" = "Version";
+"バージョン %@" = "Version %@";
 "パイナップルの家" = "Pineapple house";
 "ヒトデ" = "Starfish";
 "ヒメダカ" = "Orange medaka";
 "ピンクの枝サンゴ。" = "Pink branching coral.";
 "ピンクの花が咲く。" = "Blooms with pink flowers.";
 "ブラックモーリー" = "Black molly";
+"プライバシーについて" = "Privacy";
 "プラティ" = "Platy";
 "プレゼントの箱" = "Gift box";
 "ベタ" = "Betta";
@@ -317,6 +324,7 @@
 "メインのディスプレイのみ" = "Main display only";
 "メッセージ記録のうち、トークン数・時刻・メッセージIDのみ" = "From message records: only token counts, times, and message IDs";
 "メールで報告…" = "Report by Email…";
+"ライセンスの文面が見つかりません。" = "License text not found.";
 "ラスボラ" = "Harlequin rasbora";
 "ラミレジィ" = "Ram cichlid";
 "ラミーノーズテトラ" = "Rummy-nose tetra";
@@ -351,6 +359,7 @@
 "光る宝石" = "Glowing gems";
 "入っています" = "Installed";
 "入力 %@・出力 %@・キャッシュ書込 %@・キャッシュ読込 %@ トークン（%lld 件）" = "Input %@ · Output %@ · Cache write %@ · Cache read %@ tokens (%lld records)";
+"全文を見る" = "Show Full Text";
 "内容: %@" = "Reads: %@";
 "内容をコピー" = "Copy Report";
 "再起動すると切り替わります。" = "Takes effect after restarting.";
@@ -527,6 +536,7 @@
 "群れで泳ぐ" = "Schools";
 "老齢" = "Elderly";
 "老齢（ゆっくり過ごしています）" = "Elderly (taking it easy)";
+"自動アップデート · MIT License" = "Automatic updates · MIT License";
 "自動給餌器" = "Auto feeder";
 "自動給餌器が餌をあげました（残り %lld 回分）" = "The auto feeder fed your fish (%lld servings left)";
 "自然な雰囲気の流木。" = "Natural-looking driftwood.";
@@ -568,6 +578,7 @@
 "読み取り中…" = "Reading…";
 "読み取り専用で、トークン数・時刻・重複判定用のIDだけを使います。会話の本文や認証情報は保存しません。" = "Records are read-only, and only token counts, times, and de-duplication IDs are used. Conversations and credentials are never stored.";
 "読み取る利用記録を選んでください" = "Choose which usage records to read";
+"謝辞・ライセンス" = "Acknowledgments & Licenses";
 "貝がら" = "Scallop shell";
 "買えるものだけ" = "Affordable only";
 "赤い水草" = "Red plants";

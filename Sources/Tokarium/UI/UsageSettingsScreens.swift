@@ -362,6 +362,7 @@ struct SettingsScreen: View {
             }
             PixelSection("アップデートとサポート") {
                 UpdateSettings()
+                Button("Tokarium について（ライセンス）") { store.showAbout = true }
                 Button("チュートリアルをもう一度見る") {
                     store.settings.tutorialDone = false
                     store.toast = String(localized: "水槽の画面に戻ると、案内が始まります")

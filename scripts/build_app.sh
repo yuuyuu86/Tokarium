@@ -22,6 +22,8 @@ install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/Mac
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 # ドット絵フォント（DotGothic16, SIL OFL）
 ditto Resources/Fonts "$APP/Contents/Resources/Fonts"
+# 同梱しているソフトウェアのライセンス
+ditto Resources/Licenses "$APP/Contents/Resources/Licenses"
 # 翻訳（ja / en）
 for lproj in Resources/*.lproj(N); do
   ditto "$lproj" "$APP/Contents/Resources/$(basename "$lproj")"

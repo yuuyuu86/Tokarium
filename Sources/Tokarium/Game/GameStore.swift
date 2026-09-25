@@ -87,6 +87,8 @@ final class GameStore {
     var toast: String?
     /// 表示中の不具合報告。
     var bugReport: BugReportRequest?
+    /// 「このアプリについて」を表示中。
+    var showAbout = false
     /// 置き場所を決めている最中の装飾（買った直後や持ち物から出したとき）。
     var placingDecoration: UUID?
 
@@ -107,6 +109,10 @@ final class GameStore {
     /// iCloud Drive で同期しているほかの Mac で得たコイン。
     private(set) var otherMacsEarned = 0
     @ObservationIgnored private var lastPulledModified: Date?
+    @ObservationIgnored private var lastPushedAt: Date?
+    @ObservationIgnored private var lastEarnedRefreshAt: Date?
+    /// 時間経過だけの保存を iCloud Drive に書く間隔。
+    static let periodicPushInterval: TimeInterval = 180
     var livingFish: [Fish] { state.tank.fish.filter(\.isAlive) }
     var dangerFish: [Fish] { state.tank.fish.filter { $0.condition.isDanger } }
 
@@ -177,7 +183,8 @@ final class GameStore {
         announce(report)
         notifyChanges(before: before)
         evaluateProgress()
-        save()
+        // 時間経過だけの保存は、iCloud Drive へは数分に1回にまとめる
+        save(periodic: !report.isCatchUp && report.newlyDead.isEmpty && report.births.isEmpty)
     }
 
     private func announce(_ report: Simulation.Report) {
@@ -578,7 +585,8 @@ final class GameStore {
 
     // MARK: 保存
 
-    func save() {
+    /// 保存する。`periodic` は時間経過だけの定期的な保存（iCloud Drive へは間引く）。
+    func save(periodic: Bool = false) {
         evaluateProgress()
         // 泳いでいる位置も覚えておく
         for i in state.tank.fish.indices {
@@ -590,7 +598,11 @@ final class GameStore {
         state.savedAt = Date()
         state.savedBy = settings.machineID
         write(state, to: "game.json")
-        if settings.iCloudSync { pushToICloud() }
+        if settings.iCloudSync {
+            // 操作したときはすぐ、時間経過だけのときは数分に1回まで
+            let due = lastPushedAt.map { Date().timeIntervalSince($0) >= Self.periodicPushInterval } ?? true
+            if !periodic || due { pushToICloud() }
+        }
     }
 
     private func saveSettings() { write(settings, to: "settings.json") }
@@ -717,7 +729,11 @@ extension GameStore {
     @discardableResult
     func pullFromICloud() -> Bool {
         guard let folder = Self.iCloudFolder else { return false }
-        refreshOtherMacsEarned(folder)
+        // ほかの Mac のコインは1分に1回だけ数え直す
+        if lastEarnedRefreshAt.map({ Date().timeIntervalSince($0) >= 60 }) ?? true {
+            lastEarnedRefreshAt = Date()
+            refreshOtherMacsEarned(folder)
+        }
         let url = folder.appendingPathComponent("game.json")
         guard let modified = (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date,
               modified != lastPulledModified else { return false }
@@ -736,6 +752,7 @@ extension GameStore {
 
     func pushToICloud() {
         guard let folder = Self.iCloudFolder else { return }
+        lastPushedAt = Date()
         do {
             try FileManager.default.createDirectory(at: folder.appendingPathComponent("earned"), withIntermediateDirectories: true)
             let url = folder.appendingPathComponent("game.json")

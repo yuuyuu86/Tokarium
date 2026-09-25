@@ -122,3 +122,11 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 - 不具合報告の送り先: リポジトリが非公開のままだと一般の人は Issue を作れないので、公開するかメールアドレスを設定する
 - デスクトップ表示の実機確認（複数ディスプレイ、Spaces、Stage Manager、フルスクリーン、スリープ復帰）
 - Copilot CLI・OpenCode・Gemini CLI の実データでの形式確認（手元に記録がなく未確認）
+
+## ライセンス
+
+MIT License（`LICENSE`）。同梱しているソフトウェア:
+- Sparkle — MIT License（`Resources/Licenses/Sparkle.txt`）
+- DotGothic16 — SIL Open Font License 1.1（`Resources/Licenses/DotGothic16-OFL.txt`）
+
+アプリ内では「Tokarium について」から全文を読める。

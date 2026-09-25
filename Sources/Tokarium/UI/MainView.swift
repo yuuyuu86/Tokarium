@@ -96,6 +96,9 @@ struct MainView: View {
         .sheet(item: Binding(get: { store.settings.onboarded ? store.bugReport : nil }, set: { store.bugReport = $0 })) { req in
             BugReportView(crash: req.crash).modifier(PixelSheet())
         }
+        .sheet(isPresented: Binding(get: { store.showAbout && store.settings.onboarded }, set: { store.showAbout = $0 })) {
+            AboutView().modifier(PixelSheet())
+        }
         .frame(minWidth: 820, minHeight: 560)
     }
 
