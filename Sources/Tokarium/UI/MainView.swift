@@ -160,6 +160,13 @@ private struct TopHUD: View {
                 Text("餌 \(store.state.food)")
             }
             .help("餌やり1回で1つ使います。お店で買えます")
+            if let event = SeasonalEvents.active() {
+                PixelBadge {
+                    Image(systemName: event.symbol).foregroundStyle(PixelPalette.gold)
+                    Text(event.name)
+                }
+                .help("期間限定の魚と装飾がお店に並んでいます（\(event.periodText)）")
+            }
             Spacer(minLength: 10)
             if let f = store.state.tank.fish.first(where: { $0.id == hovered }) {
                 FishHoverStatus(fish: f)
@@ -183,7 +190,10 @@ private struct TopHUD: View {
 
 /// カーソルを重ねた魚のステータス（上部に出す）。
 private struct FishHoverStatus: View {
+    @Environment(GameStore.self) private var store
     let fish: Fish
+
+    private var mood: String? { Ecology.mood(fish, in: store.state.tank) }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -211,6 +221,7 @@ private struct FishHoverStatus: View {
         var parts = [fish.species.name, fish.stage.label]
         if fish.isAlive { parts.append(String(localized: "\(Int(fish.ageDays()))日齢")) }
         if fish.isElderly() { parts.append(String(localized: "老齢")) }
+        if let mood { parts.append(mood) }
         return parts.joined(separator: String(localized: "・"))
     }
 
@@ -421,6 +432,9 @@ private struct FishActionMenu: View {
                 }
             } else {
                 action("お別れする", "hand.wave.fill") { confirmFarewell = true }
+            }
+            action(fish.isFavorite ? "お気に入りを外す" : "お気に入り（主役）にする", fish.isFavorite ? "heart.slash.fill" : "heart.fill") {
+                store.toggleFavorite(fish.id)
             }
             action("名前を変える", "pencil") {
                 newName = fish.name

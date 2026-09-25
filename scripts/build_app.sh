@@ -59,6 +59,24 @@ if [[ -n "${BUILD_NUMBER:-}" ]]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$WIDGET/Contents/Info.plist"
 fi
 
+# スクリーンセーバー（水槽の描画のコードを共有する別のバンドル）
+SAVER="$APP/Contents/Resources/Tokarium.saver"
+mkdir -p "$SAVER/Contents/MacOS" "$SAVER/Contents/Resources" build/saver
+SAVER_SRC=(Sources/Tokarium/Art/*.swift Sources/Tokarium/Game/Catalog.swift Sources/Tokarium/Game/GameState.swift
+           Sources/Tokarium/Game/Simulation.swift Sources/Tokarium/Game/Progress.swift Sources/Tokarium/Game/Ecology.swift
+           Sources/Tokarium/Game/Events.swift Sources/Tokarium/Render/AquariumStyle.swift Sources/Tokarium/Render/PixelSprites.swift
+           Sources/Tokarium/Render/SwimEngine.swift Saver/TokariumSaver.swift)
+SAVER_BINS=()
+for arch in "${WIDGET_ARCHS[@]}"; do
+  xcrun swiftc -parse-as-library -swift-version 5 -target "$arch-apple-macos14.0" -sdk "$(xcrun --show-sdk-path --sdk macosx)" -O \
+    -module-name TokariumSaver -emit-library -Xlinker -bundle -o "build/saver/TokariumSaver-$arch" "${SAVER_SRC[@]}" \
+    -framework ScreenSaver -framework SwiftUI
+  SAVER_BINS+=("build/saver/TokariumSaver-$arch")
+done
+lipo -create "${SAVER_BINS[@]}" -output "$SAVER/Contents/MacOS/TokariumSaver"
+cp Saver/Info.plist "$SAVER/Contents/Info.plist"
+[[ -f build/AppIcon.icns ]] && cp build/AppIcon.icns "$SAVER/Contents/Resources/thumbnail.icns"
+
 if [[ ! -f build/AppIcon.icns ]]; then
   swift scripts/make_icon.swift build/AppIcon.iconset
   iconutil -c icns build/AppIcon.iconset -o build/AppIcon.icns
@@ -75,11 +93,13 @@ if [[ -n "${SIGN_IDENTITY:-}" ]]; then
   "${SIGN[@]}" "$SPARKLE/Versions/B/Updater.app"
   "${SIGN[@]}" "$SPARKLE"
   "${SIGN[@]}" --entitlements Widget/TokariumWidget.entitlements "$WIDGET"
+  "${SIGN[@]}" "$SAVER"
   "${SIGN[@]}" --entitlements Resources/Tokarium.entitlements "$APP"
 else
   # 内側から順に署名する（--deep だとウィジェットのサンドボックス設定が消える）
   codesign --force --deep --sign - "$SPARKLE"
   codesign --force --sign - --entitlements Widget/TokariumWidget.entitlements "$WIDGET"
+  codesign --force --sign - "$SAVER"
   codesign --force --sign - "$APP"
 fi
 codesign --verify --strict "$APP"

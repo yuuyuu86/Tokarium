@@ -34,6 +34,14 @@ private func env(_ key: String) -> String? {
 
 /// Claude Code 形式の JSONL の1行を読む。Claude Code と Cowork で共通。
 private func recordClaudeLine(_ line: Data, source: SourceInfo, ctx: ScanContext) {
+    // 利用上限に達したときの記録（"...usage limit reached|<リセットのUNIX時刻>"）
+    if let text = String(data: line, encoding: .utf8), let r = text.range(of: "usage limit reached|") {
+        let digits = text[r.upperBound...].prefix { $0.isNumber }
+        if let epoch = Double(digits) {
+            let reset = Date(timeIntervalSince1970: epoch)
+            if ctx.ledger.claudeLimitResetAt.map({ reset > $0 }) ?? true { ctx.ledger.claudeLimitResetAt = reset }
+        }
+    }
     guard let obj = JSON.object(line),
           obj["type"] as? String == "assistant",
           let message = obj["message"] as? [String: Any],
@@ -55,7 +63,12 @@ private func recordClaudeLine(_ line: Data, source: SourceInfo, ctx: ScanContext
     } else {
         key = nil
     }
-    ctx.record(source: source, key: key, date: JSON.date(obj["timestamp"]), tokens: tokens)
+    let date = JSON.date(obj["timestamp"])
+    // 5時間枠の推定用に、付与開始より前も含めて最近の応答を覚えておく
+    if let date, let key, date > Date().addingTimeInterval(-24 * 3600) {
+        ctx.ledger.claudeRecent[key] = RecentUse(date: date, tokens: tokens.total)
+    }
+    ctx.record(source: source, key: key, date: date, tokens: tokens)
 }
 
 struct ClaudeCodeReader: UsageReader {

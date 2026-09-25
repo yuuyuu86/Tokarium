@@ -465,3 +465,83 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
     #expect(Ambient.at(night, calendar: cal).speed < 1)
     #expect(SwimEngine.DrifterKind.forSeason(cal.date(from: DateComponents(year: 2026, month: 4, day: 1))!, calendar: cal) == .petal)
 }
+
+// MARK: - 魚どうしの関わり・イベント・お気に入り・利用枠
+
+@Test func cleanersSlowWaterDecayAndBulliesStressVictims() {
+    var tank = Tank()
+    #expect(Ecology.waterDecayFactor(tank) == 1)
+    tank.fish = [Fish(speciesID: "cory", name: "a"), Fish(speciesID: "oto", name: "b")]
+    #expect(abs(Ecology.waterDecayFactor(tank) - 0.84) < 0.001)
+
+    let betta = Fish(speciesID: "betta", name: "b")
+    tank.fish = [betta, Fish(speciesID: "tigerbarb", name: "t")]
+    #expect(Ecology.bulliesOf(betta, in: tank) == ["tigerbarb"])
+    #expect(Ecology.conflicts(buying: "tigerbarb", into: Tank()).isEmpty)
+    #expect(Ecology.conflicts(buying: "angel", into: tank) == ["tigerbarb"])
+
+    // ストレスのある魚は、ない魚より弱る
+    let start = Date(timeIntervalSince1970: 0)
+    var s = GameState.newGame(now: start)
+    s.tank.fish = [Fish(speciesID: "betta", name: "b", health: 80), Fish(speciesID: "tigerbarb", name: "t", health: 80)]
+    var rng = SeededRandom(seed: 1)
+    for m in 1...120 { Simulation.advance(&s, to: start.addingTimeInterval(Double(m) * 60), rng: &rng) }
+    #expect(s.tank.fish[0].health < s.tank.fish[1].health)
+}
+
+@Test func seasonalEventsCoverTheirDates() {
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+    func d(_ m: Int, _ day: Int) -> Date { cal.date(from: DateComponents(year: 2026, month: m, day: day, hour: 12))! }
+    #expect(SeasonalEvents.active(on: d(1, 3), calendar: cal)?.id == "newyear")
+    #expect(SeasonalEvents.active(on: d(12, 30), calendar: cal)?.id == "newyear")
+    #expect(SeasonalEvents.active(on: d(12, 24), calendar: cal)?.id == "christmas")
+    #expect(SeasonalEvents.active(on: d(10, 31), calendar: cal)?.id == "halloween")
+    #expect(SeasonalEvents.active(on: d(8, 1), calendar: cal)?.id == "summer")
+    #expect(SeasonalEvents.active(on: d(5, 1), calendar: cal) == nil)
+    // 限定品は図鑑のコンプリートに数えない
+    for e in SeasonalEvents.all {
+        for id in e.fish { #expect(!Catalog.species(id).isRegular && Catalog.species(id).id == id) }
+        for id in e.decorations { #expect(Catalog.decoration(id).id == id) }
+    }
+}
+
+@MainActor
+@Test func onlyOneFavorite() throws {
+    let store = GameStore(directory: try tempHome())
+    _ = store.buyFish(Catalog.species("neon"))
+    let a = store.state.tank.fish[0].id, b = store.state.tank.fish[1].id
+    store.toggleFavorite(a)
+    #expect(store.favoriteFish?.id == a)
+    store.toggleFavorite(b)
+    #expect(store.favoriteFish?.id == b)
+    #expect(store.state.tank.fish.filter(\.isFavorite).count == 1)
+    store.toggleFavorite(b)
+    #expect(store.favoriteFish == nil)
+}
+
+@Test func claudeWindowEstimate() {
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "UTC")!
+    let t0 = cal.date(from: DateComponents(year: 2026, month: 9, day: 25, hour: 10, minute: 20))!
+    let recent: [String: RecentUse] = [
+        "a": RecentUse(date: t0, tokens: 100),
+        "b": RecentUse(date: t0.addingTimeInterval(3600), tokens: 50),
+    ]
+    let est = ClaudeWindowEstimate.current(from: recent, now: t0.addingTimeInterval(7200), calendar: cal)
+    #expect(est?.tokens == 150 && est?.messages == 2)
+    #expect(est?.start == cal.date(from: DateComponents(year: 2026, month: 9, day: 25, hour: 10)))
+    #expect(ClaudeWindowEstimate.current(from: recent, now: t0.addingTimeInterval(6 * 3600), calendar: cal) == nil)
+}
+
+@Test func claudeLimitMessageIsRecorded() throws {
+    let home = try tempHome()
+    let start = Date()
+    let line = #"{"type":"assistant","timestamp":"2026-09-25T10:00:00.000Z","message":{"id":"x","content":[{"type":"text","text":"Claude AI usage limit reached|1790000000"}],"usage":{"input_tokens":0,"output_tokens":0}}}"#
+    let file = home.appendingPathComponent(".claude/projects/p/s.jsonl")
+    try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try (line + "\n").write(to: file, atomically: true, encoding: .utf8)
+    let ctx = ScanContext(ledger: UsageLedger(startDate: start.addingTimeInterval(-86400 * 365)), includeEstimated: false, home: home)
+    try ClaudeCodeReader().scan(ctx)
+    #expect(ctx.ledger.claudeLimitResetAt == Date(timeIntervalSince1970: 1790000000))
+}

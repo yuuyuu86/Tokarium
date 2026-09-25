@@ -21,7 +21,7 @@ struct DexScreen: View {
         }
     }
 
-    private var shopSpecies: [FishSpecies] { Catalog.fish.filter { !$0.hidden } }
+    private var shopSpecies: [FishSpecies] { Catalog.fish.filter(\.isRegular) }
 
     private var summaryDex: String {
         let seen = shopSpecies.filter { store.state.dex[$0.id] != nil }.count
@@ -36,6 +36,15 @@ struct DexScreen: View {
         VStack(alignment: .leading, spacing: 14) {
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(shopSpecies) { sp in DexCard(species: sp, entry: store.state.dex[sp.id]) }
+            }
+            Text("季節の魚").font(.pixel(.headline)).foregroundStyle(PixelPalette.sand)
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(SeasonalEvents.all) { event in
+                    ForEach(event.fish, id: \.self) { id in
+                        DexCard(species: Catalog.species(id), entry: store.state.dex[id],
+                                hint: String(localized: "\(event.name)（\(event.periodText)）にお店に並びます"))
+                    }
+                }
             }
             Text("記念の魚").font(.pixel(.headline)).foregroundStyle(PixelPalette.sand)
             Text("よく使うAIごとに、そのAIで \(MemorialFish.threshold) コインを得ると記念の魚がやってきます。")

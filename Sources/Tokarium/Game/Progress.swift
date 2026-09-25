@@ -67,8 +67,8 @@ struct AchievementContext {
     let coinsEarned: Int
     let now: Date
 
-    var speciesSeen: Int { state.dex.keys.filter { !Catalog.species($0).hidden }.count }
-    var shopSpeciesCount: Int { Catalog.fish.filter { !$0.hidden }.count }
+    var speciesSeen: Int { state.dex.keys.filter { Catalog.species($0).isRegular }.count }
+    var shopSpeciesCount: Int { Catalog.fish.filter(\.isRegular).count }
     var daysWithoutDeath: Double {
         now.timeIntervalSince(state.stats.lastDeathAt ?? state.createdAt) / 86400
     }

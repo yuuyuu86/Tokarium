@@ -55,6 +55,8 @@ struct Fish: Codable, Identifiable, Equatable {
     var generation: Int = 1
     /// まれに生まれる色違い。
     var isShiny: Bool = false
+    /// お気に入り（写真やウィジェットの主役）。
+    var isFavorite: Bool = false
     /// 水槽内の位置（0〜1 の正規化座標）。
     var x: Double = 0.5
     var y: Double = 0.5
@@ -113,6 +115,7 @@ struct Fish: Codable, Identifiable, Equatable {
         isSick = try c.decodeIfPresent(Bool.self, forKey: .isSick) ?? false
         generation = try c.decodeIfPresent(Int.self, forKey: .generation) ?? 1
         isShiny = try c.decodeIfPresent(Bool.self, forKey: .isShiny) ?? false
+        isFavorite = try c.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         x = try c.decodeIfPresent(Double.self, forKey: .x) ?? 0.5
         y = try c.decodeIfPresent(Double.self, forKey: .y) ?? 0.5
     }

@@ -59,6 +59,37 @@ struct SourceTotals: Codable, Equatable {
     var uncreditedWeighted: Double = 0
 }
 
+struct RecentUse: Codable, Equatable {
+    var date: Date
+    var tokens: Int64
+}
+
+/// Claude の5時間枠の推定（ccusage と同じ考え方: 最初の応答の時刻を1時間単位に切り下げて5時間）。
+struct ClaudeWindowEstimate: Equatable {
+    var start: Date
+    var end: Date
+    var tokens: Int64
+    var messages: Int
+
+    static let length: TimeInterval = 5 * 3600
+
+    static func current(from recent: [String: RecentUse], now: Date = Date(), calendar: Calendar = .current) -> ClaudeWindowEstimate? {
+        let events = recent.values.sorted { $0.date < $1.date }
+        var block: ClaudeWindowEstimate?
+        for e in events {
+            if let b = block, e.date < b.end {
+                block?.tokens += e.tokens
+                block?.messages += 1
+            } else {
+                let start = calendar.dateInterval(of: .hour, for: e.date)?.start ?? e.date
+                block = ClaudeWindowEstimate(start: start, end: start.addingTimeInterval(length), tokens: e.tokens, messages: 1)
+            }
+        }
+        guard let b = block, now < b.end else { return nil }
+        return b
+    }
+}
+
 struct QuotaWindow: Codable, Equatable {
     var usedPercent: Double
     var windowMinutes: Int?
@@ -92,6 +123,10 @@ struct UsageLedger: Codable {
     var quotas: [String: QuotaInfo] = [:]
     /// 日ごと・取得元ごとの、コインに換算した重み付きトークン（日付はその Mac の時刻）。
     var daily: [String: [String: Double]] = [:]
+    /// Claude の最近の応答（5時間枠の推定に使う。24時間より古いものは消す）。応答ID → 時刻とトークン数。
+    var claudeRecent: [String: RecentUse] = [:]
+    /// Claude の利用上限に達したと記録されたときの、リセット予定時刻。
+    var claudeLimitResetAt: Date?
 
     init(startDate: Date) { self.startDate = startDate }
 
@@ -105,6 +140,8 @@ struct UsageLedger: Codable {
         sources = try c.decodeIfPresent([String: SourceTotals].self, forKey: .sources) ?? [:]
         quotas = try c.decodeIfPresent([String: QuotaInfo].self, forKey: .quotas) ?? [:]
         daily = try c.decodeIfPresent([String: [String: Double]].self, forKey: .daily) ?? [:]
+        claudeRecent = try c.decodeIfPresent([String: RecentUse].self, forKey: .claudeRecent) ?? [:]
+        claudeLimitResetAt = try c.decodeIfPresent(Date.self, forKey: .claudeLimitResetAt)
     }
 
     /// その日にAIで得たコイン。

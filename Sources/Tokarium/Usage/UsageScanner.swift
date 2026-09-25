@@ -46,6 +46,9 @@ actor UsageScanner {
             }
         }
         ledger = ctx.ledger
+        // 24時間より古い応答は枠の推定に使わない
+        let cutoff = Date().addingTimeInterval(-24 * 3600)
+        ledger.claudeRecent = ledger.claudeRecent.filter { $0.value.date > cutoff }
         save()
         return ScanSnapshot(ledger: ledger, statuses: statuses, scannedAt: Date())
     }

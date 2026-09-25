@@ -129,6 +129,7 @@ enum Simulation {
         let living = state.tank.fish.filter(\.isAlive).count
         var waterLoss = (waterDecayBasePerHour + waterDecayPerFishPerHour * Double(living)) * h
         if state.equipment.contains(Equipment.filter.id) { waterLoss *= 0.5 }
+        waterLoss *= Ecology.waterDecayFactor(state.tank)
         state.tank.waterQuality = clamp(state.tank.waterQuality - waterLoss)
         let water = state.tank.waterQuality
 
@@ -156,7 +157,13 @@ enum Simulation {
             if f.fullness < starvingThreshold { delta -= starvingHealthLossPerHour * h }
             if water < dirtyWaterThreshold { delta -= dirtyWaterHealthLossPerHour * h }
             if f.isSick { delta -= sickHealthLossPerHour * h }
-            if delta == 0 { delta = recoveryPerHour * h * (f.isElderly(at: time) ? 0.5 : 1) }
+            // 相性の悪い魚がいるとストレスで弱る
+            if !Ecology.bulliesOf(f, in: state.tank).isEmpty { delta -= Ecology.stressHealthLossPerHour * h }
+            if delta == 0 {
+                delta = recoveryPerHour * h * (f.isElderly(at: time) ? 0.5 : 1)
+                // 共生の相手がいると早く元気になる
+                if Ecology.hasPartner(f, in: state.tank) { delta *= 1.5 }
+            }
             f.health = clamp(f.health + delta)
             if let floor = floors[f.id] { f.health = max(f.health, floor) }
 

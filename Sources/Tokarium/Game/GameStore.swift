@@ -280,6 +280,17 @@ final class GameStore {
         save()
     }
 
+    /// お気に入りの魚（主役は1匹）。
+    var favoriteFish: Fish? { state.tank.fish.first { $0.isFavorite } }
+
+    /// お気に入りにする（ほかの魚のお気に入りは外す）。もう一度押すと外す。
+    func toggleFavorite(_ id: UUID) {
+        let wasFavorite = state.tank.fish.first { $0.id == id }?.isFavorite ?? false
+        for i in state.tank.fish.indices { state.tank.fish[i].isFavorite = !wasFavorite && state.tank.fish[i].id == id }
+        if let f = favoriteFish { toast = String(localized: "\(f.name)をお気に入り（主役）にしました") }
+        save()
+    }
+
     /// 死んだ魚とお別れする（水槽から取り出す）。
     func farewell(_ id: UUID) {
         state.tank.fish.removeAll { $0.id == id && !$0.isAlive }

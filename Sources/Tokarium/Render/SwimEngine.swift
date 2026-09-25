@@ -109,7 +109,13 @@ final class SwimEngine {
         lastDate = date
         time += dt
         sync(fish)
-        for f in fish { if var s = swimmers[f.id] { move(&s, fish: f, dt: dt); swimmers[f.id] = s } }
+        let leaders = schoolLeaders(fish)
+        let anemones = decorations.filter { $0.isPlaced && $0.kindID == "anemone" }.map(\.x)
+        for f in fish {
+            guard var s = swimmers[f.id] else { continue }
+            move(&s, fish: f, dt: dt, leader: leaders[f.id], anemones: anemones)
+            swimmers[f.id] = s
+        }
         updatePellets(dt)
         updateBubbles(dt, decorations: decorations)
         ripples.removeAll { time - $0.start > 1.2 }
@@ -164,7 +170,18 @@ final class SwimEngine {
         return (.random(in: 0.06...0.94), .random(in: range))
     }
 
-    private func move(_ s: inout Swimmer, fish f: Fish, dt: Double) {
+    /// 群れの魚ごとに、ついていく先頭の魚と自分の並び順を決める。
+    private func schoolLeaders(_ fish: [Fish]) -> [UUID: (id: UUID, rank: Int)] {
+        var result: [UUID: (UUID, Int)] = [:]
+        let groups = Dictionary(grouping: fish.filter { $0.isAlive && Ecology.schooling.contains($0.speciesID) }, by: \.speciesID)
+        for (_, members) in groups where members.count >= 2 {
+            let leader = members[0].id
+            for (i, m) in members.enumerated().dropFirst() { result[m.id] = (leader, i) }
+        }
+        return result
+    }
+
+    private func move(_ s: inout Swimmer, fish f: Fish, dt: Double, leader: (id: UUID, rank: Int)?, anemones: [Double]) {
         guard f.isAlive else {
             // 死んだ魚は底へ沈んで止まる
             s.vx = 0
@@ -198,8 +215,21 @@ final class SwimEngine {
             chasing = true
             speed *= 1.8
             if hypot((p.x - s.x) * aspect, p.y - s.y) < 0.025 { pellets.remove(at: i) }
+        } else if let leader, let l = swimmers[leader.id] {
+            // 群れ: 先頭の魚の少し後ろを、ずらして並んで泳ぐ
+            let back = l.facingRight ? -1.0 : 1.0
+            let row = Double((leader.rank + 1) / 2) * 0.035
+            let side = leader.rank % 2 == 0 ? 1.0 : -1.0
+            s.targetX = min(0.97, max(0.03, l.x + back * row + sin(s.phase * 0.3) * 0.01))
+            s.targetY = min(0.84, max(0.05, l.y + side * row * 0.8))
+            speed *= 1.15
         } else if time >= s.retargetAt || hypot((s.targetX - s.x) * aspect, s.targetY - s.y) < 0.02 {
             (s.targetX, s.targetY) = randomTarget(for: f)
+            // 共生: イソギンチャクのそばにいることが多い
+            if Ecology.symbiosis[f.speciesID] != nil, let home = anemones.first, Double.random(in: 0...1) < 0.75 {
+                s.targetX = home + .random(in: -0.04...0.04)
+                s.targetY = .random(in: 0.7...0.8)
+            }
             s.retargetAt = time + .random(in: 3...9)
         }
 

@@ -14,12 +14,24 @@ struct WidgetSnapshot: Codable {
     var waterValue: Double
     var danger: [String]
     var sick: Int
+    var favorite: FavoriteInfo?
+}
+
+struct FavoriteInfo: Codable {
+    var name: String
+    var species: String
+    var days: Int
+    var condition: String
+    var health: Double
+    var fullness: Double
+    var isAlive: Bool
 }
 
 struct TankEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetSnapshot?
     let image: CGImage?
+    var favoriteImage: CGImage? = nil
 }
 
 private enum SharedData {
@@ -33,15 +45,17 @@ private enum SharedData {
 
     static var folder: URL { realHome.appendingPathComponent("Library/Application Support/Tokarium/widget") }
 
+    static func image(_ name: String) -> CGImage? {
+        guard let data = try? Data(contentsOf: folder.appendingPathComponent(name)),
+              let src = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        return CGImageSourceCreateImageAtIndex(src, 0, nil)
+    }
+
     static func load() -> TankEntry {
         let snap = (try? Data(contentsOf: folder.appendingPathComponent("snapshot.json")))
             .flatMap { try? JSONDecoder().decode(WidgetSnapshot.self, from: $0) }
-        var image: CGImage?
-        if let data = try? Data(contentsOf: folder.appendingPathComponent("tank.png")),
-           let src = CGImageSourceCreateWithData(data as CFData, nil) {
-            image = CGImageSourceCreateImageAtIndex(src, 0, nil)
-        }
-        return TankEntry(date: Date(), snapshot: snap, image: image)
+        return TankEntry(date: Date(), snapshot: snap, image: image("tank.png"),
+                         favoriteImage: snap?.favorite == nil ? nil : image("favorite.png"))
     }
 }
 
@@ -88,6 +102,25 @@ struct TankWidgetView: View {
     @ViewBuilder
     private func content(_ snap: WidgetSnapshot) -> some View {
         switch family {
+        case .systemSmall where snap.favorite != nil:
+            // 主役の魚を大きく
+            let f = snap.favorite!
+            ZStack(alignment: .bottom) {
+                tankImage.blur(radius: 1.5).opacity(0.6)
+                if let img = entry.favoriteImage {
+                    Image(decorative: img, scale: 1).interpolation(.none).resizable().aspectRatio(contentMode: .fit)
+                        .padding(.horizontal, 18).padding(.bottom, 40).padding(.top, 14)
+                        .scaleEffect(x: 1, y: f.isAlive ? 1 : -1)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("♥ \(f.name)").font(pixelFont(12)).lineLimit(1)
+                    Text("\(f.condition)・\(f.days)d").font(pixelFont(10)).foregroundStyle(sand.opacity(0.8))
+                }
+                .foregroundStyle(sand)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(6)
+                .background(deep.opacity(0.85))
+            }
         case .systemSmall:
             ZStack(alignment: .bottom) {
                 tankImage
@@ -106,6 +139,15 @@ struct TankWidgetView: View {
             HStack(spacing: 10) {
                 tankImage.frame(maxWidth: .infinity)
                 VStack(alignment: .leading, spacing: 5) {
+                    if let f = snap.favorite {
+                        HStack(spacing: 4) {
+                            if let img = entry.favoriteImage {
+                                Image(decorative: img, scale: 1).interpolation(.none).resizable().aspectRatio(contentMode: .fit).frame(width: 26, height: 18)
+                            }
+                            Text(f.name).lineLimit(1)
+                        }
+                        .font(pixelFont(12)).foregroundStyle(Color(red: 1, green: 0.55, blue: 0.7))
+                    }
                     row("circle.hexagongrid.circle.fill", "\(snap.coins)", gold)
                     row("drop.fill", snap.water, snap.waterValue < 45 ? danger : sand)
                     row("fish.fill", "\(snap.fishCount)/\(snap.maxFish)", sand)

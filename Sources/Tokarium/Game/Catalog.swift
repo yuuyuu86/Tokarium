@@ -34,6 +34,10 @@ struct FishSpecies: Identifiable {
     let design: FishDesign
     /// お店に並ばない（記念の魚など）。
     var hidden = false
+    /// 季節のイベントの限定品（イベント中だけお店に並ぶ）。
+    var event: String? = nil
+    /// 図鑑のコンプリートに数える、いつでも買える魚か。
+    var isRegular: Bool { !hidden && event == nil }
 
     var rarity: FishRarity { price >= 300 ? .rare : price >= 120 ? .uncommon : .common }
 }
@@ -51,6 +55,9 @@ struct DecorationKind: Identifiable {
     let category: DecorationCategory
     /// お店に並ばない（実績のごほうびなど）。
     var hidden = false
+    /// 季節のイベントの限定品。
+    var event: String? = nil
+    var isRegular: Bool { !hidden && event == nil }
 }
 
 enum DecorationCategory: CaseIterable {
@@ -283,7 +290,35 @@ enum Catalog {
                         $0.back = 0x5A9A30; $0.body = 0x7CC242; $0.bellyColor = 0xF4F0C0; $0.fin = 0x9CD262
                         $0.patterns = [.spots(count: 6, size: 0.05, color: 0x1E3A12)]
                     }),
-    ] + memorialSpecies
+    ] + memorialSpecies + eventSpecies
+
+    /// 季節のイベントの限定の魚。
+    static let eventSpecies: [FishSpecies] = [
+        FishSpecies(id: "tai", name: String(localized: "めでたい鯛"), price: 120, blurb: String(localized: "お正月の縁起もの。桜色にかがやく。"),
+                    speed: 0.05, zone: .any, lifespanDays: 365, design: fishDesign {
+                        $0.length = 18; $0.aspect = 0.62; $0.depth = 0.78; $0.blunt = 0.5; $0.dorsal = .spiky; $0.dorsalHeight = 0.4
+                        $0.back = 0xD84050; $0.body = 0xF07080; $0.bellyColor = 0xFFD8DC; $0.fin = 0xF08A98
+                        $0.patterns = [.spots(count: 6, size: 0.02, color: 0x70B0FF)]
+                    }, event: "newyear"),
+        FishSpecies(id: "yukatagoldfish", name: String(localized: "夏祭り金魚"), price: 60, blurb: String(localized: "金魚すくいの人気者。紅白と黒のもよう。"),
+                    speed: 0.05, zone: .any, lifespanDays: 365, design: fishDesign {
+                        $0.length = 14; $0.aspect = 0.62; $0.tail = .double; $0.tailFrac = 0.34; $0.tailSpread = 0.9; $0.depth = 0.74; $0.blunt = 0.8
+                        $0.back = 0xE03020; $0.body = 0xFF5030; $0.bellyColor = 0xFFB0A0; $0.fin = 0xFF7050
+                        $0.patterns = [.patches(count: 2, color: 0xFFFFFF), .spots(count: 3, size: 0.05, color: 0x151515)]
+                    }, event: "summer"),
+        FishSpecies(id: "ghostfish", name: String(localized: "おばけテトラ"), price: 90, blurb: String(localized: "ハロウィンの夜にだけ現れる、すきとおった魚。"),
+                    speed: 0.07, zone: .any, lifespanDays: 300, design: fishDesign {
+                        $0.length = 14; $0.aspect = 0.45; $0.tail = .fan; $0.tailFrac = 0.3; $0.depth = 0.6; $0.eyeSize = 1.5
+                        $0.back = 0xC0B0E0; $0.body = 0xE8E0F8; $0.bellyColor = 0xF8F4FF; $0.fin = 0xD8D0F0; $0.iris = 0x401060
+                        $0.patterns = [.spots(count: 3, size: 0.04, color: 0x9070D0)]
+                    }, event: "halloween"),
+        FishSpecies(id: "santafish", name: String(localized: "サンタテトラ"), price: 90, blurb: String(localized: "赤と白のクリスマスカラー。"),
+                    speed: 0.09, zone: .any, lifespanDays: 300, design: fishDesign {
+                        $0.length = 13; $0.aspect = 0.45; $0.depth = 0.64
+                        $0.back = 0xB01020; $0.body = 0xE83030; $0.bellyColor = 0xFFFFFF; $0.fin = 0xFFFFFF
+                        $0.patterns = [.vStripes(count: 1, width: 0.1, color: 0xFFFFFF, from: 0.3, to: 0.3), .head(color: 0xFFFFFF, fraction: 0.12)]
+                    }, event: "christmas"),
+    ]
 
     /// AIの利用でもらえる記念の魚（お店には並ばない）。
     static let memorialSpecies: [FishSpecies] = [
@@ -396,7 +431,45 @@ enum Catalog {
                      .p([(0, 0.48), (1, 0.34), (0.9, 1), (0.1, 1)], 0x6A4A30, texture: .wood), .r(0.02, 0.44, 0.96, 0.05, 0x4A3020, role: .detail),
                      .e(0.25, 0.6, 0.06, 0.12, 0x1C1410, role: .dark), .e(0.45, 0.58, 0.06, 0.12, 0x1C1410, role: .dark),
                      .e(0.65, 0.56, 0.06, 0.12, 0x1C1410, role: .dark), .p([(0.75, 0.4), (0.85, 0.5), (0.8, 0.75), (0.72, 0.6)], 0x1C1410, role: .dark)])),
-    ] + rewardDecorations
+    ] + rewardDecorations + eventDecorations
+
+    /// 季節のイベントの限定の装飾。
+    static let eventDecorations: [DecorationKind] = {
+        var list: [(DecorationKind, String)] = [
+            (deco("kagamimochi", String(localized: "鏡もち"), 60, String(localized: "お正月の飾り。"), .structure, 14, 14,
+                  .parts([.r(0, 0.86, 1, 0.14, 0xC03020), .e(0.05, 0.52, 0.9, 0.4, 0xF8F4EC), .e(0.15, 0.24, 0.7, 0.36, 0xF8F4EC),
+                          .e(0.36, 0.04, 0.28, 0.24, 0xF0A020)])), "newyear"),
+            (deco("kadomatsu", String(localized: "門松"), 80, String(localized: "竹と松のお正月飾り。"), .structure, 14, 24,
+                  .parts([.p([(0.15, 1), (0.15, 0.2), (0.35, 0.05), (0.35, 1)], 0x3A9A4A), .p([(0.4, 1), (0.4, 0.05), (0.6, -0.1), (0.6, 1)], 0x4AB05A),
+                          .p([(0.65, 1), (0.65, 0.3), (0.85, 0.15), (0.85, 1)], 0x3A9A4A), .r(0.05, 0.62, 0.9, 0.38, 0xC8A060, texture: .wood),
+                          .r(0.05, 0.72, 0.9, 0.05, 0x8A6A30, role: .detail)])), "newyear"),
+            (deco("furin", String(localized: "風鈴"), 50, String(localized: "涼しげな音が聞こえてきそう。"), .structure, 10, 18,
+                  .parts([.r(0.48, 0, 0.04, 0.2, 0x505050), .e(0.1, 0.12, 0.8, 0.5, 0xB8E4FF), .r(0.2, 0.3, 0.6, 0.06, 0xE04040, role: .detail),
+                          .r(0.46, 0.6, 0.08, 0.14, 0x505050), .r(0.3, 0.72, 0.4, 0.28, 0xF4F0E0)])), "summer"),
+            (deco("yoyo", String(localized: "水ヨーヨー"), 30, String(localized: "夏祭りのおみやげ。"), .structure, 10, 12,
+                  .parts([.e(0, 0.2, 1, 0.8, 0xFF8AB0), .r(0.1, 0.5, 0.8, 0.08, 0xFFE070, role: .detail), .r(0.1, 0.65, 0.8, 0.06, 0x60C0FF, role: .detail),
+                          .r(0.47, 0, 0.06, 0.25, 0xF0F0F0)])), "summer"),
+            (deco("pumpkin", String(localized: "かぼちゃランタン"), 60, String(localized: "ぼんやり光るハロウィンのかぼちゃ。"), .structure, 16, 14,
+                  .parts([.r(0.44, 0, 0.12, 0.2, 0x3A7A2A), .e(0, 0.12, 1, 0.88, 0xF08020), .r(0.3, 0.14, 0.05, 0.84, 0xC86010, role: .detail),
+                          .r(0.65, 0.14, 0.05, 0.84, 0xC86010, role: .detail), .p([(0.2, 0.45), (0.32, 0.3), (0.42, 0.45)], 0xFFE070, role: .glow),
+                          .p([(0.58, 0.45), (0.68, 0.3), (0.8, 0.45)], 0xFFE070, role: .glow),
+                          .p([(0.25, 0.62), (0.75, 0.62), (0.65, 0.78), (0.35, 0.78)], 0xFFE070, role: .glow)])), "halloween"),
+            (deco("ghost", String(localized: "おばけ"), 50, String(localized: "ちょっとこわがりなおばけ。"), .structure, 12, 16,
+                  .parts([.p([(0.1, 1), (0.1, 0.4), (0.5, 0), (0.9, 0.4), (0.9, 1), (0.75, 0.88), (0.6, 1), (0.45, 0.88), (0.3, 1)], 0xF4F0FF, smooth: true),
+                          .e(0.3, 0.35, 0.12, 0.16, 0x302040, role: .dark), .e(0.58, 0.35, 0.12, 0.16, 0x302040, role: .dark)])), "halloween"),
+            (deco("xmastree", String(localized: "クリスマスツリー"), 120, String(localized: "かざりつけた小さなツリー。"), .structure, 20, 30,
+                  .parts([.r(0.42, 0.85, 0.16, 0.15, 0x7A4A2A), .p([(0.05, 0.88), (0.5, 0.45), (0.95, 0.88)], 0x2E8B3A),
+                          .p([(0.12, 0.62), (0.5, 0.22), (0.88, 0.62)], 0x3A9A4A), .p([(0.2, 0.38), (0.5, 0.06), (0.8, 0.38)], 0x4AB05A),
+                          .e(0.3, 0.7, 0.1, 0.07, 0xE83030, role: .detail), .e(0.6, 0.5, 0.1, 0.07, 0xF0C040, role: .detail),
+                          .e(0.4, 0.3, 0.1, 0.07, 0x40A0F0, role: .detail),
+                          .p([(0.5, -0.04), (0.55, 0.05), (0.5, 0.1), (0.45, 0.05)], 0xFFE070, role: .glow)])), "christmas"),
+            (deco("present", String(localized: "プレゼントの箱"), 40, String(localized: "中身はなにかな？"), .structure, 12, 12,
+                  .parts([.r(0, 0.3, 1, 0.7, 0xE03040), .r(0.42, 0.3, 0.16, 0.7, 0xF0C040, role: .detail), .r(0, 0.55, 1, 0.12, 0xF0C040, role: .detail),
+                          .e(0.2, 0.05, 0.3, 0.3, 0xF0C040), .e(0.5, 0.05, 0.3, 0.3, 0xF0C040)])), "christmas"),
+        ]
+        for i in list.indices { list[i].0.event = list[i].1 }
+        return list.map(\.0)
+    }()
 
     /// 実績のごほうびでもらえる限定の装飾（お店には並ばない）。
     static let rewardDecorations: [DecorationKind] = {

@@ -9,15 +9,32 @@ enum Snapshot {
     }
 
     /// いまの水槽を画像にする（操作パネルなし）。
-    static func render(store: GameStore, size: CGSize, scale: CGFloat = 2) -> CGImage? {
+    static func render(store: GameStore, size: CGSize, scale: CGFloat = 2, nameplate: Bool = true) -> CGImage? {
         let tank = store.state.tank
         let style = store.style
         let engine = store.engine
         let ambient = store.settings.timeOfDay ? Ambient.at(Date()) : .day
         let treasure = store.state.treasureX
-        let view = Canvas { ctx, size in
-            style.drawBackground(&ctx, size: size, tank: tank)
-            style.drawLive(&ctx, size: size, tank: tank, engine: engine, selected: nil, treasureX: treasure, ambient: ambient)
+        let favorite = nameplate ? store.favoriteFish : nil
+        let view = ZStack(alignment: .bottomLeading) {
+            Canvas { ctx, size in
+                style.drawBackground(&ctx, size: size, tank: tank)
+                style.drawLive(&ctx, size: size, tank: tank, engine: engine, selected: favorite?.id, treasureX: treasure, ambient: ambient)
+            }
+            if let f = favorite {
+                // 主役の魚の名札
+                HStack(spacing: 10) {
+                    FishIcon(speciesID: f.speciesID, dead: !f.isAlive, shiny: f.isShiny).frame(width: 44, height: 28)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("♥ \(f.name)").font(.pixel(.headline)).foregroundStyle(PixelPalette.text)
+                        Text("\(f.species.name)・\(f.stage.label)・\(Int(f.ageDays()))日齢").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    }
+                }
+                .padding(12)
+                .background(PixelFrame(fill: PixelPalette.deep.opacity(0.9), border: PixelPalette.sand, step: 2))
+                .padding(16)
+                .environment(store)
+            }
         }
         .frame(width: size.width, height: size.height)
 

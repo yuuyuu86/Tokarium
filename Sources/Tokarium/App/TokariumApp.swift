@@ -30,10 +30,12 @@ struct TokariumApp: App {
         }
 
         MenuBarExtra {
-            MenuBarContent().environment(delegate.store).environment(delegate.updater)
+            MenuBarPanel().environment(delegate.store).environment(delegate.updater)
         } label: {
             Image(systemName: delegate.store.dangerFish.isEmpty ? "fish" : "exclamationmark.triangle.fill")
         }
+        // メニューバーから小さな水槽をのぞく
+        .menuBarExtraStyle(.window)
     }
 }
 
@@ -84,39 +86,92 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-private struct MenuBarContent: View {
+/// メニューバーの小窓: 小さな水槽とステータス、よく使う操作。
+private struct MenuBarPanel: View {
     @Environment(GameStore.self) private var store
     @Environment(Updater.self) private var updater
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        Text("コイン: \(store.coins)")
-        Text("水質: \(WaterCondition(store.state.tank.waterQuality).label)")
-        if store.dangerFish.isEmpty {
-            Text("魚: \(store.livingFish.count) 匹・みんな無事")
-        } else {
-            Text("危険な魚: \(store.dangerFish.map(\.name).joined(separator: "、"))")
+        VStack(alignment: .leading, spacing: 10) {
+            AquariumView(store: store)
+                .frame(width: 340, height: 190)
+                .clipped()
+                .overlay(Rectangle().strokeBorder(PixelPalette.sand, lineWidth: 3))
+                .overlay(alignment: .topTrailing) {
+                    PixelBadge {
+                        Image(systemName: "circle.hexagongrid.circle.fill").foregroundStyle(PixelPalette.gold)
+                        Text("\(store.coins)").monospacedDigit().foregroundStyle(PixelPalette.gold)
+                    }
+                    .scaleEffect(0.85)
+                    .padding(4)
+                }
+
+            HStack(spacing: 12) {
+                Label(WaterCondition(store.state.tank.waterQuality).label, systemImage: "drop.fill")
+                Label("\(store.livingFish.count)/\(store.state.tank.size.maxFish)", systemImage: "fish.fill")
+                Label("\(store.state.food)", systemImage: "leaf.fill")
+                    .foregroundStyle(store.state.food <= Catalog.lowFood ? PixelPalette.danger : PixelPalette.text)
+            }
+            .font(.pixel(.caption))
+            .lineLimit(1)
+
+            if store.dangerFish.isEmpty {
+                Text("魚: \(store.livingFish.count) 匹・みんな無事").font(.pixel(.caption)).foregroundStyle(Color(rgb: 0x5FD068))
+            } else {
+                Label("危険な魚: \(store.dangerFish.map(\.name).joined(separator: "、"))", systemImage: "exclamationmark.triangle.fill")
+                    .font(.pixel(.caption)).foregroundStyle(PixelPalette.danger)
+            }
+            if let f = store.favoriteFish {
+                HStack(spacing: 6) {
+                    FishIcon(speciesID: f.speciesID, dead: !f.isAlive, shiny: f.isShiny).frame(width: 26, height: 18)
+                    Text("♥ \(f.name)・\(f.condition.label)").font(.pixel(.caption))
+                }
+            }
+
+            QuotaPanel(compact: true)
+
+            HStack(spacing: 6) {
+                Button { store.feed() } label: { Label("餌（\(store.state.food)）", systemImage: "leaf.fill") }
+                    .disabled(store.state.food == 0)
+                Button { store.changeWater() } label: { Label("水換え", systemImage: "drop.triangle.fill") }
+                Spacer()
+                Button {
+                    openWindow(id: "main")
+                    NSApp.activate(ignoringOtherApps: true)
+                } label: { Label("開く", systemImage: "macwindow") }
+            }
+
+            Divider().overlay(PixelPalette.sea)
+
+            HStack(spacing: 6) {
+                Button(store.settings.displayMode == .desktop ? "ウィンドウ表示へ" : "デスクトップ表示へ") {
+                    store.settings.displayMode = store.settings.displayMode == .desktop ? .window : .desktop
+                }
+                Button { store.scanNow() } label: { Image(systemName: "arrow.clockwise") }
+                    .help("AI利用記録を今すぐ読み取る").accessibilityLabel("AI利用記録を今すぐ読み取る")
+                Spacer()
+                Menu {
+                    Button("アップデートを確認…") { updater.checkForUpdates() }.disabled(!updater.canCheckForUpdates)
+                    Button("不具合を報告…") {
+                        store.bugReport = BugReportRequest()
+                        openWindow(id: "main")
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
+                    Divider()
+                    Button("Tokarium を終了") { NSApp.terminate(nil) }
+                } label: { Image(systemName: "ellipsis.circle") }
+                    .menuStyle(.borderlessButton)
+                    .fixedSize()
+                    .accessibilityLabel("その他")
+            }
         }
-        Divider()
-        Button("餌をあげる（残り \(store.state.food)）") { store.feed() }.disabled(store.state.food == 0)
-        Button("水換え") { store.changeWater() }
-        Divider()
-        Button("Tokarium を開く") {
-            openWindow(id: "main")
-            NSApp.activate(ignoringOtherApps: true)
-        }
-        Button(store.settings.displayMode == .desktop ? "ウィンドウ表示に切り替え" : "デスクトップ表示に切り替え") {
-            store.settings.displayMode = store.settings.displayMode == .desktop ? .window : .desktop
-        }
-        Button("AI利用記録を今すぐ読み取る") { store.scanNow() }
-        Divider()
-        Button("アップデートを確認…") { updater.checkForUpdates() }.disabled(!updater.canCheckForUpdates)
-        Button("不具合を報告…") {
-            store.bugReport = BugReportRequest()
-            openWindow(id: "main")
-            NSApp.activate(ignoringOtherApps: true)
-        }
-        Divider()
-        Button("Tokarium を終了") { NSApp.terminate(nil) }.keyboardShortcut("q")
+        .buttonStyle(.pixel)
+        .font(.pixel(.body))
+        .foregroundStyle(PixelPalette.text)
+        .padding(14)
+        .frame(width: 368)
+        .background(PixelPalette.deep)
+        .preferredColorScheme(.dark)
     }
 }

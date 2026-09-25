@@ -280,6 +280,18 @@ extension AquariumStyle {
                 }
                 ctx.fill(sparkle, with: .color(Color(rgb: 0xFFF6B0)))
             }
+            if f.isFavorite && f.isAlive && !f.isSick && !f.condition.isDanger {
+                // お気に入りの魚の上に小さなハート
+                let hx = snap(rect.midX, p) - p * 2, hy = rect.minY - p * 5
+                let heart = [" x x ", "xxxxx", "xxxxx", " xxx ", "  x  "]
+                var path = Path()
+                for (r, row) in heart.enumerated() {
+                    for (c, ch) in row.enumerated() where ch == "x" {
+                        path.addRect(CGRect(x: hx + CGFloat(c) * p, y: hy + CGFloat(r) * p, width: p, height: p))
+                    }
+                }
+                ctx.fill(path, with: .color(Color(rgb: 0xFF6A9A)))
+            }
             if f.id == selected { drawSelection(&ctx, rect.insetBy(dx: -p * 2, dy: -p * 2), p: p) }
             if f.isSick && !f.condition.isDanger { drawMarker(&ctx, above: rect, p: p, color: 0x8E24AA, symbol: "+") }
             if f.condition.isDanger { drawMarker(&ctx, above: rect, p: p, color: 0xE53935, symbol: "!") }

@@ -38,6 +38,12 @@ struct UsageScreen: View {
                 }
 
                 GroupBox {
+                    QuotaPanel()
+                } label: {
+                    Label("AIごとの利用枠", systemImage: "gauge.with.dots.needle.33percent")
+                }
+
+                GroupBox {
                     UsageChart()
                 } label: {
                     Label("日ごとのAI利用", systemImage: "chart.bar")
@@ -46,23 +52,6 @@ struct UsageScreen: View {
                 Text("対応元").font(.pixel(.headline))
                 ForEach(UsageReaders.all, id: \.info.id) { reader in
                     SourceRow(info: reader.info)
-                }
-
-                if let quota = store.ledger.quotas["codex"] {
-                    GroupBox {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                KindBadge(kind: .quota)
-                                Text("Codex の利用枠（\(quota.plan ?? "-")）").font(.pixel(.subheadline))
-                            }
-                            if let p = quota.primary { quotaLine(String(localized: "主な枠"), p) }
-                            if let s = quota.secondary { quotaLine(String(localized: "追加の枠"), s) }
-                            Text("利用枠の消費率です。トークン数ではないため、コインには換算しません。\(quota.observedAt.relativeText)時点。")
-                                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
-                        }
-                        .padding(6)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
                 }
 
                 Text("このMacでは読み取れないもの").font(.pixel(.headline))
@@ -82,23 +71,6 @@ struct UsageScreen: View {
         }
     }
 
-    private func quotaLine(_ title: String, _ w: QuotaWindow) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack {
-                Text(title).font(.pixel(.caption))
-                Spacer()
-                Group {
-                    if let reset = w.resetsAt {
-                        Text("\(Int(w.usedPercent))% 使用・\(reset.shortText) にリセット")
-                    } else {
-                        Text("\(Int(w.usedPercent))% 使用")
-                    }
-                }
-                .font(.pixel(.caption)).monospacedDigit()
-            }
-            ProgressView(value: min(100, w.usedPercent), total: 100).tint(.teal)
-        }
-    }
 }
 
 private struct SourceRow: View {
@@ -161,6 +133,30 @@ private struct SourceRow: View {
 }
 
 // MARK: - 設定
+
+private struct SaverSettings: View {
+    @Environment(GameStore.self) private var store
+    @State private var error: String?
+    @State private var installed = SaverExporter.isInstalled
+
+    var body: some View {
+        HStack {
+            Button {
+                do {
+                    try SaverExporter.install(store: store)
+                    installed = true
+                    store.toast = String(localized: "スクリーンセーバーを入れました。設定で「Tokarium」を選んでください")
+                } catch {
+                    self.error = String(localized: "スクリーンセーバーを入れられませんでした: \(error.localizedDescription)")
+                }
+            } label: { Label(installed ? "スクリーンセーバーを入れ直す" : "スクリーンセーバーを入れる", systemImage: "sparkles.tv") }
+            if installed { Text("入っています").font(.pixel(.caption)).foregroundStyle(Color(rgb: 0x5FD068)) }
+        }
+        Text("Mac のスクリーンセーバーとして、あなたの水槽が泳ぎます。水槽の中身は数分おきに新しくなります。")
+            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        if let error { Text(error).font(.pixel(.caption)).foregroundStyle(PixelPalette.danger) }
+    }
+}
 
 private struct ReminderSettings: View {
     @Environment(GameStore.self) private var store
@@ -347,6 +343,9 @@ struct SettingsScreen: View {
             PixelSection("水槽の演出") {
                 Toggle("時間帯で明るさを変える（夜は魚もゆっくり）", isOn: $store.settings.timeOfDay)
                 Toggle("季節の浮遊物（春は花びら・秋は葉・冬はマリンスノー）", isOn: $store.settings.seasons)
+            }
+            PixelSection("スクリーンセーバー") {
+                SaverSettings()
             }
             PixelSection("お世話のリマインド") {
                 ReminderSettings()

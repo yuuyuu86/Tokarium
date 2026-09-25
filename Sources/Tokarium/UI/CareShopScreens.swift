@@ -21,6 +21,11 @@ struct CareScreen: View {
                         Label("持っている餌: \(store.state.food) 回分　／　薬: \(store.state.medicine) 個", systemImage: "leaf")
                             .font(.pixel(.callout))
                         Text(careHint).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                        let factor = Ecology.waterDecayFactor(store.state.tank)
+                        if factor < 1 {
+                            Label("掃除役のおかげで、水の汚れる速さが \(Int(((1 - factor) * 100).rounded()))% 下がっています",
+                                  systemImage: "sparkles").font(.pixel(.caption)).foregroundStyle(Color(rgb: 0x5FD068))
+                        }
                     }
                     .padding(6)
                 } label: {
@@ -67,6 +72,11 @@ private struct FishRow: View {
                         .onSubmit { store.rename(fish.id, to: name) }
                     Text(fish.species.name).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                     Spacer()
+                    Button { store.toggleFavorite(fish.id) } label: {
+                        Image(systemName: fish.isFavorite ? "heart.fill" : "heart").foregroundStyle(Color(rgb: 0xFF6A9A))
+                    }
+                    .help(fish.isFavorite ? "お気に入りを外す" : "お気に入り（主役）にする")
+                    .accessibilityLabel(fish.isFavorite ? "お気に入りを外す" : "お気に入り（主役）にする")
                     if fish.isSick && fish.isAlive {
                         Button { store.giveMedicine(fish.id) } label: { Label("薬をあげる", systemImage: "cross.case") }
                             .disabled(store.state.medicine == 0)
@@ -75,6 +85,10 @@ private struct FishRow: View {
                     ConditionBadge(condition: fish.condition)
                 }
                 Text(lifeText).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                if let mood = Ecology.mood(fish, in: store.state.tank) {
+                    Text(mood).font(.pixel(.caption))
+                        .foregroundStyle(mood.contains(String(localized: "ストレス")) ? Color(rgb: 0xFFA030) : Color(rgb: 0x5FD068))
+                }
                 if fish.isAlive {
                     HStack(spacing: 16) {
                         StatBar(title: String(localized: "満腹"), value: fish.fullness, word: fish.fullness < Simulation.hungryThreshold ? String(localized: "空腹") : String(localized: "十分"))
@@ -173,27 +187,59 @@ struct ShopScreen: View {
     private var fishSection: some View {
         let size = store.state.tank.size
         Text("水槽の魚 \(store.livingFish.count)/\(size.maxFish) 匹").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        if let event = SeasonalEvents.active() {
+            eventHeader(event)
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(event.fish, id: \.self) { id in fishCard(Catalog.species(id)) }
+            }
+        }
         ForEach([FishRarity.common, .uncommon, .rare], id: \.self) { rarity in
-            let list = Catalog.fish.filter { !$0.hidden && $0.rarity == rarity && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
+            let list = Catalog.fish.filter { $0.isRegular && $0.rarity == rarity && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
             if !list.isEmpty {
                 Text(rarity.label).font(.pixel(.headline))
                 LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(list) { sp in
-                        ShopCard(title: sp.name, blurb: sp.blurb, price: sp.price, canAfford: store.coins >= sp.price,
-                                 owned: store.livingFish.filter { $0.speciesID == sp.id }.count) {
-                            FishIcon(speciesID: sp.id)
-                        } buy: {
-                            message = store.buyFish(sp)?.errorDescription
-                        }
-                    }
+                    ForEach(list) { sp in fishCard(sp) }
                 }
             }
+        }
+    }
+
+    private func fishCard(_ sp: FishSpecies) -> some View {
+        let conflicts = Ecology.conflicts(buying: sp.id, into: store.state.tank)
+        return ShopCard(title: sp.name, blurb: sp.blurb, price: sp.price, canAfford: store.coins >= sp.price,
+                        owned: store.livingFish.filter { $0.speciesID == sp.id }.count,
+                        tags: Ecology.traits(sp.id),
+                        warning: conflicts.isEmpty ? nil : String(localized: "相性注意: \(conflicts.map { Catalog.species($0).name }.joined(separator: "、"))")) {
+            FishIcon(speciesID: sp.id)
+        } buy: {
+            message = store.buyFish(sp)?.errorDescription
+        }
+    }
+
+    private func eventHeader(_ event: SeasonalEvent) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: event.symbol).foregroundStyle(PixelPalette.gold)
+            Text("期間限定: \(event.name)（\(event.periodText)）").font(.pixel(.headline)).foregroundStyle(PixelPalette.gold)
         }
     }
 
     @ViewBuilder
     private var decorationSection: some View {
         let size = store.state.tank.size
+        if let event = SeasonalEvents.active() {
+            eventHeader(event)
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(event.decorations, id: \.self) { id in
+                    let kind = Catalog.decoration(id)
+                    ShopCard(title: kind.name, blurb: kind.blurb, price: kind.price, canAfford: store.coins >= kind.price,
+                             owned: store.state.tank.decorations.filter { $0.kindID == kind.id }.count) {
+                        DecorationIcon(kindID: kind.id)
+                    } buy: {
+                        message = store.buyDecoration(kind)?.errorDescription
+                    }
+                }
+            }
+        }
         Text("置いている装飾 \(store.state.tank.decorations.filter(\.isPlaced).count)/\(size.maxDecorations) 個。置いた装飾は「水槽」画面の「配置を編集」で動かせます。")
             .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
         let stored = store.state.tank.decorations.filter { !$0.isPlaced }
@@ -209,7 +255,7 @@ struct ShopScreen: View {
             }
         }
         ForEach(DecorationCategory.allCases, id: \.self) { category in
-            let list = Catalog.decorations.filter { !$0.hidden && $0.category == category && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
+            let list = Catalog.decorations.filter { $0.isRegular && $0.category == category && (!affordableOnly || store.coins >= $0.price) }.sorted { $0.price < $1.price }
             if !list.isEmpty {
                 Text(category.label).font(.pixel(.headline))
                 LazyVGrid(columns: columns, spacing: 12) {
@@ -301,6 +347,8 @@ private struct ShopCard<Icon: View>: View {
     let price: Int
     let canAfford: Bool
     var owned = 0
+    var tags: [String] = []
+    var warning: String? = nil
     @ViewBuilder let icon: () -> Icon
     let buy: () -> Void
 
@@ -321,8 +369,22 @@ private struct ShopCard<Icon: View>: View {
             }
             Text(blurb).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim).multilineTextAlignment(.center)
                 .lineLimit(2, reservesSpace: true)
+            if !tags.isEmpty {
+                HStack(spacing: 4) {
+                    ForEach(tags, id: \.self) { tag in
+                        Text(tag).font(.pixel(.caption2)).padding(.horizontal, 5).padding(.vertical, 2)
+                            .background(PixelFrame(fill: PixelPalette.sea.opacity(0.6), border: PixelPalette.sea, outline: .clear, step: 1))
+                    }
+                }
+            }
+            if let warning {
+                Label(warning, systemImage: "exclamationmark.triangle.fill").font(.pixel(.caption2))
+                    .foregroundStyle(Color(rgb: 0xFFA030)).lineLimit(2).multilineTextAlignment(.center)
+            }
             Button(action: buy) {
                 Label("\(price) コインで買う", systemImage: "cart")
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(PixelButtonStyle(prominent: canAfford))
