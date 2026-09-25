@@ -5,7 +5,7 @@ import Testing
 // MARK: - 遊びの数値の見直し用のシミュレーション
 //
 // TOKARIUM_BALANCE=1 swift test --filter balanceReport
-// 1日あたりのコインがちがう3人のプレイヤーが60日遊んだときの、ランク・図鑑・品種・お題の進み方を表にする。
+// 1日あたりのコインがちがう3人のプレイヤーが60日遊んだときの、ランク・図鑑・品種・ミッションの進み方を表にする。
 
 struct BalancePlayer {
     let name: String
@@ -226,7 +226,7 @@ enum BalanceSim {
     for p in players {
         let (days, sources) = BalanceSim.run(p, days: 60)
         print("\n== \(p.name) ==")
-        print("日  ランク 経験値 コイン 魚 図鑑 品種 お題 誕生 水槽 隠れ 実績")
+        print("日  ランク 経験値 コイン 魚 図鑑 品種 ミッション 誕生 水槽 隠れ 実績")
         for d in days where [1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60].contains(d.day) {
             print(String(format: "%2d  %4d %6d %6d %3d %3d %4d %4d %4d %3d %3d %3d", d.day, d.rank, d.xp, d.coins, d.fish, d.species, d.variants,
                          d.quests, d.births, d.tankLevel, d.secrets, d.achievements))
@@ -243,6 +243,6 @@ enum BalanceSim {
     // 1週間で数ランクは上がり、1か月でもまだ最高ランクには届かない
     #expect(week.rank >= 3)
     #expect(month.rank < KeeperRank.maxRank)
-    // 1か月でお題を半分以上はこなせる
+    // 1か月でミッションを半分以上はこなせる
     #expect(month.quests >= 30 * 3 / 2)
 }

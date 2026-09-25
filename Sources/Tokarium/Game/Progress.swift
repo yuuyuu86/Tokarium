@@ -179,7 +179,7 @@ enum Achievements {
         Achievement(id: "rank20", title: String(localized: "伝説のアクアリスト"), detail: String(localized: "飼育員ランク20になった"), reward: nil) {
             $0.state.rank >= KeeperRank.maxRank
         },
-        Achievement(id: "quests_30", title: String(localized: "働き者"), detail: String(localized: "お題を30回達成した"), reward: nil) {
+        Achievement(id: "quests_30", title: String(localized: "働き者"), detail: String(localized: "ミッションを30回達成した"), reward: nil) {
             $0.state.quests.completedCount >= 30
         },
         Achievement(id: "layout_80", title: String(localized: "アクアスケーパー"), detail: String(localized: "レイアウトの評価で80点をとった"), reward: nil) {

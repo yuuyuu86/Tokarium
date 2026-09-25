@@ -135,7 +135,7 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, seed: U
     #expect(store.buyFish(pricey) == nil)
 }
 
-// MARK: お題
+// MARK: ミッション
 
 @Test func questsArePickedPerPeriodAndClaimedOnce() {
     let day = Date(timeIntervalSince1970: 1_790_000_000)
@@ -157,7 +157,7 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, seed: U
     #expect(s.claim(quest, now: day) == nil)
     #expect(s.quests.completedCount == 1)
 
-    // 次の週になると、前のお題の記録は消える
+    // 次の週になると、前のミッションの記録は消える
     s.questEvent(.touch, now: day.addingTimeInterval(8 * 86400))
     #expect(s.quests.progress[quest.id] == nil)
 }

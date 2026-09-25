@@ -16,7 +16,7 @@ enum XPEvent: String, Codable, CaseIterable {
         case .newSpecies: return 30
         case .newVariant: return 25
         case .achievement: return 50
-        case .quest: return 0   // お題ごとに決まっている
+        case .quest: return 0   // ミッションごとに決まっている
         case .oldAge: return 20
         case .layout: return 0  // 評価の上がった分
         case .secret: return 60

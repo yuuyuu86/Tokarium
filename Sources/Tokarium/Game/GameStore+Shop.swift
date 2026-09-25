@@ -9,7 +9,7 @@ extension GameStore {
         case rankTooLow(Int)
         var errorDescription: String? {
             switch self {
-            case .notEnoughFragments: return String(localized: "かけらが足りません。お題を達成するともらえます")
+            case .notEnoughFragments: return String(localized: "かけらが足りません。ミッションを達成するともらえます")
             case .rankTooLow(let r): return String(localized: "飼育員ランク \(r) になると買えます")
             case .notEnoughCoins: return String(localized: "コインが足りません")
             case .tankFull: return String(localized: "水槽がいっぱいです。お店で水槽を大きくできます")

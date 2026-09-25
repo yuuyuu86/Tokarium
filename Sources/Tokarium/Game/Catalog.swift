@@ -57,7 +57,7 @@ struct DecorationKind: Identifiable {
     var hidden = false
     /// 季節のイベントの限定品。
     var event: String? = nil
-    /// お題のかけらと交換できる装飾（かけらの数）。
+    /// ミッションのかけらと交換できる装飾（かけらの数）。
     var fragmentPrice: Int? = nil
     var isRegular: Bool { !hidden && event == nil }
 }
@@ -537,7 +537,7 @@ enum Catalog {
                      .e(0.65, 0.56, 0.06, 0.12, 0x1C1410, role: .dark), .p([(0.75, 0.4), (0.85, 0.5), (0.8, 0.75), (0.72, 0.6)], 0x1C1410, role: .dark)])),
     ] + rewardDecorations + eventDecorations + questDecorations
 
-    /// お題でもらえる「かけら」と交換する装飾（お店には並ばない）。
+    /// ミッションでもらえる「かけら」と交換する装飾（お店には並ばない）。
     static let questDecorations: [DecorationKind] = {
         var list: [(DecorationKind, Int)] = [
             (deco("glassfloat", String(localized: "ガラスの浮き玉"), 0, String(localized: "海をただよってきた青いガラス玉。"), .structure, 12, 12,
@@ -554,7 +554,7 @@ enum Catalog {
                   .parts([.r(0.2, 0.86, 0.6, 0.14, 0x8A8A88, texture: .stone), .r(0.4, 0.5, 0.2, 0.38, 0x9A9A98, texture: .stone),
                           .r(0.15, 0.3, 0.7, 0.22, 0xA8A8A4, texture: .stone), .r(0.35, 0.34, 0.3, 0.14, 0xFFD870, role: .glow),
                           .p([(0, 0.32), (0.5, 0.08), (1, 0.32)], 0x7A7A78), .e(0.42, 0, 0.16, 0.12, 0x8A8A88)])), 15),
-            (deco("ryugu", String(localized: "竜宮城"), 0, String(localized: "お題をこなした人だけが招かれる海の御殿。"), .structure, 52, 40,
+            (deco("ryugu", String(localized: "竜宮城"), 0, String(localized: "ミッションをこなした人だけが招かれる海の御殿。"), .structure, 52, 40,
                   .parts([.r(0.05, 0.55, 0.9, 0.45, 0xD84030), .r(0.2, 0.3, 0.6, 0.28, 0xE85040),
                           .p([(0, 0.58), (0.5, 0.4), (1, 0.58)], 0x2A6A58), .p([(0.12, 0.32), (0.5, 0.1), (0.88, 0.32)], 0x2A6A58),
                           .p([(0.4, 0.12), (0.5, 0), (0.6, 0.12)], 0xF0C040, role: .glow), .a(0.42, 0.72, 0.16, 0.28),

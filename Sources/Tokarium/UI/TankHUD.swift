@@ -44,7 +44,7 @@ struct TopHUD: View {
                 }
             }
             .buttonStyle(.plain)
-            .help("飼育員ランク \(store.state.rank)（\(KeeperRank.title(store.state.rank))）。クリックでお題の画面へ")
+            .help("飼育員ランク \(store.state.rank)（\(KeeperRank.title(store.state.rank))）。クリックでミッションの画面へ")
             .accessibilityLabel("飼育員ランク \(store.state.rank)")
             PixelBadge {
                 Image(systemName: "circle.hexagongrid.circle.fill").foregroundStyle(PixelPalette.gold)

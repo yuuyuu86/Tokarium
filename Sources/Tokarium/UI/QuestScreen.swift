@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - お題と飼育員ランク
+// MARK: - ミッションと飼育員ランク
 
 struct QuestScreen: View {
     @Environment(GameStore.self) private var store
@@ -19,13 +19,13 @@ struct QuestScreen: View {
                     }
                     .buttonStyle(.pixelProminent)
                 }
-                PixelSection("今日のお題") {
+                PixelSection("今日のミッション") {
                     ForEach(Quests.today()) { QuestRow(quest: $0) }
-                    Text("毎日0時に新しいお題に変わります。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    Text("毎日0時に新しいミッションに変わります。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                 }
-                PixelSection("今週のお題") {
+                PixelSection("今週のミッション") {
                     ForEach(Quests.thisWeek()) { QuestRow(quest: $0) }
-                    Text("毎週月曜日に新しいお題に変わります。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    Text("毎週月曜日に新しいミッションに変わります。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                 }
                 exchange
             }
@@ -43,7 +43,7 @@ struct QuestScreen: View {
                 Spacer()
                 FragmentLabel(count: store.state.fragments).font(.pixel(.title3))
             }
-            Text("お題でもらえるかけらを集めると、ここでしか手に入らない装飾と交換できます。")
+            Text("ミッションでもらえるかけらを集めると、ここでしか手に入らない装飾と交換できます。")
                 .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(Catalog.questDecorations) { kind in
@@ -103,7 +103,7 @@ struct RankCard: View {
             } else {
                 Text("最高ランクです。").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
             }
-            Text("餌やり・水換え（1日の回数に上限あり）、稚魚の誕生、成長、図鑑や品種の登録、実績、お題で経験値がたまります。")
+            Text("餌やり・水換え（1日の回数に上限あり）、稚魚の誕生、成長、図鑑や品種の登録、実績、ミッションで経験値がたまります。")
                 .font(.pixel(.caption2)).foregroundStyle(PixelPalette.dim)
         }
         .padding(12)

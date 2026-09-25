@@ -9,7 +9,7 @@ enum Screen: String, CaseIterable, Identifiable {
         case .tank: return String(localized: "水槽")
         case .care: return String(localized: "お世話")
         case .shop: return String(localized: "お店")
-        case .quests: return String(localized: "お題")
+        case .quests: return String(localized: "ミッション")
         case .dex: return String(localized: "図鑑")
         case .usage: return String(localized: "AI利用量")
         case .settings: return String(localized: "設定")

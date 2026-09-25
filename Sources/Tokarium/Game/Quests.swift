@@ -1,8 +1,8 @@
 import Foundation
 
-// MARK: - 毎日・毎週のお題
+// MARK: - 毎日・毎週のミッション
 
-/// お題で数えること。AIの利用量やコインの支払いは数えない（お題のためにAIを使いたくならないように）。
+/// ミッションで数えること。AIの利用量やコインの支払いは数えない（ミッションのためにAIを使いたくならないように）。
 enum QuestKind: String, Codable {
     case feed, feedOne, waterChange, touch, cleanMinutes, placeDecoration, birth, grownUp, newVariant
 }
@@ -34,7 +34,7 @@ struct QuestTemplate {
     let reward: QuestReward
 }
 
-/// その日（その週）のお題。
+/// その日（その週）のミッション。
 struct Quest: Identifiable, Equatable {
     let template: QuestTemplate
     /// 期間の識別（日付や週）。
@@ -44,13 +44,13 @@ struct Quest: Identifiable, Equatable {
     static func == (a: Quest, b: Quest) -> Bool { a.id == b.id }
 }
 
-/// お題の進み具合。
+/// ミッションの進み具合。
 struct QuestBook: Codable, Equatable {
-    /// お題ID → 進み具合。
+    /// ミッションID → 進み具合。
     var progress: [String: Int] = [:]
-    /// ごほうびを受け取ったお題。
+    /// ごほうびを受け取ったミッション。
     var claimed: Set<String> = []
-    /// これまでに達成したお題の数。
+    /// これまでに達成したミッションの数。
     var completedCount = 0
 }
 
@@ -97,7 +97,7 @@ enum Quests {
         return String(format: "%04d-W%02d", comps.yearForWeekOfYear ?? 0, comps.weekOfYear ?? 0)
     }
 
-    /// 期間ごとに決まったお題を選ぶ（同じ日なら何度見ても同じ）。
+    /// 期間ごとに決まったミッションを選ぶ（同じ日なら何度見ても同じ）。
     private static func pick(_ pool: [QuestTemplate], count: Int, key: String) -> [QuestTemplate] {
         var rng = SeededRandom(seed: key.stableSeed)
         return Array(pool.shuffled(using: &rng).prefix(count))
@@ -130,11 +130,11 @@ extension GameState {
         Quests.current(now).filter { isDone($0) && !isClaimed($0) }
     }
 
-    /// 行動をお題に数える。戻り値は、これで達成したお題。
+    /// 行動をミッションに数える。戻り値は、これで達成したミッション。
     @discardableResult
     mutating func questEvent(_ kind: QuestKind, count: Int = 1, now: Date = Date()) -> [Quest] {
         let current = Quests.current(now)
-        // 期間の過ぎたお題の記録は消す
+        // 期間の過ぎたミッションの記録は消す
         let ids = Set(current.map(\.id))
         quests.progress = quests.progress.filter { ids.contains($0.key) }
         quests.claimed = quests.claimed.filter { ids.contains($0) }

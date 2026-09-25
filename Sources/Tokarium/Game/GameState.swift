@@ -230,9 +230,9 @@ struct GameState: Codable, Equatable {
     var xpToday: [String: Int] = [:]
     /// 経験値を渡し済みの数（図鑑の種類・品種・実績・天寿）。二重に渡さないため。
     var xpCounted = XPCounted()
-    /// 毎日・毎週のお題。
+    /// 毎日・毎週のミッション。
     var quests = QuestBook()
-    /// お題でもらえるかけら。
+    /// ミッションでもらえるかけら。
     var fragments = 0
     /// お別れした魚の思い出（殿堂）。
     var memories: [FishMemory] = []

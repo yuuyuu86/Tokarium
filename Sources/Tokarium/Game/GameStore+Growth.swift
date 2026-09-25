@@ -1,6 +1,6 @@
 import Foundation
 
-/// やり込み要素（飼育員ランク・お題・品種・なつき度・隠れた魚・殿堂・称号・レイアウトの評価）
+/// やり込み要素（飼育員ランク・ミッション・品種・なつき度・隠れた魚・殿堂・称号・レイアウトの評価）
 extension GameStore {
     // MARK: 経験値とランク
 
@@ -19,18 +19,18 @@ extension GameStore {
              body: unlocked.isEmpty ? KeeperRank.title(rank) : String(localized: "お店に並んだもの: \(unlocked.joined(separator: String(localized: "、")))"))
     }
 
-    // MARK: お題
+    // MARK: ミッション
 
-    /// 行動をお題に数える。達成したら知らせる。
+    /// 行動をミッションに数える。達成したら知らせる。
     func questEvent(_ kind: QuestKind, count: Int = 1) {
         let done = state.questEvent(kind, count: count)
         if let q = done.first {
-            toast = String(localized: "お題「\(q.template.title)」を達成しました。お題の画面でごほうびを受け取れます")
+            toast = String(localized: "ミッション「\(q.template.title)」を達成しました。ミッションの画面でごほうびを受け取れます")
             sfx(.sparkle, spontaneous: kind == .cleanMinutes || kind == .birth || kind == .grownUp || kind == .newVariant)
         }
     }
 
-    /// お題のごほうびを受け取る。
+    /// ミッションのごほうびを受け取る。
     func claim(_ quest: Quest) {
         let before = state.rank
         guard let reward = state.claim(quest) else { return }
@@ -158,7 +158,7 @@ extension GameStore {
 
     var layoutScore: LayoutScore { Layout.score(state.tank) }
 
-    /// 装飾を置いた・動かしたあと。お題に数え、いちばんよい評価を更新する。
+    /// 装飾を置いた・動かしたあと。ミッションに数え、いちばんよい評価を更新する。
     func decorationArranged() {
         questEvent(.placeDecoration)
         let score = layoutScore.total
@@ -182,7 +182,7 @@ extension GameStore {
 
     // MARK: 時間経過で起きること
 
-    /// 時間経過のあとに、お題・経験値・隠れた魚を反映する。
+    /// 時間経過のあとに、ミッション・経験値・隠れた魚を反映する。
     func applyGrowth(_ report: Simulation.Report, now: Date) {
         if !report.births.isEmpty {
             gainXP(.birth)
