@@ -16,6 +16,22 @@ struct DexEntry: Codable, Equatable {
     var oldAge = 0
     /// 色違いを迎えた数。
     var shiny = 0
+    /// 迎えた品種。
+    var variants: Set<FishVariant> = []
+
+    init(firstSeenAt: Date) { self.firstSeenAt = firstSeenAt }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        firstSeenAt = try c.decode(Date.self, forKey: .firstSeenAt)
+        owned = try c.decodeIfPresent(Int.self, forKey: .owned) ?? 0
+        born = try c.decodeIfPresent(Int.self, forKey: .born) ?? 0
+        maxGeneration = try c.decodeIfPresent(Int.self, forKey: .maxGeneration) ?? 1
+        oldAge = try c.decodeIfPresent(Int.self, forKey: .oldAge) ?? 0
+        shiny = try c.decodeIfPresent(Int.self, forKey: .shiny) ?? 0
+        // 品種ができる前に迎えた魚は原種として数える
+        variants = try c.decodeIfPresent(Set<FishVariant>.self, forKey: .variants) ?? [.wild]
+    }
 }
 
 // MARK: - 数えておくこと
@@ -121,6 +137,42 @@ enum Achievements {
         Achievement(id: "treasure", title: String(localized: "宝さがし"), detail: String(localized: "流れてきた宝箱を開けた"), reward: nil) {
             $0.state.stats.treasures >= 1
         },
+        Achievement(id: "variant_first", title: String(localized: "ブリーダー"), detail: String(localized: "原種ではない品種を迎えた"), reward: nil) {
+            $0.state.variantsDiscovered >= 1
+        },
+        Achievement(id: "variant_10", title: String(localized: "品種コレクター"), detail: String(localized: "品種を合わせて10見つけた"), reward: "crystal") {
+            $0.state.variantsDiscovered >= 10
+        },
+        Achievement(id: "variant_all", title: String(localized: "品種マスター"), detail: String(localized: "1種類の魚で、すべての品種をそろえた"), reward: nil) {
+            $0.state.dex.values.contains { $0.variants.count >= FishVariant.allCases.count }
+        },
+        Achievement(id: "combo_variant", title: String(localized: "かけあわせの妙"), detail: String(localized: "2つの色を組み合わせた品種を迎えた"), reward: nil) {
+            $0.state.dex.values.contains { $0.variants.contains { $0.isCombination } }
+        },
+        Achievement(id: "secret", title: String(localized: "秘境の探検家"), detail: String(localized: "隠れた魚に出会った"), reward: nil) { ctx in
+            SecretFish.all.contains { ctx.state.dex[$0.speciesID] != nil }
+        },
+        Achievement(id: "secret_all", title: String(localized: "幻の魚ハンター"), detail: String(localized: "隠れた魚すべてに出会った"), reward: nil) { ctx in
+            SecretFish.all.allSatisfy { ctx.state.dex[$0.speciesID] != nil }
+        },
+        Achievement(id: "rank10", title: String(localized: "水族館の主任"), detail: String(localized: "飼育員ランク10になった"), reward: nil) {
+            $0.state.rank >= 10
+        },
+        Achievement(id: "rank20", title: String(localized: "伝説のアクアリスト"), detail: String(localized: "飼育員ランク20になった"), reward: nil) {
+            $0.state.rank >= KeeperRank.maxRank
+        },
+        Achievement(id: "quests_30", title: String(localized: "働き者"), detail: String(localized: "お題を30回達成した"), reward: nil) {
+            $0.state.quests.completedCount >= 30
+        },
+        Achievement(id: "layout_80", title: String(localized: "アクアスケーパー"), detail: String(localized: "レイアウトの評価で80点をとった"), reward: nil) {
+            $0.state.bestLayoutScore >= 80
+        },
+        Achievement(id: "affection_max", title: String(localized: "大のなかよし"), detail: String(localized: "なつき度が最大の魚がいる"), reward: nil) {
+            $0.state.tank.fish.contains { $0.isAlive && $0.affection >= Affection.max }
+        },
+        Achievement(id: "memorial_5000", title: String(localized: "AIの親友"), detail: String(localized: "記念の魚の最上位をもらった"), reward: nil) {
+            $0.state.memorialsGiven.contains { $0.hasSuffix("@5000") }
+        },
     ]
 
     static func achievement(_ id: String) -> Achievement? { all.first { $0.id == id } }
@@ -128,7 +180,7 @@ enum Achievements {
 
 // MARK: - AIの記念の魚
 
-/// よく使うAIごとに、コインがたまると記念の魚をもらえる。
+/// よく使うAIごとに、コインがたまると記念の魚をもらえる。1000・5000 コインで上位版。
 struct MemorialFish {
     let group: String
     let speciesID: String
@@ -137,6 +189,19 @@ struct MemorialFish {
     let label: String
 
     static let threshold = 100
+
+    struct Tier {
+        let threshold: Int
+        let speciesID: String
+        /// もらったことを覚えておく鍵（最初の段階は昔のデータと同じ鍵）。
+        let key: String
+    }
+
+    var tiers: [Tier] {
+        [Tier(threshold: Self.threshold, speciesID: speciesID, key: group),
+         Tier(threshold: 1000, speciesID: speciesID + "2", key: group + "@1000"),
+         Tier(threshold: 5000, speciesID: speciesID + "3", key: group + "@5000")]
+    }
 
     static let all: [MemorialFish] = [
         MemorialFish(group: "claude", speciesID: "m_claude", sources: ["claude-code", "claude-desktop-cowork"], label: "Claude"),

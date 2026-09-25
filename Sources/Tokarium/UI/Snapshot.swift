@@ -24,7 +24,7 @@ enum Snapshot {
             if let f = favorite {
                 // 主役の魚の名札
                 HStack(spacing: 10) {
-                    FishIcon(speciesID: f.speciesID, dead: !f.isAlive, shiny: f.isShiny).frame(width: 44, height: 28)
+                    FishIcon(fish: f).frame(width: 44, height: 28)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("♥ \(f.name)").font(.pixel(.headline)).foregroundStyle(PixelPalette.text)
                         Text("\(f.species.name)・\(f.stage.label)・\(Int(f.ageDays()))日齢").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)

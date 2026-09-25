@@ -57,6 +57,8 @@ struct DecorationKind: Identifiable {
     var hidden = false
     /// 季節のイベントの限定品。
     var event: String? = nil
+    /// お題のかけらと交換できる装飾（かけらの数）。
+    var fragmentPrice: Int? = nil
     var isRegular: Bool { !hidden && event == nil }
 }
 
@@ -290,7 +292,109 @@ enum Catalog {
                         $0.back = 0x5A9A30; $0.body = 0x7CC242; $0.bellyColor = 0xF4F0C0; $0.fin = 0x9CD262
                         $0.patterns = [.spots(count: 6, size: 0.05, color: 0x1E3A12)]
                     }),
-    ] + memorialSpecies + eventSpecies
+    ] + memorialSpecies + memorialUpgrades + eventSpecies + secretSpecies
+
+    /// 条件がそろうと水槽に迷いこんでくる、隠れた魚（お店には並ばない）。
+    static let secretSpecies: [FishSpecies] = [
+        FishSpecies(id: "hotaru", name: String(localized: "ホタルテトラ"), price: 0, blurb: String(localized: "夜の光に誘われてやってくる、光る斑点の魚。"),
+                    speed: 0.09, zone: .any, lifespanDays: 300, design: fishDesign {
+                        $0.length = 13; $0.aspect = 0.44; $0.tailFrac = 0.24; $0.depth = 0.62; $0.eyeSize = 1.3
+                        $0.back = 0x1A2430; $0.body = 0x2A3848; $0.bellyColor = 0x3A4A58; $0.fin = 0x405060; $0.iris = 0xD8FF60
+                        $0.patterns = [.spots(count: 6, size: 0.05, color: 0xD8FF60), .hBand(y: -0.1, thickness: 0.16, color: 0x90E040)]
+                    }, hidden: true),
+        FishSpecies(id: "cavefish", name: String(localized: "ドウクツギョ"), price: 0, blurb: String(localized: "洞窟の暗がりで暮らす、目のない白い魚。"),
+                    speed: 0.07, zone: .any, lifespanDays: 500, design: fishDesign {
+                        $0.length = 15; $0.aspect = 0.44; $0.depth = 0.64; $0.eyeSize = 0.4; $0.scales = false
+                        $0.back = 0xE8C8C8; $0.body = 0xF4DCDC; $0.bellyColor = 0xFFF0F0; $0.fin = 0xF8E0E0; $0.iris = 0xE8B0B0
+                    }, hidden: true),
+        FishSpecies(id: "rainbowmedaka", name: String(localized: "ニジイロメダカ"), price: 0, blurb: String(localized: "いろいろな品種を育てた人のもとに現れる、虹色のメダカ。"),
+                    speed: 0.08, zone: .upper, lifespanDays: 260, design: fishDesign {
+                        $0.length = 12; $0.aspect = 0.36; $0.tail = .round; $0.depth = 0.55; $0.blunt = 0.4; $0.eyeSize = 1.4
+                        $0.back = 0x6A7AD0; $0.body = 0xF0F0F0; $0.bellyColor = 0xFFF8E0; $0.fin = 0xF0B0E0
+                        $0.patterns = [.hBand(y: -0.5, thickness: 0.2, color: 0xF05050), .hBand(y: -0.2, thickness: 0.2, color: 0xF0C040),
+                                       .hBand(y: 0.1, thickness: 0.2, color: 0x50C860), .hBand(y: 0.4, thickness: 0.2, color: 0x5080F0)]
+                    }, hidden: true),
+        FishSpecies(id: "oarfish", name: String(localized: "リュウグウノツカイ"), price: 0, blurb: String(localized: "大きな水槽のにぎわいに誘われた、深海の長い魚。"),
+                    speed: 0.04, zone: .any, lifespanDays: 600, design: fishDesign {
+                        $0.length = 34; $0.aspect = 0.2; $0.tailFrac = 0.1; $0.tail = .pointed; $0.depth = 0.7; $0.blunt = 0.7
+                        $0.dorsal = .long; $0.dorsalHeight = 0.5; $0.anal = .none
+                        $0.back = 0xA8B4C8; $0.body = 0xD8E0EC; $0.bellyColor = 0xF0F4F8; $0.fin = 0xF04050
+                        $0.patterns = [.spots(count: 8, size: 0.02, color: 0x6A7890)]
+                    }, hidden: true),
+        FishSpecies(id: "coelacanth", name: String(localized: "シーラカンス"), price: 0, blurb: String(localized: "古代から姿を変えない「生きた化石」。"),
+                    speed: 0.035, zone: .any, lifespanDays: 900, design: fishDesign {
+                        $0.length = 26; $0.aspect = 0.42; $0.tailFrac = 0.22; $0.tail = .spade; $0.depth = 0.72; $0.blunt = 0.6
+                        $0.dorsal = .tall; $0.anal = .tall
+                        $0.back = 0x1C2C48; $0.body = 0x2E4468; $0.bellyColor = 0x44587A; $0.fin = 0x2A3C5C; $0.iris = 0x60C0C0
+                        $0.patterns = [.spots(count: 9, size: 0.035, color: 0xE0E8F0)]
+                    }, hidden: true),
+    ]
+
+    /// 記念の魚の上位版（そのAIで 1000・5000 コインを得るともらえる）。
+    static let memorialUpgrades: [FishSpecies] = [
+        FishSpecies(id: "m_claude2", name: String(localized: "アンバーベール（Claude 1000 記念）"), price: 0,
+                    blurb: String(localized: "Claude と歩んだ 1000 コインの記念。ベールのようなひれ。"),
+                    speed: 0.07, zone: .any, lifespanDays: 500, design: fishDesign {
+                        $0.length = 16; $0.aspect = 0.62; $0.tail = .veil; $0.tailFrac = 0.36; $0.tailSpread = 0.95; $0.depth = 0.62
+                        $0.dorsal = .sail; $0.dorsalHeight = 0.5
+                        $0.back = 0xA84A26; $0.body = 0xD97757; $0.bellyColor = 0xF4D9C6; $0.fin = 0xF8C8A0
+                        $0.patterns = [.spots(count: 5, size: 0.04, color: 0xFFE8A0)]
+                    }, hidden: true),
+        FishSpecies(id: "m_claude3", name: String(localized: "アンバードラゴン（Claude 5000 記念）"), price: 0,
+                    blurb: String(localized: "Claude と歩んだ 5000 コインの記念。琥珀色の竜のような魚。"),
+                    speed: 0.06, zone: .any, lifespanDays: 700, design: fishDesign {
+                        $0.length = 22; $0.aspect = 0.5; $0.tail = .veil; $0.tailFrac = 0.34; $0.tailSpread = 1.0; $0.depth = 0.6
+                        $0.dorsal = .long; $0.dorsalHeight = 0.55; $0.filaments = true; $0.barbels = true
+                        $0.back = 0x8A3A18; $0.body = 0xD06A40; $0.bellyColor = 0xFFE0B0; $0.fin = 0xFFB070; $0.iris = 0xFFD040
+                        $0.patterns = [.hBand(y: -0.2, thickness: 0.14, color: 0xFFD060), .spots(count: 6, size: 0.03, color: 0xFFF4D0)]
+                    }, hidden: true),
+        FishSpecies(id: "m_codex2", name: String(localized: "コンパイラベタ（Codex 1000 記念）"), price: 0,
+                    blurb: String(localized: "Codex と歩んだ 1000 コインの記念。緑に光る長いひれ。"),
+                    speed: 0.06, zone: .upper, lifespanDays: 500, design: fishDesign {
+                        $0.length = 16; $0.aspect = 0.7; $0.tail = .veil; $0.tailFrac = 0.38; $0.tailSpread = 1.0; $0.depth = 0.55
+                        $0.dorsal = .veil; $0.anal = .veil; $0.analHeight = 0.5
+                        $0.back = 0x0C1014; $0.body = 0x182028; $0.bellyColor = 0x283440; $0.fin = 0x3CE06A; $0.iris = 0x3CE06A
+                        $0.patterns = [.hBand(y: -0.1, thickness: 0.18, color: 0x3CE06A)]
+                    }, hidden: true),
+        FishSpecies(id: "m_codex3", name: String(localized: "カーネルアロワナ（Codex 5000 記念）"), price: 0,
+                    blurb: String(localized: "Codex と歩んだ 5000 コインの記念。黒と緑のうろこがきらめく。"),
+                    speed: 0.05, zone: .upper, lifespanDays: 700, design: fishDesign {
+                        $0.length = 26; $0.aspect = 0.32; $0.tailFrac = 0.2; $0.tail = .spade; $0.depth = 0.7; $0.blunt = 0.3; $0.barbels = true
+                        $0.back = 0x0A0E12; $0.body = 0x1A242E; $0.bellyColor = 0x2E3C48; $0.fin = 0x2AA850; $0.iris = 0x3CE06A
+                        $0.patterns = [.spots(count: 10, size: 0.025, color: 0x3CE06A), .hBand(y: 0.1, thickness: 0.1, color: 0x7CFF9A)]
+                    }, hidden: true),
+        FishSpecies(id: "m_gemini2", name: String(localized: "ツインネビュラ（Gemini 1000 記念）"), price: 0,
+                    blurb: String(localized: "Gemini や Qwen と歩んだ 1000 コインの記念。星雲のもよう。"),
+                    speed: 0.06, zone: .any, lifespanDays: 500, design: fishDesign {
+                        $0.length = 17; $0.aspect = 0.72; $0.tail = .double; $0.tailFrac = 0.34; $0.depth = 0.72; $0.blunt = 0.7
+                        $0.dorsal = .sail; $0.dorsalHeight = 0.45
+                        $0.back = 0x2A40C0; $0.body = 0x5060E8; $0.bellyColor = 0xC0A0F8; $0.fin = 0xB090F8
+                        $0.patterns = [.patches(count: 3, color: 0x9A60E8), .spots(count: 6, size: 0.03, color: 0xFFFFFF)]
+                    }, hidden: true),
+        FishSpecies(id: "m_gemini3", name: String(localized: "ギャラクシーエンゼル（Gemini 5000 記念）"), price: 0,
+                    blurb: String(localized: "Gemini や Qwen と歩んだ 5000 コインの記念。銀河を泳ぐ天使。"),
+                    speed: 0.05, zone: .any, lifespanDays: 700, design: fishDesign {
+                        $0.length = 18; $0.aspect = 1.1; $0.tailFrac = 0.26; $0.tail = .fan; $0.depth = 0.5; $0.blunt = 0.55
+                        $0.dorsal = .long; $0.dorsalHeight = 0.9; $0.anal = .long; $0.analHeight = 0.85; $0.filaments = true
+                        $0.back = 0x1A1A60; $0.body = 0x3A30A0; $0.bellyColor = 0x8070E0; $0.fin = 0x6A5AE0
+                        $0.patterns = [.spots(count: 12, size: 0.02, color: 0xFFFFFF), .vStripes(count: 2, width: 0.05, color: 0xC090FF)]
+                    }, hidden: true),
+        FishSpecies(id: "m_other2", name: String(localized: "ゴールドコード（1000 記念）"), price: 0,
+                    blurb: String(localized: "OpenCode・Copilot・Ollama と歩んだ 1000 コインの記念。"),
+                    speed: 0.06, zone: .any, lifespanDays: 500, design: fishDesign {
+                        $0.length = 17; $0.aspect = 0.62; $0.tail = .crescent; $0.depth = 0.75; $0.dorsal = .spiky; $0.dorsalHeight = 0.4
+                        $0.back = 0xB07808; $0.body = 0xF0C030; $0.bellyColor = 0xFFF4B0; $0.fin = 0xFFE070
+                        $0.patterns = [.vStripes(count: 3, width: 0.05, color: 0xFFFFFF, from: 0.25, to: 0.7), .eyeSpot(color: 0x202020)]
+                    }, hidden: true),
+        FishSpecies(id: "m_other3", name: String(localized: "オープンソースの王（5000 記念）"), price: 0,
+                    blurb: String(localized: "OpenCode・Copilot・Ollama と歩んだ 5000 コインの記念。王冠のようなひれ。"),
+                    speed: 0.05, zone: .any, lifespanDays: 700, design: fishDesign {
+                        $0.length = 22; $0.aspect = 0.62; $0.tail = .fan; $0.tailFrac = 0.3; $0.depth = 0.74
+                        $0.dorsal = .spiky; $0.dorsalHeight = 0.6; $0.filaments = true
+                        $0.back = 0x906000; $0.body = 0xE8B820; $0.bellyColor = 0xFFF0A0; $0.fin = 0xF04040; $0.iris = 0x2060F0
+                        $0.patterns = [.head(color: 0xFFF0A0, fraction: 0.2), .spots(count: 6, size: 0.03, color: 0xFFFFFF)]
+                    }, hidden: true),
+    ]
 
     /// 季節のイベントの限定の魚。
     static let eventSpecies: [FishSpecies] = [
@@ -431,7 +535,37 @@ enum Catalog {
                      .p([(0, 0.48), (1, 0.34), (0.9, 1), (0.1, 1)], 0x6A4A30, texture: .wood), .r(0.02, 0.44, 0.96, 0.05, 0x4A3020, role: .detail),
                      .e(0.25, 0.6, 0.06, 0.12, 0x1C1410, role: .dark), .e(0.45, 0.58, 0.06, 0.12, 0x1C1410, role: .dark),
                      .e(0.65, 0.56, 0.06, 0.12, 0x1C1410, role: .dark), .p([(0.75, 0.4), (0.85, 0.5), (0.8, 0.75), (0.72, 0.6)], 0x1C1410, role: .dark)])),
-    ] + rewardDecorations + eventDecorations
+    ] + rewardDecorations + eventDecorations + questDecorations
+
+    /// お題でもらえる「かけら」と交換する装飾（お店には並ばない）。
+    static let questDecorations: [DecorationKind] = {
+        var list: [(DecorationKind, Int)] = [
+            (deco("glassfloat", String(localized: "ガラスの浮き玉"), 0, String(localized: "海をただよってきた青いガラス玉。"), .structure, 12, 12,
+                  .parts([.e(0.08, 0.08, 0.84, 0.84, 0x70C8F0, role: .glow), .e(0.24, 0.2, 0.22, 0.22, 0xFFFFFF, role: .detail),
+                          .r(0, 0.46, 1, 0.08, 0x8A6A40, role: .detail), .r(0.46, 0, 0.08, 1, 0x8A6A40, role: .detail)])), 5),
+            (deco("pearlshell", String(localized: "真珠の貝"), 0, String(localized: "ひとつぶの真珠を抱いた貝。"), .sea, 12, 10,
+                  .parts([.e(0, 0.4, 1, 0.6, 0xE8C8D8), .e(0.05, 0, 0.9, 0.5, 0xD8B0C4), .e(0.34, 0.4, 0.32, 0.34, 0xFFFFF0, role: .glow)])), 8),
+            (deco("moonstone", String(localized: "月の石"), 0, String(localized: "やわらかく光る、月の色の石。"), .stone, 18, 12,
+                  .parts([.e(0, 0.1, 1, 0.9, 0xD8D4B0, texture: .stone), .e(0.3, 0.25, 0.3, 0.3, 0xFFFBE0, role: .glow)])), 10),
+            (deco("crystal", String(localized: "水晶の柱"), 0, String(localized: "紫にかがやく水晶のかたまり。"), .stone, 14, 22,
+                  .parts([.p([(0.05, 1), (0.2, 0.3), (0.38, 1)], 0xB080F0, role: .glow), .p([(0.3, 1), (0.5, 0), (0.7, 1)], 0xD0A8FF, role: .glow),
+                          .p([(0.62, 1), (0.8, 0.4), (0.95, 1)], 0xA070E0, role: .glow), .e(0, 0.88, 1, 0.12, 0x5A5070, texture: .stone)])), 12),
+            (deco("stonelantern", String(localized: "石灯籠"), 0, String(localized: "水の中にともる、和の灯り。"), .structure, 14, 26,
+                  .parts([.r(0.2, 0.86, 0.6, 0.14, 0x8A8A88, texture: .stone), .r(0.4, 0.5, 0.2, 0.38, 0x9A9A98, texture: .stone),
+                          .r(0.15, 0.3, 0.7, 0.22, 0xA8A8A4, texture: .stone), .r(0.35, 0.34, 0.3, 0.14, 0xFFD870, role: .glow),
+                          .p([(0, 0.32), (0.5, 0.08), (1, 0.32)], 0x7A7A78), .e(0.42, 0, 0.16, 0.12, 0x8A8A88)])), 15),
+            (deco("ryugu", String(localized: "竜宮城"), 0, String(localized: "お題をこなした人だけが招かれる海の御殿。"), .structure, 52, 40,
+                  .parts([.r(0.05, 0.55, 0.9, 0.45, 0xD84030), .r(0.2, 0.3, 0.6, 0.28, 0xE85040),
+                          .p([(0, 0.58), (0.5, 0.4), (1, 0.58)], 0x2A6A58), .p([(0.12, 0.32), (0.5, 0.1), (0.88, 0.32)], 0x2A6A58),
+                          .p([(0.4, 0.12), (0.5, 0), (0.6, 0.12)], 0xF0C040, role: .glow), .a(0.42, 0.72, 0.16, 0.28),
+                          .r(0.12, 0.66, 0.08, 0.12, 0xFFE070, role: .glow), .r(0.8, 0.66, 0.08, 0.12, 0xFFE070, role: .glow)])), 25),
+        ]
+        for i in list.indices {
+            list[i].0.hidden = true
+            list[i].0.fragmentPrice = list[i].1
+        }
+        return list.map(\.0)
+    }()
 
     /// 季節のイベントの限定の装飾。
     static let eventDecorations: [DecorationKind] = {

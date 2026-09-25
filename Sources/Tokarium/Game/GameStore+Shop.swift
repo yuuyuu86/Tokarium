@@ -4,10 +4,13 @@ import Foundation
 extension GameStore {
     // MARK: お店
 
-    enum PurchaseError: LocalizedError {
-        case notEnoughCoins, tankFull, tooManyDecorations, maxSize
+    enum PurchaseError: LocalizedError, Equatable {
+        case notEnoughCoins, tankFull, tooManyDecorations, maxSize, notEnoughFragments
+        case rankTooLow(Int)
         var errorDescription: String? {
             switch self {
+            case .notEnoughFragments: return String(localized: "かけらが足りません。お題を達成するともらえます")
+            case .rankTooLow(let r): return String(localized: "飼育員ランク \(r) になると買えます")
             case .notEnoughCoins: return String(localized: "コインが足りません")
             case .tankFull: return String(localized: "水槽がいっぱいです。お店で水槽を大きくできます")
             case .tooManyDecorations: return String(localized: "これ以上は置けません。持ち物に入りました。お店で水槽を大きくできます")
@@ -24,6 +27,8 @@ extension GameStore {
 
     @discardableResult
     func buyFish(_ sp: FishSpecies) -> PurchaseError? {
+        let need = KeeperRank.required(sp)
+        guard state.rank >= need else { return failed(.rankTooLow(need)) }
         guard coins >= sp.price else { return failed(.notEnoughCoins) }
         guard livingFish.count < state.tank.size.maxFish else { return failed(.tankFull) }
         let n = state.tank.fish.filter { $0.speciesID == sp.id }.count + 1
@@ -41,6 +46,8 @@ extension GameStore {
 
     @discardableResult
     func buyDecoration(_ kind: DecorationKind) -> PurchaseError? {
+        let need = KeeperRank.required(kind)
+        guard state.rank >= need else { return failed(.rankTooLow(need)) }
         guard coins >= kind.price else { return failed(.notEnoughCoins) }
         let placed = state.tank.decorations.filter(\.isPlaced).count
         let d = Decoration(kindID: kind.id, isPlaced: placed < state.tank.size.maxDecorations,
@@ -86,6 +93,8 @@ extension GameStore {
     @discardableResult
     func buyTankUpgrade() -> PurchaseError? {
         guard let next = nextTankSize else { return failed(.maxSize) }
+        let need = KeeperRank.required(tankLevel: next.level)
+        guard state.rank >= need else { return failed(.rankTooLow(need)) }
         guard coins >= next.price else { return failed(.notEnoughCoins) }
         state.coinsSpent += next.price
         state.tank.level = next.level
@@ -100,6 +109,7 @@ extension GameStore {
         if Simulation.giveMedicine(&state, fish: id) {
             toast = String(localized: "薬をあげました")
             sfx(.medicine)
+            addAffection(id, Affection.perMedicine)
             save()
         } else if state.medicine == 0 {
             sfx(.error)
@@ -135,7 +145,7 @@ extension GameStore {
         placingDecoration = nil
         toast = String(localized: "\(d.kind.name)を置きました")
         sfx(.place)
-        save()
+        decorationArranged()
     }
 
     /// 置くのをやめて持ち物にしまう。

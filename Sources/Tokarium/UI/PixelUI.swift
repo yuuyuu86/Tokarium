@@ -132,6 +132,12 @@ extension View {
         self.background(PixelFrame(fill: highlight ? PixelPalette.danger.opacity(0.22) : PixelPalette.inset,
                                    border: highlight ? PixelPalette.danger.opacity(0.8) : PixelPalette.sea, outline: .clear, step: 2))
     }
+
+    /// 金色の枠の区切り（ランク・記録・選んでいる称号など、よいことを目立たせる）。
+    func pixelInsetGold(_ on: Bool = true) -> some View {
+        self.background(PixelFrame(fill: on ? PixelPalette.gold.opacity(0.1) : PixelPalette.inset,
+                                   border: on ? PixelPalette.gold.opacity(0.85) : PixelPalette.sea, outline: .clear, step: 2))
+    }
 }
 
 // MARK: - ボタン

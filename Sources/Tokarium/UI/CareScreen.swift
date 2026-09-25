@@ -61,7 +61,7 @@ private struct FishRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
-            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny)
+            FishIcon(fish: fish)
                 .frame(width: 56, height: 36)
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
@@ -70,7 +70,8 @@ private struct FishRow: View {
                         .font(.pixel(.headline))
                         .frame(maxWidth: 200)
                         .onSubmit { store.rename(fish.id, to: name) }
-                    Text(fish.species.name).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    Text(fish.breedName).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    if fish.isAlive { HeartsView(affection: fish.affection) }
                     Spacer()
                     Button { store.toggleFavorite(fish.id) } label: {
                         Image(systemName: fish.isFavorite ? "heart.fill" : "heart").foregroundStyle(Color(rgb: 0xFF6A9A))
@@ -85,6 +86,15 @@ private struct FishRow: View {
                     ConditionBadge(condition: fish.condition)
                 }
                 Text(lifeText).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                HStack(spacing: 10) {
+                    Text("性格: \(fish.personality.label)").help(fish.personality.blurb)
+                    Text("遺伝子: \(fish.genotype.text)")
+                        .help("見た目は「\(fish.variant.label)」。色の遺伝子を2つ持ち、子に1つずつ受け継ぎます")
+                }
+                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                if fish.isAlive {
+                    PartnerPicker(fish: fish)
+                }
                 if let mood = Ecology.mood(fish, in: store.state.tank) {
                     Text(mood).font(.pixel(.caption))
                         .foregroundStyle(mood.contains(String(localized: "ストレス")) ? Color(rgb: 0xFFA030) : Color(rgb: 0x5FD068))
@@ -117,7 +127,8 @@ private struct FishRow: View {
 
     private var lifeText: String {
         let days = Int(fish.ageDays(at: fish.diedAt ?? Date()))
-        var parts = ["\(fish.stage.label)", String(localized: "\(days)日齢"), String(localized: "寿命の目安 \(Int(fish.species.lifespanDays))日")]
+        var parts = ["\(fish.stage.label)", String(localized: "\(days)日齢"), String(localized: "寿命の目安 \(Int(fish.species.lifespanDays))日"),
+                     String(format: String(localized: "体長 %.1fcm"), fish.lengthCM), String(localized: "\(fish.generation)代目")]
         if fish.stage != .adult && fish.isAlive { parts.append(String(localized: "成長 \(Int(fish.growth * 100))%")) }
         if fish.isElderly() { parts.append(String(localized: "老齢（ゆっくり過ごしています）")) }
         return parts.joined(separator: String(localized: "・"))
@@ -128,6 +139,38 @@ private struct FishRow: View {
         case .critical: return String(localized: "危険")
         case .weak: return String(localized: "弱っている")
         default: return fish.health >= 90 ? String(localized: "良好") : String(localized: "ふつう")
+        }
+    }
+}
+
+/// 繁殖の相手を選ぶ。ペアから生まれうる品種も見せる。
+private struct PartnerPicker: View {
+    @Environment(GameStore.self) private var store
+    let fish: Fish
+
+    var body: some View {
+        let candidates = store.state.tank.fish.filter { $0.isAlive && $0.speciesID == fish.speciesID && $0.id != fish.id }
+        if !candidates.isEmpty {
+            let partner = store.partner(of: fish)
+            HStack(spacing: 8) {
+                Menu {
+                    Button("ペアにしない（自由に相手を選ぶ）") { store.setPartner(fish.id, to: nil) }
+                    ForEach(candidates) { c in
+                        Button("\(c.name)（\(c.breedName)）") { store.setPartner(fish.id, to: c.id) }
+                    }
+                } label: {
+                    Label(partner.map { String(localized: "ペア: \($0.name)") } ?? String(localized: "ペアを選ぶ"), systemImage: "heart.circle")
+                        .font(.pixel(.caption))
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                if let partner {
+                    let outcomes = Genetics.outcomes(fish.genotype, partner.genotype)
+                    Text("生まれうる品種: " + outcomes.map { "\($0.0.label) \(Int($0.1 * 100))%" }.joined(separator: String(localized: "、")))
+                        .font(.pixel(.caption)).foregroundStyle(Color(rgb: 0xB0E0FF))
+                        .lineLimit(2)
+                }
+            }
         }
     }
 }

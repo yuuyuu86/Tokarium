@@ -57,11 +57,28 @@ struct Fish: Codable, Identifiable, Equatable {
     var isShiny: Bool = false
     /// お気に入り（写真やウィジェットの主役）。
     var isFavorite: Bool = false
+    /// 色の遺伝子（見た目の品種が決まる）。
+    var genotype: Genotype = .wild
+    var personality: Personality = .calm
+    /// なつき度 0〜100。
+    var affection: Double = 0
+    /// 体の大きさ（種類の標準を1とする）。
+    var size: Double = 1
+    /// 最後に近くの水をたたいてもらった日時（なつき度を上げすぎないため）。
+    var lastPettedAt: Date?
+    /// 繁殖の相手に選んだ魚。
+    var partnerID: UUID?
     /// 水槽内の位置（0〜1 の正規化座標）。
     var x: Double = 0.5
     var y: Double = 0.5
 
     var species: FishSpecies { Catalog.species(speciesID) }
+    var variant: FishVariant { genotype.variant }
+    /// 品種つきの種類の名前（例: 「ゴールド・ネオンテトラ」）。
+    var breedName: String { variant == .wild ? species.name : String(localized: "\(variant.label)・\(species.name)") }
+    static let sizeRange = 0.8...1.4
+    /// 体長（cm）。成長と体の大きさで変わる。
+    var lengthCM: Double { Double(species.design.length) * 0.32 * size * (0.45 + 0.55 * growth) }
 
     var stage: GrowthStage {
         if growth >= 1 { return .adult }
@@ -95,6 +112,10 @@ struct Fish: Codable, Identifiable, Equatable {
         self.growth = growth
         self.x = x
         self.y = y
+        var rng = SystemRandomNumberGenerator()
+        self.genotype = .forShop(rng: &rng)
+        self.personality = Personality.allCases.randomElement() ?? .calm
+        self.size = Double.random(in: 0.9...1.1)
     }
 
     // 古い保存データに無い項目は既定値で読む
@@ -118,6 +139,15 @@ struct Fish: Codable, Identifiable, Equatable {
         isFavorite = try c.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         x = try c.decodeIfPresent(Double.self, forKey: .x) ?? 0.5
         y = try c.decodeIfPresent(Double.self, forKey: .y) ?? 0.5
+        // 品種・性格ができる前の魚は、ID から決まった値にする（読むたびに変わらない）
+        var seeded = SeededRandom(seed: id.uuidString.stableSeed)
+        genotype = try c.decodeIfPresent(Genotype.self, forKey: .genotype) ?? .forShop(rng: &seeded)
+        personality = try c.decodeIfPresent(Personality.self, forKey: .personality)
+            ?? Personality.allCases.randomElement(using: &seeded) ?? .calm
+        affection = try c.decodeIfPresent(Double.self, forKey: .affection) ?? 0
+        size = try c.decodeIfPresent(Double.self, forKey: .size) ?? Double.random(in: 0.9...1.1, using: &seeded)
+        lastPettedAt = try c.decodeIfPresent(Date.self, forKey: .lastPettedAt)
+        partnerID = try c.decodeIfPresent(UUID.self, forKey: .partnerID)
     }
 }
 
@@ -193,6 +223,30 @@ struct GameState: Codable, Equatable {
     /// 最後に保存した日時と Mac（iCloud Drive 同期で新しい方を選ぶ）。
     var savedAt: Date?
     var savedBy: String?
+    /// 飼育員の経験値。
+    var xp = 0
+    /// 1日の上限がある経験値の、今日の回数。
+    var xpDay: String?
+    var xpToday: [String: Int] = [:]
+    /// 経験値を渡し済みの数（図鑑の種類・品種・実績・天寿）。二重に渡さないため。
+    var xpCounted = XPCounted()
+    /// 毎日・毎週のお題。
+    var quests = QuestBook()
+    /// お題でもらえるかけら。
+    var fragments = 0
+    /// お別れした魚の思い出（殿堂）。
+    var memories: [FishMemory] = []
+    /// 表示する称号（実績のID）。
+    var selectedTitle: String?
+    /// いちばん高かったレイアウトの評価。
+    var bestLayoutScore = 0
+
+    struct XPCounted: Codable, Equatable {
+        var species = 0
+        var variants = 0
+        var achievements = 0
+        var oldAge = 0
+    }
 
     init(createdAt: Date = Date(), lastSimulatedAt: Date = Date()) {
         self.createdAt = createdAt
@@ -224,10 +278,31 @@ struct GameState: Codable, Equatable {
         lastTreasureDay = try c.decodeIfPresent(String.self, forKey: .lastTreasureDay)
         savedAt = try c.decodeIfPresent(Date.self, forKey: .savedAt)
         savedBy = try c.decodeIfPresent(String.self, forKey: .savedBy)
+        quests = try c.decodeIfPresent(QuestBook.self, forKey: .quests) ?? QuestBook()
+        fragments = try c.decodeIfPresent(Int.self, forKey: .fragments) ?? 0
+        memories = try c.decodeIfPresent([FishMemory].self, forKey: .memories) ?? []
+        selectedTitle = try c.decodeIfPresent(String.self, forKey: .selectedTitle)
+        bestLayoutScore = try c.decodeIfPresent(Int.self, forKey: .bestLayoutScore) ?? 0
+        xpDay = try c.decodeIfPresent(String.self, forKey: .xpDay)
+        xpToday = try c.decodeIfPresent([String: Int].self, forKey: .xpToday) ?? [:]
         // 図鑑ができる前のデータは、いまいる魚から図鑑を作る
         if dex.isEmpty {
             for f in tank.fish { recordInDex(f, at: f.purchasedAt, born: false) }
         }
+        // ランクができる前のデータは、これまでの記録から経験値を見積もる
+        if let saved = try c.decodeIfPresent(Int.self, forKey: .xp) {
+            xp = saved
+            xpCounted = try c.decodeIfPresent(XPCounted.self, forKey: .xpCounted) ?? currentXPCounts
+        } else {
+            xp = KeeperRank.estimatedXP(self)
+            xpCounted = currentXPCounts
+        }
+    }
+
+    /// 経験値の対象になる、いまの数。
+    var currentXPCounts: XPCounted {
+        XPCounted(species: dex.count, variants: variantsDiscovered, achievements: achievements.count,
+                  oldAge: dex.values.reduce(0) { $0 + $1.oldAge })
     }
 
     /// 魚を迎えたことを図鑑に書く。
@@ -237,6 +312,7 @@ struct GameState: Codable, Equatable {
         if born { e.born += 1 }
         e.maxGeneration = max(e.maxGeneration, f.generation)
         if f.isShiny { e.shiny += 1 }
+        e.variants.insert(f.variant)
         dex[f.speciesID] = e
     }
 

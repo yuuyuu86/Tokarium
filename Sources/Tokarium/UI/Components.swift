@@ -23,13 +23,37 @@ struct FishIcon: View {
     let speciesID: String
     var dead = false
     var shiny = false
+    var variant: FishVariant = .wild
+    /// まだ見つけていないものは黒い影だけ。
+    var silhouette = false
+
+    init(speciesID: String, dead: Bool = false, shiny: Bool = false, variant: FishVariant = .wild, silhouette: Bool = false) {
+        self.speciesID = speciesID
+        self.dead = dead
+        self.shiny = shiny
+        self.variant = variant
+        self.silhouette = silhouette
+    }
+
+    /// 水槽の魚そのままのアイコン（品種・色違いつき）。
+    init(fish: Fish) {
+        self.init(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny, variant: fish.variant)
+    }
+
     var body: some View {
         let style = store.style
-        if let art = style.fishImage(speciesID, frame: 0, dead: dead, shiny: shiny) {
-            Image(decorative: art.image, scale: 1).interpolation(.none)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .scaleEffect(x: 1, y: dead ? -1 : 1)
+        if let art = style.fishImage(speciesID, frame: 0, dead: dead, shiny: shiny, variant: variant) {
+            if silhouette {
+                Image(decorative: art.image, scale: 1).renderingMode(.template).interpolation(.none)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(Color.black.opacity(0.55))
+            } else {
+                Image(decorative: art.image, scale: 1).interpolation(.none)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .scaleEffect(x: 1, y: dead ? -1 : 1)
+            }
         }
     }
 }

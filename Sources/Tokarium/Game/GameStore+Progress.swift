@@ -20,10 +20,12 @@ extension GameStore {
             post(title: String(localized: "実績「\(a.title)」を達成"), body: body)
         }
 
-        // よく使うAIの記念の魚
-        for m in MemorialFish.all where !state.memorialsGiven.contains(m.group) && ledger.coins(from: m.sources) >= MemorialFish.threshold {
-            state.memorialsGiven.insert(m.group)
-            let sp = Catalog.species(m.speciesID)
+        // よく使うAIの記念の魚（100・1000・5000 コイン）
+        for m in MemorialFish.all {
+            let earned = ledger.coins(from: m.sources)
+            guard let tier = m.tiers.first(where: { !state.memorialsGiven.contains($0.key) && earned >= $0.threshold }) else { continue }
+            state.memorialsGiven.insert(tier.key)
+            let sp = Catalog.species(tier.speciesID)
             if livingFish.count < state.tank.size.maxFish {
                 state.addFish(Fish(speciesID: sp.id, name: sp.name, fullness: 80, purchasedAt: now, growth: 1,
                                    x: .random(in: 0.2...0.8), y: 0.3), at: now)
@@ -32,7 +34,7 @@ extension GameStore {
                 post(title: String(localized: "記念の魚がやってきました"), body: String(localized: "\(m.label) をたくさん使った記念に、\(sp.name)が水槽に入りました。"))
             } else {
                 // 水槽がいっぱいなら、空いたときにもう一度ためす
-                state.memorialsGiven.remove(m.group)
+                state.memorialsGiven.remove(tier.key)
             }
         }
 
@@ -44,6 +46,8 @@ extension GameStore {
             toast = String(localized: "今日はAIをたくさん使いました！ 宝箱が流れてきました")
             sfx(.sparkle, spontaneous: true)
         }
+
+        awardProgressXP()
     }
 
     /// 宝箱を開ける。
@@ -64,11 +68,14 @@ extension GameStore {
         engine.touch(x: x, y: y)
         sfx(.tap)
         state.stats.touches += 1
+        petFish(near: x, y: y)
+        questEvent(.touch)
     }
 
     @discardableResult
     func buyEquipment(_ e: Equipment) -> PurchaseError? {
         guard !state.equipment.contains(e.id) else { return nil }
+        guard state.rank >= KeeperRank.equipmentRank else { return failed(.rankTooLow(KeeperRank.equipmentRank)) }
         guard coins >= e.price else { return failed(.notEnoughCoins) }
         state.coinsSpent += e.price
         sfx(.buy)

@@ -42,6 +42,9 @@ extension GameStore {
         state.stats.feedings += 1
         engine.dropFood(count: min(24, 4 + livingFish.count * 2))
         sfx(.feed)
+        for f in livingFish { addAffection(f.id, Affection.perFeedAll) }
+        gainXP(.feed)
+        questEvent(.feed)
         save()
     }
 
@@ -54,6 +57,10 @@ extension GameStore {
         state.stats.feedings += 1
         engine.dropFood(count: 4, near: engine.position(of: id)?.x ?? f.x)
         sfx(.feed)
+        addAffection(id, Affection.perFeedOne)
+        gainXP(.feed)
+        questEvent(.feed)
+        questEvent(.feedOne)
         toast = String(localized: "\(f.name)に餌をあげました")
         save()
     }
@@ -64,6 +71,8 @@ extension GameStore {
         state.stats.waterChanges += 1
         toast = String(localized: "水をきれいにしました")
         sfx(.water)
+        gainXP(.waterChange)
+        questEvent(.waterChange)
         save()
     }
 
@@ -91,7 +100,11 @@ extension GameStore {
 
     /// 死んだ魚とお別れする（水槽から取り出す）。
     func farewell(_ id: UUID) {
-        if state.tank.fish.contains(where: { $0.id == id && !$0.isAlive }) { sfx(.farewell) }
+        if let f = state.tank.fish.first(where: { $0.id == id && !$0.isAlive }) {
+            sfx(.farewell)
+            remember(f)
+        }
+        for i in state.tank.fish.indices where state.tank.fish[i].partnerID == id { state.tank.fish[i].partnerID = nil }
         state.tank.fish.removeAll { $0.id == id && !$0.isAlive }
         state.notifiedDangerFish.remove(id)
         save()

@@ -150,7 +150,7 @@ private struct MenuBarPanel: View {
             }
             if let f = store.favoriteFish {
                 HStack(spacing: 6) {
-                    FishIcon(speciesID: f.speciesID, dead: !f.isAlive, shiny: f.isShiny).frame(width: 26, height: 18)
+                    FishIcon(fish: f).frame(width: 26, height: 18)
                     Text("♥ \(f.name)・\(f.condition.label)").font(.pixel(.caption))
                 }
             }

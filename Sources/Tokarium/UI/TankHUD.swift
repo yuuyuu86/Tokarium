@@ -36,6 +36,16 @@ struct TopHUD: View {
                     .transition(.opacity)
             }
             Spacer(minLength: 10)
+            Button { store.command = .show(.quests) } label: {
+                PixelBadge {
+                    Text("Lv.\(store.state.rank)").foregroundStyle(PixelPalette.gold).monospacedDigit()
+                    PixelBar(value: KeeperRank.progress(xp: store.state.xp) * 100, color: PixelPalette.gold).frame(width: 44)
+                    if let title = store.titleText { Text("【\(title)】").lineLimit(1) }
+                }
+            }
+            .buttonStyle(.plain)
+            .help("飼育員ランク \(store.state.rank)（\(KeeperRank.title(store.state.rank))）。クリックでお題の画面へ")
+            .accessibilityLabel("飼育員ランク \(store.state.rank)")
             PixelBadge {
                 Image(systemName: "circle.hexagongrid.circle.fill").foregroundStyle(PixelPalette.gold)
                 Text("\(store.coins)").monospacedDigit().foregroundStyle(PixelPalette.gold)
@@ -61,9 +71,12 @@ struct FishHoverStatus: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny).frame(width: 40, height: 26)
+            FishIcon(fish: fish).frame(width: 40, height: 26)
             VStack(alignment: .leading, spacing: 2) {
-                Text(fish.name).font(.pixel(.callout)).lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(fish.name).font(.pixel(.callout)).lineLimit(1)
+                    if fish.isAlive { HeartsView(affection: fish.affection) }
+                }
                 Text(subtitle).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim).lineLimit(1)
             }
             ConditionBadge(condition: fish.condition)
@@ -82,7 +95,7 @@ struct FishHoverStatus: View {
     }
 
     private var subtitle: String {
-        var parts = [fish.species.name, fish.stage.label]
+        var parts = [fish.breedName, fish.stage.label, fish.personality.label]
         if fish.isAlive { parts.append(String(localized: "\(Int(fish.ageDays()))日齢")) }
         if fish.isElderly() { parts.append(String(localized: "老齢")) }
         if let mood { parts.append(mood) }
@@ -131,6 +144,7 @@ struct TankOverlays: View {
                     .font(.pixel(.callout))
                     .pixelPanel(padding: 10)
                     .frame(maxWidth: .infinity)
+                LayoutScorePanel()
             }
         }
         .padding(.horizontal, 16)
@@ -189,6 +203,9 @@ struct BottomBar: View {
                         if !compact { Text(s.title) }
                         if s == .care && !store.dangerFish.isEmpty {
                             Text("!").foregroundStyle(PixelPalette.danger)
+                        }
+                        if s == .quests && !store.state.claimableQuests().isEmpty {
+                            Text("!").foregroundStyle(PixelPalette.gold)
                         }
                     }
                     .fixedSize()
@@ -281,7 +298,7 @@ struct FishActionMenu: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                FishIcon(speciesID: fish.speciesID, dead: !fish.isAlive, shiny: fish.isShiny).frame(width: 34, height: 22)
+                FishIcon(fish: fish).frame(width: 34, height: 22)
                 Text(fish.name).font(.pixel(.callout)).lineLimit(1)
                 Spacer(minLength: 0)
                 Button(action: onClose) { Image(systemName: "xmark") }
@@ -342,5 +359,58 @@ struct PixelSheet: ViewModifier {
             .tint(PixelPalette.gold)
             .background(PixelFrame(fill: PixelPalette.deep, border: PixelPalette.sand))
             .preferredColorScheme(.dark)
+    }
+}
+
+// MARK: - レイアウトの評価
+
+/// 配置を編集しているあいだに出す、レイアウトの点数。
+struct LayoutScorePanel: View {
+    @Environment(GameStore.self) private var store
+    @State private var expanded = false
+
+    var body: some View {
+        let score = store.layoutScore
+        VStack(alignment: .leading, spacing: 6) {
+            Button { expanded.toggle() } label: {
+                HStack(spacing: 8) {
+                    Text("レイアウト評価").font(.pixel(.callout))
+                    Text("\(score.total)点").font(.pixel(.title3)).foregroundStyle(PixelPalette.gold).monospacedDigit()
+                    HStack(spacing: 1) {
+                        ForEach(0..<5, id: \.self) { i in
+                            Image(systemName: i < score.stars ? "star.fill" : "star")
+                                .foregroundStyle(i < score.stars ? PixelPalette.gold : PixelPalette.dim)
+                        }
+                    }
+                    .font(.system(size: 10))
+                    Text(score.rankText).font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    Text("自己ベスト \(store.state.bestLayoutScore)").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                    Image(systemName: expanded ? "chevron.up" : "chevron.down").foregroundStyle(PixelPalette.dim)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("レイアウト評価 \(score.total)点")
+            if expanded {
+                ForEach(score.parts, id: \.title) { p in
+                    HStack {
+                        Text(p.title).font(.pixel(.caption)).frame(width: 90, alignment: .leading)
+                        PixelBar(value: Double(p.points) / Double(max(1, p.max)) * 100, color: Color(rgb: 0x5FD068)).frame(width: 120)
+                        Text("\(p.points)/\(p.max)").font(.pixel(.caption)).monospacedDigit().foregroundStyle(PixelPalette.dim)
+                    }
+                }
+                ForEach(score.bonuses, id: \.title) { b in
+                    Label("\(b.title) +\(b.points)（\(b.detail)）", systemImage: "sparkles")
+                        .font(.pixel(.caption)).foregroundStyle(PixelPalette.gold)
+                }
+                ForEach(score.tips, id: \.self) { tip in
+                    Label(tip, systemImage: "lightbulb").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                }
+                Text("組み合わせのボーナス: \(Layout.combos.map(\.title).joined(separator: String(localized: "、")))")
+                    .font(.pixel(.caption2)).foregroundStyle(PixelPalette.dim)
+            }
+        }
+        .pixelPanel(padding: 10)
+        .frame(maxWidth: 560)
+        .frame(maxWidth: .infinity)
     }
 }

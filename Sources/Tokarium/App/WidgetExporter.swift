@@ -65,7 +65,7 @@ enum WidgetExporter {
             try JSONEncoder.tokarium.encode(snap).write(to: folder.appendingPathComponent("snapshot.json"), options: .atomic)
             // 主役の魚の大きなドット絵
             let favURL = folder.appendingPathComponent("favorite.png")
-            if let f = store.favoriteFish, let art = store.style.fishImage(f.speciesID, frame: 0, dead: !f.isAlive, shiny: f.isShiny),
+            if let f = store.favoriteFish, let art = store.style.fishImage(f, frame: 0),
                let big = scaled(art.image, by: 8), let png = NSBitmapImageRep(cgImage: big).representation(using: .png, properties: [:]) {
                 try png.write(to: favURL, options: .atomic)
             } else {

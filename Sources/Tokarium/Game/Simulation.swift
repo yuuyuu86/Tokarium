@@ -135,7 +135,8 @@ enum Simulation {
 
         for i in state.tank.fish.indices where state.tank.fish[i].isAlive {
             var f = state.tank.fish[i]
-            f.fullness = clamp(f.fullness - fullnessDecayPerHour * h)
+            // くいしんぼうは少し早くおなかがすく
+            f.fullness = clamp(f.fullness - fullnessDecayPerHour * h * (f.personality == .glutton ? 1.15 : 1))
 
             // 病気
             if f.isSick {
@@ -212,16 +213,21 @@ enum Simulation {
             guard chance(breedingChancePerHour, hours: h, rng: &rng) else { continue }
             let sp = Catalog.species(speciesID)
             let count = min(room, Int.random(in: 1...3, using: &rng))
-            let parent = group[0]
-            let generation = (group.map(\.generation).max() ?? 1) + 1
-            let shinyChance = group.contains(where: \.isShiny) ? shinyChanceFromShinyParent : Self.shinyChance
+            guard let (p1, p2) = pair(from: group, living: living, rng: &rng) else { continue }
+            let generation = max(p1.generation, p2.generation) + 1
+            let shinyChance = p1.isShiny || p2.isShiny ? shinyChanceFromShinyParent : Self.shinyChance
             var n = state.tank.fish.filter { $0.speciesID == speciesID }.count
             for _ in 0..<count {
                 n += 1
                 var fry = Fish(speciesID: speciesID, name: String(localized: "\(sp.name) \(n)号"), fullness: 70, purchasedAt: time, bornAt: time,
-                               growth: 0, x: min(0.95, max(0.05, parent.x + .random(in: -0.05...0.05, using: &rng))), y: parent.y)
+                               growth: 0, x: min(0.95, max(0.05, p1.x + .random(in: -0.05...0.05, using: &rng))), y: p1.y)
                 fry.generation = generation
                 fry.isShiny = Double.random(in: 0..<1, using: &rng) < shinyChance
+                // 両親から色の遺伝子・性格・体の大きさを受け継ぐ
+                fry.genotype = Genetics.child(of: p1.genotype, p2.genotype, rng: &rng)
+                fry.personality = Genetics.childPersonality(p1.personality, p2.personality, rng: &rng)
+                fry.size = Genetics.childSize(p1.size, p2.size, rng: &rng)
+                fry.affection = 0
                 state.addFish(fry, at: time, born: true)
                 state.stats.births += 1
                 report.births.append(fry)
@@ -229,6 +235,19 @@ enum Simulation {
             state.lastBirthAt = time
             return
         }
+    }
+
+    /// 繁殖する2匹。ペアを決めた魚はその相手とだけ繁殖する（相手の調子が悪いときは待つ）。
+    /// ペアのない魚どうしは無作為に選ぶ。
+    static func pair<R: RandomNumberGenerator>(from group: [Fish], living: [Fish], rng: inout R) -> (Fish, Fish)? {
+        let alive = Set(living.map(\.id))
+        for f in group {
+            if let partner = f.partnerID, let mate = group.first(where: { $0.id == partner }) { return (f, mate) }
+        }
+        let free = group.filter { f in f.partnerID.map { !alive.contains($0) } ?? true }
+        guard free.count >= 2 else { return nil }
+        let shuffled = free.shuffled(using: &rng)
+        return (shuffled[0], shuffled[1])
     }
 
     /// 自動給餌器: おなかをすかせた魚がいれば、決まった間隔で餌をあげる（餌を使う）。

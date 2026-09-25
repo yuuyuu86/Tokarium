@@ -47,6 +47,8 @@ final class GameStore {
     @ObservationIgnored var lastPulledModified: Date?
     @ObservationIgnored var lastPushedAt: Date?
     @ObservationIgnored var lastEarnedRefreshAt: Date?
+    /// 水がきれいだった時間（お題に数える前の、1分未満の端数）。
+    @ObservationIgnored var cleanMinutesCarry = 0.0
     /// 時間経過だけの保存を iCloud Drive に書く間隔。
     static let periodicPushInterval: TimeInterval = 180
     var livingFish: [Fish] { state.tank.fish.filter(\.isAlive) }
@@ -145,6 +147,7 @@ final class GameStore {
             resumeMessage = msg
         }
         announce(report)
+        applyGrowth(report, now: now)
         notifyChanges(before: before)
         evaluateProgress()
         // 時間経過だけの保存は、iCloud Drive へは数分に1回にまとめる

@@ -29,17 +29,31 @@ extension AquariumStyle {
     }
 
     /// 魚の1ドットの大きさ。成長に合わせて大きくなる（整数ピクセルでくっきり描く）。
-    func fishDot(_ growth: Double, p: CGFloat) -> CGFloat {
-        max(1, (p * (1 + 0.7 * CGFloat(growth))).rounded())
+    func fishDot(_ growth: Double, size: Double = 1, p: CGFloat) -> CGFloat {
+        max(1, (p * (1 + 0.7 * CGFloat(growth)) * CGFloat(size)).rounded())
     }
 
-    /// 魚の画像と、ドット単位の大きさ。手描きのスプライトがあればそれを使う。
-    func fishImage(_ speciesID: String, frame: Int, dead: Bool, shiny: Bool) -> (image: CGImage, dots: CGSize)? {
-        guard shiny && !dead else { return fishImage(speciesID, frame: frame, dead: dead) }
-        guard let base = fishImage(speciesID, frame: frame, dead: false),
-              let img = ArtCache.shared.image("shiny-\(speciesID)-\(frame % 2)", make: { ArtRenderer.shinyVariant(base.image) })
-        else { return nil }
+    /// 魚の画像と、ドット単位の大きさ。品種の色と色違いを重ねる。
+    func fishImage(_ speciesID: String, frame: Int, dead: Bool, shiny: Bool, variant: FishVariant = .wild) -> (image: CGImage, dots: CGSize)? {
+        guard !dead, shiny || variant != .wild else { return fishImage(speciesID, frame: frame, dead: dead) }
+        guard let base = fishImage(speciesID, frame: frame, dead: false) else { return nil }
+        var img = base.image
+        if variant != .wild {
+            guard let v = ArtCache.shared.image("variant-\(variant.rawValue)-\(speciesID)-\(frame % 2)", make: { ArtRenderer.variantImage(base.image, variant) })
+            else { return nil }
+            img = v
+        }
+        if shiny {
+            let source = img
+            guard let s = ArtCache.shared.image("shiny-\(variant.rawValue)-\(speciesID)-\(frame % 2)", make: { ArtRenderer.shinyVariant(source) })
+            else { return nil }
+            img = s
+        }
         return (img, base.dots)
+    }
+
+    func fishImage(_ f: Fish, frame: Int) -> (image: CGImage, dots: CGSize)? {
+        fishImage(f.speciesID, frame: frame, dead: !f.isAlive, shiny: f.isShiny, variant: f.variant)
     }
 
     func fishImage(_ speciesID: String, frame: Int, dead: Bool) -> (image: CGImage, dots: CGSize)? {
@@ -133,7 +147,7 @@ extension AquariumStyle {
     func fishFrame(_ f: Fish, tank: Tank, engine: SwimEngine, size: CGSize) -> CGRect? {
         guard let s = engine.swimmers[f.id] else { return nil }
         let p = dot(size, level: tank.level)
-        let fp = fishDot(f.growth, p: p)
+        let fp = fishDot(f.growth, size: f.size, p: p)
         guard let art = fishImage(f.speciesID, frame: 0, dead: !f.isAlive) else { return nil }
         let w = art.dots.width * fp, h = art.dots.height * fp
         let bob = f.isAlive ? CGFloat(sin(s.phase * 0.5)) * p * 0.6 : 0
@@ -260,7 +274,7 @@ extension AquariumStyle {
         for f in tank.fish.sorted(by: { ($0.isAlive ? 1 : 0) < ($1.isAlive ? 1 : 0) }) {
             guard let s = engine.swimmers[f.id], let rect = fishFrame(f, tank: tank, engine: engine, size: size) else { continue }
             let frame = f.isAlive ? Int(s.phase) % 2 : 0
-            guard let art = fishImage(f.speciesID, frame: frame, dead: !f.isAlive, shiny: f.isShiny) else { continue }
+            guard let art = fishImage(f, frame: frame) else { continue }
             var layer = ctx
             if !s.facingRight || !f.isAlive {
                 layer.translateBy(x: rect.midX, y: rect.midY)

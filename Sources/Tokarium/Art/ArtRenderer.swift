@@ -106,6 +106,68 @@ enum ArtRenderer {
 }
 
 extension ArtRenderer {
+    /// 品種の色に塗りかえる。暗い輪郭や目はそのまま残す。
+    static func variantImage(_ image: CGImage, _ variant: FishVariant) -> CGImage? {
+        recolor(image) { h, s, v in
+            guard v > 0.14 else { return (h, s, v) }
+            switch variant {
+            case .wild: return (h, s, v)
+            case .albino: return (0.08, s * 0.12, min(1, v * 1.1 + 0.12))
+            case .black: return (h, s * 0.5, max(0.12, v * 0.36))
+            case .gold: return (0.115, max(s, 0.72), max(v, 0.62))
+            case .blue: return (0.58, max(s, 0.55), v)
+            case .red: return (0.99, max(s, 0.65), v)
+            case .pastel: return (h, s * 0.4, v * 0.6 + 0.4)
+            case .sunset: return ((0.96 + v * 0.16).truncatingRemainder(dividingBy: 1), max(s, 0.7), max(v, 0.5))
+            case .sky: return (0.55, 0.38, v * 0.55 + 0.45)
+            case .panda: return v > 0.6 ? (h, 0, 0.95) : (h, 0, 0.16)
+            case .purple: return (0.78, max(s, 0.5), v)
+            case .platinum: return (0.13, 0.12, v * 0.45 + 0.55)
+            case .sakura: return (0.95, 0.35, v * 0.45 + 0.55)
+            }
+        }
+    }
+
+    /// 1ピクセルずつ色相・彩度・明度を変える。
+    static func recolor(_ image: CGImage, _ transform: (Double, Double, Double) -> (Double, Double, Double)) -> CGImage? {
+        let w = image.width, h = image.height
+        var px = [UInt8](repeating: 0, count: w * h * 4)
+        guard let ctx = CGContext(data: &px, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
+                                  space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        else { return nil }
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+        for i in stride(from: 0, to: px.count, by: 4) where px[i + 3] == 255 {
+            let r = Double(px[i]) / 255, g = Double(px[i + 1]) / 255, b = Double(px[i + 2]) / 255
+            let mx = max(r, g, b), mn = min(r, g, b), d = mx - mn
+            var hue = 0.0
+            if d > 0 {
+                if mx == r { hue = ((g - b) / d).truncatingRemainder(dividingBy: 6) } else if mx == g { hue = (b - r) / d + 2 } else { hue = (r - g) / d + 4 }
+                hue /= 6
+                if hue < 0 { hue += 1 }
+            }
+            let sat = mx > 0 ? d / mx : 0
+            var (h2, s2, v2) = transform(hue, sat, mx)
+            h2 = h2.truncatingRemainder(dividingBy: 1)
+            if h2 < 0 { h2 += 1 }
+            s2 = min(1, max(0, s2)); v2 = min(1, max(0, v2))
+            let hh = h2 * 6, c = v2 * s2, x = c * (1 - abs(hh.truncatingRemainder(dividingBy: 2) - 1)), m = v2 - c
+            let (r2, g2, b2): (Double, Double, Double)
+            switch Int(hh) {
+            case 0: (r2, g2, b2) = (c, x, 0)
+            case 1: (r2, g2, b2) = (x, c, 0)
+            case 2: (r2, g2, b2) = (0, c, x)
+            case 3: (r2, g2, b2) = (0, x, c)
+            case 4: (r2, g2, b2) = (x, 0, c)
+            default: (r2, g2, b2) = (c, 0, x)
+            }
+            px[i] = UInt8((r2 + m) * 255); px[i + 1] = UInt8((g2 + m) * 255); px[i + 2] = UInt8((b2 + m) * 255)
+        }
+        return px.withUnsafeMutableBytes { buf in
+            CGContext(data: buf.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
+                      space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage()
+        }
+    }
+
     /// 色違い: 色相をずらし、少しあざやかにする（灰色の輪郭や目はそのまま）。
     static func shinyVariant(_ image: CGImage, hueShift: Double = 0.42) -> CGImage? {
         let w = image.width, h = image.height

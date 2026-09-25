@@ -115,9 +115,10 @@ final class SwimEngine {
         sync(fish)
         let leaders = schoolLeaders(fish)
         let anemones = decorations.filter { $0.isPlaced && $0.kindID == "anemone" }.map(\.x)
+        let placed = decorations.filter(\.isPlaced).map(\.x)
         for f in fish {
             guard var s = swimmers[f.id] else { continue }
-            move(&s, fish: f, dt: dt, leader: leaders[f.id], anemones: anemones)
+            move(&s, fish: f, dt: dt, leader: leaders[f.id], anemones: anemones, decorations: placed)
             swimmers[f.id] = s
         }
         updatePellets(dt)
@@ -185,7 +186,18 @@ final class SwimEngine {
         return result
     }
 
-    private func move(_ s: inout Swimmer, fish f: Fish, dt: Double, leader: (id: UUID, rank: Int)?, anemones: [Double]) {
+    /// たたいた場所への反応。なつき度と性格で変わる。
+    private enum TouchReaction { case none, approach, flee }
+
+    private func reaction(of f: Fish, at s: Swimmer, to a: (x: Double, y: Double)) -> TouchReaction {
+        let d = hypot((a.x - s.x) * aspect, a.y - s.y)
+        // 臆病な魚は、なつくまでは逃げる
+        if f.personality == .shy && f.affection < 60 { return d < 0.35 ? .flee : .none }
+        let reach = 0.3 + f.affection / 100 * 0.45 + (f.personality == .friendly ? 0.2 : 0)
+        return d < reach ? .approach : .none
+    }
+
+    private func move(_ s: inout Swimmer, fish f: Fish, dt: Double, leader: (id: UUID, rank: Int)?, anemones: [Double], decorations: [Double]) {
         guard f.isAlive else {
             // 死んだ魚は底へ沈んで止まる
             s.vx = 0
@@ -203,21 +215,32 @@ final class SwimEngine {
         if f.isElderly() { speed *= 0.75 }
         // 稚魚はちょこまか、成魚はゆったり
         speed *= 1.15 - 0.3 * f.growth
-        speed *= speedFactor
+        speed *= speedFactor * f.personality.speedFactor
 
         // 近くに餌があれば向かう
         var chasing = false
-        if f.condition != .critical, let a = attractPoint, hypot((a.x - s.x) * aspect, a.y - s.y) < 0.5 {
-            // たたいた場所に寄ってくる
+        let touch = f.condition == .critical ? nil : attractPoint.map { (point: $0, reaction: reaction(of: f, at: s, to: $0)) }
+        if let touch, touch.reaction == .approach {
+            // たたいた場所に寄ってくる（なついているほど速い）
+            let a = touch.point
             s.targetX = a.x + sin(s.phase) * 0.03
             s.targetY = f.species.zone == .bottom ? s.targetY : a.y + cos(s.phase) * 0.03
             chasing = true
-            speed *= 1.5
-        } else if f.condition != .critical, let (i, p) = nearestPellet(to: s), hypot((p.x - s.x) * aspect, p.y - s.y) < 0.6 {
+            speed *= 1.3 + f.affection / 100 * 0.6
+        } else if let touch, touch.reaction == .flee {
+            // 反対側へ逃げる
+            let a = touch.point
+            s.targetX = min(0.95, max(0.05, s.x + (s.x >= a.x ? 0.3 : -0.3)))
+            s.targetY = f.species.zone == .bottom ? s.targetY : min(0.8, max(0.1, s.y + (s.y >= a.y ? 0.15 : -0.15)))
+            chasing = true
+            speed *= 1.7
+        } else if f.condition != .critical, let (i, p) = nearestPellet(to: s),
+                  hypot((p.x - s.x) * aspect, p.y - s.y) < (f.personality == .glutton ? 0.85 : 0.6) {
             s.targetX = p.x
             s.targetY = min(p.y, 0.84)
             chasing = true
-            speed *= 1.8
+            // くいしんぼうはまっさきに飛びつく
+            speed *= f.personality == .glutton ? 2.4 : 1.8
             if hypot((p.x - s.x) * aspect, p.y - s.y) < 0.025 {
                 pellets.remove(at: i)
                 onEat?()
@@ -236,6 +259,10 @@ final class SwimEngine {
             if Ecology.symbiosis[f.speciesID] != nil, let home = anemones.first, Double.random(in: 0...1) < 0.75 {
                 s.targetX = home + .random(in: -0.04...0.04)
                 s.targetY = .random(in: 0.7...0.8)
+            } else if f.personality == .curious, let deco = decorations.randomElement(), Double.random(in: 0...1) < 0.45 {
+                // 好奇心旺盛な魚は装飾を見に行く
+                s.targetX = min(0.95, max(0.05, deco + .random(in: -0.05...0.05)))
+                s.targetY = max(yRange(for: f).lowerBound, min(yRange(for: f).upperBound, .random(in: 0.62...0.8)))
             }
             s.retargetAt = time + .random(in: 3...9)
         }

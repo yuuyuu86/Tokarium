@@ -2,13 +2,14 @@ import AppKit
 import SwiftUI
 
 enum Screen: String, CaseIterable, Identifiable {
-    case tank, care, shop, dex, usage, settings
+    case tank, care, shop, quests, dex, usage, settings
     var id: String { rawValue }
     var title: String {
         switch self {
         case .tank: return String(localized: "水槽")
         case .care: return String(localized: "お世話")
         case .shop: return String(localized: "お店")
+        case .quests: return String(localized: "お題")
         case .dex: return String(localized: "図鑑")
         case .usage: return String(localized: "AI利用量")
         case .settings: return String(localized: "設定")
@@ -19,6 +20,7 @@ enum Screen: String, CaseIterable, Identifiable {
         case .tank: return "fish.fill"
         case .care: return "heart.fill"
         case .shop: return "cart.fill"
+        case .quests: return "checklist"
         case .dex: return "book.fill"
         case .usage: return "chart.bar.fill"
         case .settings: return "gearshape.fill"
@@ -165,6 +167,7 @@ struct MainView: View {
                 case .tank: EmptyView()
                 case .care: CareScreen()
                 case .shop: ShopScreen()
+                case .quests: QuestScreen()
                 case .dex: DexScreen()
                 case .usage: UsageScreen()
                 case .settings: SettingsScreen()

@@ -290,6 +290,9 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
     let dir = try tempHome()
     let store = GameStore(directory: dir)
     #expect(store.state.tank.size.maxFish == 8)
+    // はじめはランクが足りない。ランクが足りてもコインが足りなければ買えない
+    #expect(store.buyTankUpgrade() == .rankTooLow(KeeperRank.required(tankLevel: 1)))
+    store.state.xp = KeeperRank.xpRequired(for: KeeperRank.required(tankLevel: 1))
     #expect(store.buyTankUpgrade() == .notEnoughCoins)
     #expect(store.buyMedicine() == nil)
     #expect(store.state.medicine == 1)

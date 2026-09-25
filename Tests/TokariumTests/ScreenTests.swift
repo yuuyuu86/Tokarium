@@ -110,9 +110,12 @@ private func playedStore() throws -> GameStore {
     store.giveMedicine(guppy.id)
     #expect(store.state.medicine == 0)
 
-    // お金が足りないものは買えない
-    #expect(store.buyTankUpgrade() == .notEnoughCoins)
-    #expect(store.buyFish(Catalog.species("arowana")) == .notEnoughCoins)
+    // ランクが足りないものは、まだ買えない
+    #expect(store.buyTankUpgrade() == .rankTooLow(KeeperRank.required(tankLevel: 1)))
+    #expect(store.buyFish(Catalog.species("arowana")) == .rankTooLow(KeeperRank.required(Catalog.species("arowana"))))
+    // 餌やり・水換え・装飾の配置・図鑑で経験値がたまり、お題も進む
+    #expect(store.state.xp > 0)
+    #expect(store.state.quests.progress.values.reduce(0, +) > 0 || Quests.current().allSatisfy { ![.feed, .feedOne, .waterChange, .placeDecoration].contains($0.template.kind) })
 
     // 画面からの操作の受け渡し
     store.command = .show(.shop)

@@ -148,18 +148,20 @@ struct AquariumView: View {
             let frame = style.decorationFrame(d, tank: tank, size: size)
             DecorationHandle(frame: frame, name: d.kind.name, isFront: d.layer == 1,
                              onMove: { dx in store.moveDecoration(d.id, x: d.x + dx / size.width) },
-                             onEnd: { store.save() },
+                             onEnd: { store.decorationArranged() },
                              onLayer: { store.toggleDecorationLayer(d.id) },
                              onStore: { store.setDecoration(d.id, placed: false) })
         }
     }
 
     private func fishDescription(_ f: Fish) -> String {
-        var parts = [f.name, f.species.name, f.condition.label]
+        var parts = [f.name, f.breedName, f.condition.label]
         if f.isAlive {
             parts.append(String(localized: "満腹 \(Int(f.fullness.rounded()))"))
             parts.append(String(localized: "体調 \(Int(f.health.rounded()))"))
             parts.append(f.stage.label)
+            parts.append(f.personality.label)
+            parts.append(String(localized: "なつき度 \(Int(f.affection))"))
             if let mood = Ecology.mood(f, in: store.state.tank) { parts.append(mood) }
         }
         if f.isShiny { parts.append(String(localized: "色違い")) }

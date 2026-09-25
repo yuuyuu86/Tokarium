@@ -68,7 +68,9 @@ SAVER="$APP/Contents/Resources/Tokarium.saver"
 mkdir -p "$SAVER/Contents/MacOS" "$SAVER/Contents/Resources" build/saver
 SAVER_SRC=(Sources/Tokarium/Art/*.swift Sources/Tokarium/Game/Catalog.swift Sources/Tokarium/Game/GameState.swift
            Sources/Tokarium/Game/Simulation.swift Sources/Tokarium/Game/Progress.swift Sources/Tokarium/Game/Ecology.swift
-           Sources/Tokarium/Game/Events.swift Sources/Tokarium/Render/AquariumStyle.swift Sources/Tokarium/Render/PixelSprites.swift
+           Sources/Tokarium/Game/Events.swift Sources/Tokarium/Game/Genetics.swift Sources/Tokarium/Game/Keeper.swift
+           Sources/Tokarium/Game/Quests.swift Sources/Tokarium/Game/Secrets.swift Sources/Tokarium/Game/Layout.swift
+           Sources/Tokarium/Render/AquariumStyle.swift Sources/Tokarium/Render/PixelSprites.swift
            Sources/Tokarium/Render/SwimEngine.swift Saver/TokariumSaver.swift)
 SAVER_BINS=()
 for arch in "${WIDGET_ARCHS[@]}"; do

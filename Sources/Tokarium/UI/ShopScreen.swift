@@ -51,6 +51,9 @@ struct ShopScreen: View {
         }
     }
 
+    /// まだランクが足りなければ、必要なランク。
+    private func lock(_ rank: Int) -> Int? { store.state.rank < rank ? rank : nil }
+
     @ViewBuilder
     private var fishSection: some View {
         let size = store.state.tank.size
@@ -75,6 +78,7 @@ struct ShopScreen: View {
     private func fishCard(_ sp: FishSpecies) -> some View {
         let conflicts = Ecology.conflicts(buying: sp.id, into: store.state.tank)
         return ShopCard(title: sp.name, blurb: sp.blurb, price: sp.price, canAfford: store.coins >= sp.price,
+                        lockedRank: lock(KeeperRank.required(sp)),
                         owned: store.livingFish.filter { $0.speciesID == sp.id }.count,
                         tags: Ecology.traits(sp.id),
                         warning: conflicts.isEmpty ? nil : String(localized: "相性注意: \(conflicts.map { Catalog.species($0).name }.joined(separator: "、"))")) {
@@ -129,6 +133,7 @@ struct ShopScreen: View {
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(list) { kind in
                         ShopCard(title: kind.name, blurb: kind.blurb, price: kind.price, canAfford: store.coins >= kind.price,
+                                 lockedRank: lock(KeeperRank.required(kind)),
                                  owned: store.state.tank.decorations.filter { $0.kindID == kind.id }.count) {
                             DecorationIcon(kindID: kind.id)
                         } buy: {
@@ -155,7 +160,8 @@ struct ShopScreen: View {
             }
             ForEach(Equipment.all) { e in
                 let owned = store.state.equipment.contains(e.id)
-                ShopCard(title: e.name, blurb: e.blurb, price: e.price, canAfford: !owned && store.coins >= e.price) {
+                ShopCard(title: e.name, blurb: e.blurb, price: e.price, canAfford: !owned && store.coins >= e.price,
+                         lockedRank: owned ? nil : lock(KeeperRank.equipmentRank)) {
                     Image(systemName: owned ? "checkmark.seal.fill" : e.symbol).font(.system(size: 30)).foregroundStyle(.white)
                 } buy: {
                     message = store.buyEquipment(e)?.errorDescription
@@ -173,7 +179,8 @@ struct ShopScreen: View {
             if let next = store.nextTankSize {
                 ShopCard(title: String(localized: "\(next.name)へ拡張"),
                          blurb: String(localized: "魚 \(next.maxFish) 匹・装飾 \(next.maxDecorations) 個まで置けます。"),
-                         price: next.price, canAfford: store.coins >= next.price) {
+                         price: next.price, canAfford: store.coins >= next.price,
+                         lockedRank: lock(KeeperRank.required(tankLevel: next.level))) {
                     Image(systemName: "arrow.up.left.and.arrow.down.right").font(.system(size: 30)).foregroundStyle(.white)
                 } buy: {
                     message = store.buyTankUpgrade()?.errorDescription
@@ -214,6 +221,8 @@ private struct ShopCard<Icon: View>: View {
     let blurb: String
     let price: Int
     let canAfford: Bool
+    /// ランクが足りないとき、必要なランク（買えない）。
+    var lockedRank: Int? = nil
     var owned = 0
     var tags: [String] = []
     var warning: String? = nil
@@ -249,15 +258,24 @@ private struct ShopCard<Icon: View>: View {
                 Label(warning, systemImage: "exclamationmark.triangle.fill").font(.pixel(.caption2))
                     .foregroundStyle(Color(rgb: 0xFFA030)).lineLimit(2).multilineTextAlignment(.center)
             }
-            Button(action: buy) {
-                Label("\(price) コインで買う", systemImage: "cart")
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+            if let lockedRank {
+                Label("ランク \(lockedRank) で並びます", systemImage: "lock.fill")
+                    .font(.pixel(.callout))
+                    .foregroundStyle(PixelPalette.dim)
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .pixelInset()
+            } else {
+                Button(action: buy) {
+                    Label("\(price) コインで買う", systemImage: "cart")
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PixelButtonStyle(prominent: canAfford))
+                .disabled(!canAfford)
+                .help(canAfford ? "" : "コインが足りません")
             }
-            .buttonStyle(PixelButtonStyle(prominent: canAfford))
-            .disabled(!canAfford)
-            .help(canAfford ? "" : "コインが足りません")
         }
         .padding(10)
         .pixelInset()
