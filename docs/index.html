@@ -37,6 +37,7 @@
     <a href="#lab" data-i18n="nav.lab">品種改良</a>
     <a href="#play" data-i18n="nav.play">遊び</a>
     <a href="#screens" data-i18n="nav.screens">画面</a>
+    <a href="#features" data-i18n="nav.features">機能一覧</a>
     <a href="#sources" data-i18n="nav.sources">対応AI</a>
   </nav>
   <div class="nav__tools">
@@ -215,6 +216,18 @@
         <img id="shot" src="assets/shots/tank.png" alt="水槽の画面" width="1180" height="740" loading="lazy">
       </div>
     </div>
+  </section>
+
+  <!-- 機能一覧 -->
+  <section class="section" id="features" aria-labelledby="features-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="features.eyebrow">機能一覧</p>
+      <h2 id="features-title" data-i18n="features.title">できること、ぜんぶ</h2>
+    </div>
+    <div class="filters" role="group" aria-label="分類で絞りこむ" id="feature-filters"></div>
+    <p class="features__count mono" id="feature-count" aria-live="polite"></p>
+    <ul class="features" id="feature-list"></ul>
+    <noscript><p class="aside">機能の一覧は JavaScript をオンにすると表示されます。</p></noscript>
   </section>
 
   <!-- 対応AI -->

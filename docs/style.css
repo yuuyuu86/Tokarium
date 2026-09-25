@@ -300,6 +300,27 @@ code { font-family: var(--font-term); font-size: 1.15em; color: var(--sand); }
 .window__view img.is-changing { animation: scan .35s steps(5); }
 @keyframes scan { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
 
+/* 機能一覧 */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button {
+  font: inherit; font-size: 14px; color: var(--text); cursor: pointer; padding: 2px 10px; display: inline-flex; gap: 8px; align-items: center;
+  background: var(--sea); border: 3px solid var(--abyss); box-shadow: inset 0 3px 0 #2E6DA8;
+}
+.filters button .mono { font-size: 18px; line-height: 1; color: var(--sand); }
+.filters button[aria-pressed="true"] { background: var(--gold); color: var(--abyss); box-shadow: inset 0 3px 0 #FFF0A0; }
+.filters button[aria-pressed="true"] .mono { color: var(--abyss); }
+.features__count { margin: 14px 0 12px; color: var(--dim); font-size: 20px; }
+.features { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
+.feature { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: start; padding: 10px 12px;
+  background: rgba(11,29,54,.85); border: 3px solid var(--sea); animation: drop .3s steps(3) both; }
+.feature:hover { border-color: var(--sand); }
+.feature:hover .feature__icon img { transform: translateY(-3px); }
+.feature__icon { width: 56px; height: 44px; display: grid; place-items: center; background: linear-gradient(180deg, #3190C8, #165D93); border: 3px solid var(--abyss); }
+.feature__icon img { max-width: 48px; height: auto; transition: transform .15s steps(2); }
+.feature__text { display: grid; gap: 2px; }
+.feature__text b { font-weight: 400; color: var(--sand); font-size: 16px; line-height: 1.5; }
+.feature__text span { color: var(--dim); font-size: 13.5px; line-height: 1.7; }
+
 /* 対応AI */
 .sources { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
 .sources li { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(11,29,54,.8); border: 3px solid var(--sea); }

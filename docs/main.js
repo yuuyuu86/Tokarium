@@ -12,7 +12,7 @@
   // ---------- 言語 ----------
   const EN = {
     "skip": "Skip to content",
-    "nav.how": "How it works", "nav.lab": "Breeding", "nav.play": "Play", "nav.screens": "Screens", "nav.sources": "Supported AI",
+    "nav.how": "How it works", "nav.lab": "Breeding", "nav.play": "Play", "nav.screens": "Screens", "nav.features": "Features", "nav.sources": "Supported AI",
     "nav.download": "Download", "sound.off": "Sound off", "sound.on": "Sound on",
     "hud.water": "Water: clean",
     "hero.eyebrow": "A pixel-art aquarium for your Mac",
@@ -43,6 +43,7 @@
     "play.sound.p": "Songs that change between day and night, plus sounds for feeding and water changes. All made for this app. Try ♪ at the top.",
     "play.secret.t": "Hidden fish you can't buy",
     "play.secret.p": "When conditions are right, they wander into your tank. The encyclopedia gives only hints. Memorial fish come in 3 tiers per AI at 100, 1,000 and 5,000 coins.",
+    "features.eyebrow": "Features", "features.title": "Everything it can do",
     "screens.eyebrow": "Screens", "screens.title": "Pixel-art panels over the water",
     "screens.tank": "Tank", "screens.care": "Care", "screens.shop": "Shop", "screens.missions": "Missions", "screens.variants": "Varieties",
     "sources.eyebrow": "Supported AI", "sources.title": "Reads records already on your Mac",
@@ -107,6 +108,7 @@
     updateSoundLabel();
     renderSecrets();
     renderLab();
+    renderFeatures();
     const cur = $(".window__tabs [aria-selected=true]");
     if (cur) $("#shot").alt = t().alt[cur.dataset.shot];
   }
@@ -529,6 +531,98 @@
       d.title = name;
       el.appendChild(d);
     });
+  }
+
+
+  // ---------- 機能一覧 ----------
+  const F = "assets/sprites/fish/", D = "assets/sprites/deco/";
+  const CATS = [
+    ["all", "すべて", "All"], ["care", "育てる", "Care"], ["collect", "集める", "Collect"], ["play", "遊ぶ", "Play"],
+    ["view", "見る・聴く", "Look & listen"], ["ai", "AIとコイン", "AI & coins"], ["safe", "安心して使う", "Peace of mind"],
+  ];
+  // [分類, アイコン, 日本語の名前, 日本語の説明, 英語の名前, 英語の説明]
+  const FEATURES = [
+    ["care", F + "neon-0.png", "餌やりと水換え", "餌は1日1〜2回、水換えは数日に1回。あげすぎると水が汚れます。", "Feeding and water changes", "Feed once or twice a day, change the water every few days. Overfeeding dirties the water."],
+    ["care", F + "guppy-0.png", "成長", "稚魚から若魚、成魚へ。よく世話をすると約1週間で大人に。", "Growth", "Fry grow into juveniles, then adults, in about a week of good care."],
+    ["care", D + "flowercoral.png", "繁殖と世代", "元気な成魚が2匹いると稚魚が生まれることも。何代目かも記録します。", "Breeding and generations", "Two healthy adults may have fry. Every generation is recorded."],
+    ["care", D + "pot.png", "病気と薬", "汚れた水が続くと病気に。薬や水換えで治ります。", "Illness and medicine", "Dirty water can make fish sick. Medicine and clean water help."],
+    ["care", D + "memorial.png", "寿命と天寿", "種類ごとに寿命があり、まっとうすると図鑑に記録されます。", "Lifespan", "Each species has a lifespan. A full life is noted in the encyclopedia."],
+    ["care", F + "betta-0.png", "性格6種", "くいしんぼう・人なつこい・臆病・元気・のんびり・好奇心旺盛。泳ぎ方が変わります。", "6 personalities", "Glutton, friendly, shy, lively, laid-back, curious. Each swims differently."],
+    ["care", F + "clown-0.png", "なつき度", "世話をするほどなつき、水をたたくと遠くから寄ってきます。", "Affection", "Well-loved fish swim over from farther away when you tap the water."],
+    ["care", F + "cory-0.png", "魚どうしの関わり", "群れで泳ぐ魚、水を掃除する魚、相性の悪い組み合わせ、イソギンチャクとクマノミの共生。", "Fish get along (or don't)", "Schooling fish, cleaners, bad pairings, and clownfish that love anemones."],
+    ["care", D + "airstone.png", "設備", "自動給餌器とろ過フィルターで、お世話を少し楽に。", "Equipment", "An auto feeder and a filter make care a little easier."],
+    ["care", D + "castle.png", "水槽の拡張", "小さな水槽から特大の水槽まで4段階。魚は最大32匹。", "Bigger tanks", "Four sizes, from small to extra-large. Up to 32 fish."],
+    ["care", D + "shell.png", "里親に出す", "水槽がいっぱいになったら、魚を新しいおうちへ送り出せます。", "Rehoming", "When the tank is full, send a fish to a new home."],
+    ["collect", F + "angel-0.png", "魚54種", "お店の33種に、季節・隠れた魚・記念の魚を合わせて54種。", "54 species", "33 in the shop plus seasonal, hidden and memorial fish."],
+    ["collect", "assets/sprites/variants/guppy-sunset.png", "品種13", "1種類の魚につき13品種。2色の組み合わせは繁殖でしか生まれません。", "13 varieties", "13 per species. Combination colors can only be bred."],
+    ["collect", F + "rainbowmedaka-0.png", "色違い", "まれにきらきら光る色違いが生まれます。", "Shiny fish", "Now and then, a sparkling shiny fish is born."],
+    ["collect", D + "ship.png", "装飾57種", "水草・石・サンゴ・置きもの。限定の装飾もあります。", "57 decorations", "Plants, stones, corals and ornaments, including limited ones."],
+    ["collect", D + "lighthouse.png", "図鑑", "迎えた数・生まれた数・世代・品種を種類ごとに記録。", "Encyclopedia", "Counts, births, generations and varieties for every species."],
+    ["collect", F + "hotaru-0.png", "隠れた魚5種", "条件がそろうと迷いこんでくる、お店に並ばない魚。", "5 hidden fish", "Fish you can't buy. They wander in when conditions are right."],
+    ["collect", F + "m_claude-0.png", "記念の魚", "よく使うAIごとに、100・1000・5000コインで3段階。", "Memorial fish", "For each AI you use, three tiers at 100, 1,000 and 5,000 coins."],
+    ["collect", D + "goldshell.png", "実績27と称号", "達成した実績は、称号として画面の上に表示できます。", "27 achievements and titles", "Show any achievement you've earned as a title."],
+    ["collect", D + "familystone.png", "殿堂と思い出", "いちばん長生き・大きい・新しい世代の魚と、お別れした魚の思い出。", "Hall of fame and memories", "The longest-lived, biggest and newest-generation fish, and fish you've said goodbye to."],
+    ["play", D + "glassfloat.png", "ミッション", "毎日3つ・毎週2つ。ごほうびは経験値・餌・薬・かけら。", "Missions", "3 daily and 2 weekly. Rewards are XP, food, medicine and fragments."],
+    ["play", D + "starlamp.png", "飼育員ランク", "ランク1〜20。上がるとお店に新しい魚や装飾が並びます。", "Keeper rank", "Ranks 1 to 20. New fish and decorations unlock as you rise."],
+    ["play", D + "ryugu.png", "かけらの交換所", "ミッションのかけらで、竜宮城などの限定の装飾と交換。", "Fragment exchange", "Trade mission fragments for limited decorations like the Dragon Palace."],
+    ["play", "assets/sprites/variants/neon-blue.png", "今日の入荷", "毎日2匹、品種の魚がお店に並びます。", "Today's arrivals", "Two variety fish arrive in the shop every day."],
+    ["play", D + "chest.png", "宝箱", "AIをたくさん使った日は、宝箱が流れてきます。", "Treasure chests", "On days you use AI a lot, a treasure chest drifts in."],
+    ["play", D + "pumpkin.png", "季節のイベント", "お正月・夏祭り・ハロウィン・クリスマスに限定の魚と装飾。", "Seasonal events", "Limited fish and decorations for New Year, summer festival, Halloween and Christmas."],
+    ["play", D + "torii.png", "レイアウトの評価", "配置に100点満点の点数。組み合わせのボーナスも8種。", "Layout score", "Your layout is scored out of 100, with 8 combo bonuses."],
+    ["play", D + "anemone.png", "水槽と遊ぶ", "水をたたくと魚が寄り、餌を落とすと食べに来ます。", "Play with the tank", "Tap the water and fish come over. Drop food and they eat."],
+    ["play", D + "gems.png", "写真を撮る", "操作パネルを消した水槽の写真を、ワンクリックで保存。", "Take photos", "Save a photo of your tank without the panels, in one click."],
+    ["view", D + "tallgrass.png", "ウィンドウ表示", "大きさを自由に変えられる窓で、水槽を眺めます。", "Window mode", "Watch the tank in a window you can resize."],
+    ["view", D + "wood.png", "デスクトップ表示", "壁紙の上・アイコンの下に水槽。壁紙の設定は変えません。", "Desktop mode", "The tank sits above your wallpaper and below your icons."],
+    ["view", D + "bluerock.png", "ウィジェット", "お気に入りの魚と水槽の様子を、デスクトップのウィジェットで。", "Widget", "See your favorite fish and tank status in a desktop widget."],
+    ["view", D + "stonelantern.png", "スクリーンセーバー", "あなたの水槽が、Macのスクリーンセーバーになります。", "Screen saver", "Your own tank becomes your Mac's screen saver."],
+    ["view", D + "marimo.png", "メニューバーの小窓", "メニューバーから小さな水槽をのぞいて、すぐお世話。", "Menu bar window", "Peek at a small tank from the menu bar and care for it right away."],
+    ["view", D + "lotus.png", "時間帯と季節", "朝焼け・夕焼け・夜の光。春は花びら、秋は葉、冬はマリンスノー。", "Time of day and seasons", "Dawn, dusk and night light. Petals in spring, leaves in fall, marine snow in winter."],
+    ["view", D + "furin.png", "BGMと効果音", "昼と夜で変わる曲と16種の効果音。すべてオリジナル。", "Music and sound", "Day and night songs plus 16 sound effects, all original."],
+    ["ai", D + "aimonument.png", "8つのAIに対応", "Claude Code・Codex・Gemini CLI・Qwen Code・OpenCode・Copilot CLI など。", "8 AI sources", "Claude Code, Codex, Gemini CLI, Qwen Code, OpenCode, Copilot CLI and more."],
+    ["ai", D + "treasurepile.png", "コインの換算", "重み付きで50万トークン＝1コイン。キャッシュは軽めに数えます。", "Coin conversion", "500,000 weighted tokens = 1 coin. Cache tokens count for less."],
+    ["ai", D + "pillars.png", "AI利用量のグラフ", "日ごと・AIごとに、どれだけコインになったかを表示。", "Usage chart", "See how many coins each AI earned, day by day."],
+    ["ai", D + "arch.png", "Claudeの利用枠の目安", "5時間枠の使用量と、リセットまでの時間を表示。", "Claude limit estimate", "Shows usage in the 5-hour window and time until reset."],
+    ["ai", D + "coral.png", "複数のMacで合算", "iCloud Drive で同期すると、Macごとの利用を合計します。", "Combine Macs", "With iCloud Drive sync, usage from every Mac adds up."],
+    ["safe", D + "rock.png", "自動バックアップ", "1日1回・7世代。データが壊れても自動で戻します。", "Auto backup", "Daily, 7 generations. Broken data is restored automatically."],
+    ["safe", D + "stack.png", "省電力", "窓が隠れたら止め、バッテリーや低電力モードでは控えめに。", "Power saving", "Pauses when hidden and slows down on battery or Low Power Mode."],
+    ["safe", D + "anchor.png", "ゆるめの難しさ", "Macを閉じていた間の反映は最大48時間。それだけで魚は死にません。", "Gentle pacing", "Time away counts for at most 48 hours, and that alone never kills a fish."],
+    ["safe", D + "sword.png", "アクセシビリティ", "VoiceOver で魚を1匹ずつ読み上げ。キーボード操作、動きを減らす設定にも対応。", "Accessibility", "VoiceOver reads each fish. Keyboard shortcuts and reduced motion are supported."],
+    ["safe", D + "redgrass.png", "日本語と英語", "システムの言語に合わせて切りかわります。", "Japanese and English", "Follows your system language."],
+    ["safe", D + "fern.png", "自動アップデートと通知", "新しい版はアプリの中から。危険な魚やお世話の時間を通知でお知らせ。", "Updates and reminders", "Updates arrive in the app. Notifications warn about fish in danger and remind you to feed."],
+  ];
+  let cat = "all";
+  function renderFeatures() {
+    const en = lang === "en";
+    const filters = $("#feature-filters");
+    filters.innerHTML = "";
+    for (const [id, ja, e] of CATS) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(cat === id));
+      const n = id === "all" ? FEATURES.length : FEATURES.filter(f => f[0] === id).length;
+      b.innerHTML = `${en ? e : ja}<span class="mono">${n}</span>`;
+      b.addEventListener("click", () => { cat = id; renderFeatures(); sfx("click"); });
+      filters.appendChild(b);
+    }
+    const list = $("#feature-list");
+    list.innerHTML = "";
+    const shown = FEATURES.filter(f => cat === "all" || f[0] === cat);
+    shown.forEach((f, k) => {
+      const li = document.createElement("li");
+      li.className = "feature";
+      li.style.animationDelay = `${Math.min(k, 20) * 25}ms`;
+      li.innerHTML = `<span class="feature__icon"><img class="sprite" src="${f[1]}" alt="" loading="lazy"></span>
+        <span class="feature__text"><b>${en ? f[4] : f[2]}</b><span>${en ? f[5] : f[3]}</span></span>`;
+      // ドット絵は整数倍で、枠に収まるいちばん大きな倍率にする
+      const im = $("img", li);
+      const fit = () => {
+        const k = Math.max(1, Math.floor(Math.min(44 / im.naturalWidth, 32 / im.naturalHeight)));
+        im.style.width = `${im.naturalWidth * k}px`;
+      };
+      if (im.complete && im.naturalWidth) fit(); else im.addEventListener("load", fit);
+      list.appendChild(li);
+    });
+    $("#feature-count").textContent = en ? `${shown.length} features` : `${shown.length} 個の機能`;
   }
 
   // ---------- 画面の切りかえ ----------
