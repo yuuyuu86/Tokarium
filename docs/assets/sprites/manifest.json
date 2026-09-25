@@ -1,0 +1,921 @@
+{
+  "decorations" : [
+    {
+      "h" : 20,
+      "id" : "grass",
+      "name" : "水草",
+      "w" : 14
+    },
+    {
+      "h" : 26,
+      "id" : "redgrass",
+      "name" : "赤い水草",
+      "w" : 16
+    },
+    {
+      "h" : 46,
+      "id" : "tallgrass",
+      "name" : "バリスネリア",
+      "w" : 12
+    },
+    {
+      "h" : 36,
+      "id" : "sword",
+      "name" : "アマゾンソード",
+      "w" : 30
+    },
+    {
+      "h" : 30,
+      "id" : "fern",
+      "name" : "ミクロソリウム",
+      "w" : 24
+    },
+    {
+      "h" : 11,
+      "id" : "marimo",
+      "name" : "マリモ",
+      "w" : 11
+    },
+    {
+      "h" : 36,
+      "id" : "lotus",
+      "name" : "スイレン",
+      "w" : 24
+    },
+    {
+      "h" : 16,
+      "id" : "rock",
+      "name" : "岩",
+      "w" : 28
+    },
+    {
+      "h" : 16,
+      "id" : "bluerock",
+      "name" : "青い石",
+      "w" : 22
+    },
+    {
+      "h" : 15,
+      "id" : "lava",
+      "name" : "溶岩石",
+      "w" : 24
+    },
+    {
+      "h" : 10,
+      "id" : "pebbles",
+      "name" : "玉砂利",
+      "w" : 26
+    },
+    {
+      "h" : 26,
+      "id" : "stack",
+      "name" : "石積み",
+      "w" : 20
+    },
+    {
+      "h" : 16,
+      "id" : "wood",
+      "name" : "流木",
+      "w" : 48
+    },
+    {
+      "h" : 32,
+      "id" : "arch",
+      "name" : "岩のアーチ",
+      "w" : 46
+    },
+    {
+      "h" : 18,
+      "id" : "coral",
+      "name" : "サンゴ",
+      "w" : 20
+    },
+    {
+      "h" : 30,
+      "id" : "fancoral",
+      "name" : "ウミウチワ",
+      "w" : 28
+    },
+    {
+      "h" : 13,
+      "id" : "braincoral",
+      "name" : "ノウサンゴ",
+      "w" : 24
+    },
+    {
+      "h" : 18,
+      "id" : "tubecoral",
+      "name" : "チューブサンゴ",
+      "w" : 22
+    },
+    {
+      "h" : 22,
+      "id" : "anemone",
+      "name" : "イソギンチャク",
+      "w" : 22
+    },
+    {
+      "h" : 6,
+      "id" : "shell",
+      "name" : "貝がら",
+      "w" : 9
+    },
+    {
+      "h" : 9,
+      "id" : "conch",
+      "name" : "巻き貝",
+      "w" : 12
+    },
+    {
+      "h" : 11,
+      "id" : "starfish",
+      "name" : "ヒトデ",
+      "w" : 12
+    },
+    {
+      "h" : 4,
+      "id" : "airstone",
+      "name" : "エアストーン",
+      "w" : 8
+    },
+    {
+      "h" : 18,
+      "id" : "chest",
+      "name" : "宝箱",
+      "w" : 26
+    },
+    {
+      "h" : 20,
+      "id" : "pot",
+      "name" : "つぼ",
+      "w" : 14
+    },
+    {
+      "h" : 24,
+      "id" : "anchor",
+      "name" : "いかり",
+      "w" : 20
+    },
+    {
+      "h" : 20,
+      "id" : "diver",
+      "name" : "潜水ヘルメット",
+      "w" : 18
+    },
+    {
+      "h" : 12,
+      "id" : "gems",
+      "name" : "光る宝石",
+      "w" : 18
+    },
+    {
+      "h" : 32,
+      "id" : "torii",
+      "name" : "鳥居",
+      "w" : 32
+    },
+    {
+      "h" : 30,
+      "id" : "pillars",
+      "name" : "遺跡の柱",
+      "w" : 38
+    },
+    {
+      "h" : 34,
+      "id" : "pineapple",
+      "name" : "パイナップルの家",
+      "w" : 24
+    },
+    {
+      "h" : 46,
+      "id" : "lighthouse",
+      "name" : "灯台",
+      "w" : 18
+    },
+    {
+      "h" : 39,
+      "id" : "castle",
+      "name" : "お城",
+      "w" : 57
+    },
+    {
+      "h" : 34,
+      "id" : "ship",
+      "name" : "沈没船",
+      "w" : 72
+    },
+    {
+      "h" : 10,
+      "id" : "goldshell",
+      "name" : "金の貝がら",
+      "w" : 12
+    },
+    {
+      "h" : 22,
+      "id" : "flowercoral",
+      "name" : "花サンゴ",
+      "w" : 22
+    },
+    {
+      "h" : 20,
+      "id" : "rainbowcoral",
+      "name" : "にじいろサンゴ",
+      "w" : 24
+    },
+    {
+      "h" : 24,
+      "id" : "familystone",
+      "name" : "家族の石",
+      "w" : 18
+    },
+    {
+      "h" : 22,
+      "id" : "memorial",
+      "name" : "記念の石碑",
+      "w" : 16
+    },
+    {
+      "h" : 18,
+      "id" : "starlamp",
+      "name" : "星のランプ",
+      "w" : 14
+    },
+    {
+      "h" : 14,
+      "id" : "treasurepile",
+      "name" : "金貨の山",
+      "w" : 26
+    },
+    {
+      "h" : 42,
+      "id" : "goldcastle",
+      "name" : "黄金の城",
+      "w" : 52
+    },
+    {
+      "h" : 36,
+      "id" : "aimonument",
+      "name" : "AIのモニュメント",
+      "w" : 16
+    },
+    {
+      "h" : 16,
+      "id" : "kagamimochi",
+      "name" : "鏡もち",
+      "w" : 16
+    },
+    {
+      "h" : 26,
+      "id" : "kadomatsu",
+      "name" : "門松",
+      "w" : 16
+    },
+    {
+      "h" : 20,
+      "id" : "furin",
+      "name" : "風鈴",
+      "w" : 12
+    },
+    {
+      "h" : 14,
+      "id" : "yoyo",
+      "name" : "水ヨーヨー",
+      "w" : 12
+    },
+    {
+      "h" : 16,
+      "id" : "pumpkin",
+      "name" : "かぼちゃランタン",
+      "w" : 18
+    },
+    {
+      "h" : 18,
+      "id" : "ghost",
+      "name" : "おばけ",
+      "w" : 14
+    },
+    {
+      "h" : 32,
+      "id" : "xmastree",
+      "name" : "クリスマスツリー",
+      "w" : 22
+    },
+    {
+      "h" : 14,
+      "id" : "present",
+      "name" : "プレゼントの箱",
+      "w" : 14
+    },
+    {
+      "h" : 14,
+      "id" : "glassfloat",
+      "name" : "ガラスの浮き玉",
+      "w" : 14
+    },
+    {
+      "h" : 12,
+      "id" : "pearlshell",
+      "name" : "真珠の貝",
+      "w" : 14
+    },
+    {
+      "h" : 14,
+      "id" : "moonstone",
+      "name" : "月の石",
+      "w" : 20
+    },
+    {
+      "h" : 24,
+      "id" : "crystal",
+      "name" : "水晶の柱",
+      "w" : 16
+    },
+    {
+      "h" : 28,
+      "id" : "stonelantern",
+      "name" : "石灯籠",
+      "w" : 16
+    },
+    {
+      "h" : 42,
+      "id" : "ryugu",
+      "name" : "竜宮城",
+      "w" : 54
+    }
+  ],
+  "fish" : [
+    {
+      "h" : 7,
+      "id" : "neon",
+      "name" : "ネオンテトラ",
+      "price" : 30,
+      "regular" : true,
+      "speed" : 0.089999999999999997,
+      "w" : 14,
+      "zone" : "any"
+    },
+    {
+      "h" : 7,
+      "id" : "cardinal",
+      "name" : "カージナルテトラ",
+      "price" : 45,
+      "regular" : true,
+      "speed" : 0.089999999999999997,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 7,
+      "id" : "rummynose",
+      "name" : "ラミーノーズテトラ",
+      "price" : 50,
+      "regular" : true,
+      "speed" : 0.10000000000000001,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 7,
+      "id" : "rasbora",
+      "name" : "ラスボラ",
+      "price" : 35,
+      "regular" : true,
+      "speed" : 0.089999999999999997,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 6,
+      "id" : "zebra",
+      "name" : "ゼブラダニオ",
+      "price" : 30,
+      "regular" : true,
+      "speed" : 0.12,
+      "w" : 15,
+      "zone" : "upper"
+    },
+    {
+      "h" : 6,
+      "id" : "medaka",
+      "name" : "ヒメダカ",
+      "price" : 25,
+      "regular" : true,
+      "speed" : 0.080000000000000002,
+      "w" : 13,
+      "zone" : "upper"
+    },
+    {
+      "h" : 9,
+      "id" : "guppy",
+      "name" : "グッピー",
+      "price" : 40,
+      "regular" : true,
+      "speed" : 0.070000000000000007,
+      "w" : 15,
+      "zone" : "upper"
+    },
+    {
+      "h" : 8,
+      "id" : "platy",
+      "name" : "プラティ",
+      "price" : 35,
+      "regular" : true,
+      "speed" : 0.070000000000000007,
+      "w" : 14,
+      "zone" : "any"
+    },
+    {
+      "h" : 10,
+      "id" : "molly",
+      "name" : "ブラックモーリー",
+      "price" : 45,
+      "regular" : true,
+      "speed" : 0.070000000000000007,
+      "w" : 16,
+      "zone" : "any"
+    },
+    {
+      "h" : 9,
+      "id" : "tigerbarb",
+      "name" : "スマトラ",
+      "price" : 45,
+      "regular" : true,
+      "speed" : 0.10000000000000001,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 12,
+      "id" : "gourami",
+      "name" : "ドワーフグラミー",
+      "price" : 70,
+      "regular" : true,
+      "speed" : 0.050000000000000003,
+      "w" : 16,
+      "zone" : "upper"
+    },
+    {
+      "h" : 9,
+      "id" : "ram",
+      "name" : "ラミレジィ",
+      "price" : 90,
+      "regular" : true,
+      "speed" : 0.050000000000000003,
+      "w" : 14,
+      "zone" : "any"
+    },
+    {
+      "h" : 7,
+      "id" : "cory",
+      "name" : "コリドラス",
+      "price" : 60,
+      "regular" : true,
+      "speed" : 0.040000000000000001,
+      "w" : 14,
+      "zone" : "bottom"
+    },
+    {
+      "h" : 6,
+      "id" : "oto",
+      "name" : "オトシンクルス",
+      "price" : 55,
+      "regular" : true,
+      "speed" : 0.035000000000000003,
+      "w" : 13,
+      "zone" : "bottom"
+    },
+    {
+      "h" : 7,
+      "id" : "loach",
+      "name" : "クーリーローチ",
+      "price" : 65,
+      "regular" : true,
+      "speed" : 0.040000000000000001,
+      "w" : 22,
+      "zone" : "bottom"
+    },
+    {
+      "h" : 9,
+      "id" : "pleco",
+      "name" : "セルフィンプレコ",
+      "price" : 150,
+      "regular" : true,
+      "speed" : 0.029999999999999999,
+      "w" : 22,
+      "zone" : "bottom"
+    },
+    {
+      "h" : 10,
+      "id" : "goldfish",
+      "name" : "金魚",
+      "price" : 80,
+      "regular" : true,
+      "speed" : 0.050000000000000003,
+      "w" : 16,
+      "zone" : "any"
+    },
+    {
+      "h" : 14,
+      "id" : "ryukin",
+      "name" : "琉金",
+      "price" : 110,
+      "regular" : true,
+      "speed" : 0.044999999999999998,
+      "w" : 18,
+      "zone" : "any"
+    },
+    {
+      "h" : 12,
+      "id" : "demekin",
+      "name" : "黒出目金",
+      "price" : 120,
+      "regular" : true,
+      "speed" : 0.040000000000000001,
+      "w" : 17,
+      "zone" : "any"
+    },
+    {
+      "h" : 11,
+      "id" : "koi",
+      "name" : "錦鯉",
+      "price" : 400,
+      "regular" : true,
+      "speed" : 0.040000000000000001,
+      "w" : 28,
+      "zone" : "any"
+    },
+    {
+      "h" : 9,
+      "id" : "betta",
+      "name" : "ベタ",
+      "price" : 120,
+      "regular" : true,
+      "speed" : 0.040000000000000001,
+      "w" : 16,
+      "zone" : "upper"
+    },
+    {
+      "h" : 13,
+      "id" : "angel",
+      "name" : "エンゼルフィッシュ",
+      "price" : 150,
+      "regular" : true,
+      "speed" : 0.044999999999999998,
+      "w" : 14,
+      "zone" : "any"
+    },
+    {
+      "h" : 18,
+      "id" : "discus",
+      "name" : "ディスカス",
+      "price" : 500,
+      "regular" : true,
+      "speed" : 0.035000000000000003,
+      "w" : 19,
+      "zone" : "any"
+    },
+    {
+      "h" : 11,
+      "id" : "arowana",
+      "name" : "シルバーアロワナ",
+      "price" : 800,
+      "regular" : true,
+      "speed" : 0.050000000000000003,
+      "w" : 34,
+      "zone" : "upper"
+    },
+    {
+      "h" : 8,
+      "id" : "clown",
+      "name" : "カクレクマノミ",
+      "price" : 180,
+      "regular" : true,
+      "speed" : 0.059999999999999998,
+      "w" : 16,
+      "zone" : "any"
+    },
+    {
+      "h" : 8,
+      "id" : "damsel",
+      "name" : "ルリスズメダイ",
+      "price" : 60,
+      "regular" : true,
+      "speed" : 0.089999999999999997,
+      "w" : 14,
+      "zone" : "any"
+    },
+    {
+      "h" : 11,
+      "id" : "bluetang",
+      "name" : "ナンヨウハギ",
+      "price" : 260,
+      "regular" : true,
+      "speed" : 0.059999999999999998,
+      "w" : 18,
+      "zone" : "any"
+    },
+    {
+      "h" : 14,
+      "id" : "yellowtang",
+      "name" : "キイロハギ",
+      "price" : 240,
+      "regular" : true,
+      "speed" : 0.059999999999999998,
+      "w" : 17,
+      "zone" : "any"
+    },
+    {
+      "h" : 15,
+      "id" : "butterfly",
+      "name" : "チョウチョウウオ",
+      "price" : 200,
+      "regular" : true,
+      "speed" : 0.055,
+      "w" : 16,
+      "zone" : "any"
+    },
+    {
+      "h" : 7,
+      "id" : "gramma",
+      "name" : "ロイヤルグラマ",
+      "price" : 170,
+      "regular" : true,
+      "speed" : 0.059999999999999998,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 9,
+      "id" : "mandarin",
+      "name" : "ニシキテグリ",
+      "price" : 350,
+      "regular" : true,
+      "speed" : 0.035000000000000003,
+      "w" : 15,
+      "zone" : "bottom"
+    },
+    {
+      "h" : 18,
+      "id" : "lionfish",
+      "name" : "ハナミノカサゴ",
+      "price" : 450,
+      "regular" : true,
+      "speed" : 0.029999999999999999,
+      "w" : 20,
+      "zone" : "any"
+    },
+    {
+      "h" : 9,
+      "id" : "puffer",
+      "name" : "ミドリフグ",
+      "price" : 220,
+      "regular" : true,
+      "speed" : 0.035000000000000003,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 7,
+      "id" : "hotaru",
+      "name" : "ホタルテトラ",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.089999999999999997,
+      "w" : 15,
+      "zone" : "any"
+    },
+    {
+      "h" : 8,
+      "id" : "cavefish",
+      "name" : "ドウクツギョ",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.070000000000000007,
+      "w" : 17,
+      "zone" : "any"
+    },
+    {
+      "h" : 6,
+      "id" : "rainbowmedaka",
+      "name" : "ニジイロメダカ",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.080000000000000002,
+      "w" : 14,
+      "zone" : "upper"
+    },
+    {
+      "h" : 8,
+      "id" : "oarfish",
+      "name" : "リュウグウノツカイ",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.040000000000000001,
+      "w" : 36,
+      "zone" : "any"
+    },
+    {
+      "h" : 12,
+      "id" : "coelacanth",
+      "name" : "シーラカンス",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.035000000000000003,
+      "w" : 28,
+      "zone" : "any"
+    },
+    {
+      "h" : 9,
+      "id" : "m_claude",
+      "name" : "アンバーテトラ（Claude 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.080000000000000002,
+      "w" : 16,
+      "zone" : "any"
+    },
+    {
+      "h" : 9,
+      "id" : "m_codex",
+      "name" : "ターミナルグッピー（Codex 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.080000000000000002,
+      "w" : 16,
+      "zone" : "upper"
+    },
+    {
+      "h" : 12,
+      "id" : "m_gemini",
+      "name" : "ツインスター（Gemini 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.070000000000000007,
+      "w" : 17,
+      "zone" : "any"
+    },
+    {
+      "h" : 11,
+      "id" : "m_other",
+      "name" : "コードフィッシュ（記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.070000000000000007,
+      "w" : 17,
+      "zone" : "any"
+    },
+    {
+      "h" : 11,
+      "id" : "m_claude2",
+      "name" : "アンバーベール（Claude 1000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.070000000000000007,
+      "w" : 18,
+      "zone" : "any"
+    },
+    {
+      "h" : 13,
+      "id" : "m_claude3",
+      "name" : "アンバードラゴン（Claude 5000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.059999999999999998,
+      "w" : 24,
+      "zone" : "any"
+    },
+    {
+      "h" : 13,
+      "id" : "m_codex2",
+      "name" : "コンパイラベタ（Codex 1000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.059999999999999998,
+      "w" : 18,
+      "zone" : "upper"
+    },
+    {
+      "h" : 10,
+      "id" : "m_codex3",
+      "name" : "カーネルアロワナ（Codex 5000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.050000000000000003,
+      "w" : 28,
+      "zone" : "upper"
+    },
+    {
+      "h" : 14,
+      "id" : "m_gemini2",
+      "name" : "ツインネビュラ（Gemini 1000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.059999999999999998,
+      "w" : 19,
+      "zone" : "any"
+    },
+    {
+      "h" : 21,
+      "id" : "m_gemini3",
+      "name" : "ギャラクシーエンゼル（Gemini 5000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.050000000000000003,
+      "w" : 20,
+      "zone" : "any"
+    },
+    {
+      "h" : 12,
+      "id" : "m_other2",
+      "name" : "ゴールドコード（1000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.059999999999999998,
+      "w" : 19,
+      "zone" : "any"
+    },
+    {
+      "h" : 15,
+      "id" : "m_other3",
+      "name" : "オープンソースの王（5000 記念）",
+      "price" : 0,
+      "regular" : false,
+      "speed" : 0.050000000000000003,
+      "w" : 24,
+      "zone" : "any"
+    }
+  ],
+  "variants" : [
+    {
+      "combo" : false,
+      "id" : "wild",
+      "name" : "原種"
+    },
+    {
+      "combo" : false,
+      "id" : "albino",
+      "name" : "アルビノ"
+    },
+    {
+      "combo" : false,
+      "id" : "black",
+      "name" : "ブラック"
+    },
+    {
+      "combo" : false,
+      "id" : "gold",
+      "name" : "ゴールド"
+    },
+    {
+      "combo" : false,
+      "id" : "blue",
+      "name" : "ブルー"
+    },
+    {
+      "combo" : false,
+      "id" : "red",
+      "name" : "レッド"
+    },
+    {
+      "combo" : false,
+      "id" : "pastel",
+      "name" : "パステル"
+    },
+    {
+      "combo" : true,
+      "id" : "sunset",
+      "name" : "サンセット"
+    },
+    {
+      "combo" : true,
+      "id" : "sky",
+      "name" : "スカイ"
+    },
+    {
+      "combo" : true,
+      "id" : "panda",
+      "name" : "パンダ"
+    },
+    {
+      "combo" : true,
+      "id" : "purple",
+      "name" : "パープル"
+    },
+    {
+      "combo" : true,
+      "id" : "platinum",
+      "name" : "プラチナ"
+    },
+    {
+      "combo" : true,
+      "id" : "sakura",
+      "name" : "サクラ"
+    }
+  ],
+  "variantSpecies" : [
+    "guppy",
+    "neon",
+    "goldfish",
+    "betta"
+  ]
+}

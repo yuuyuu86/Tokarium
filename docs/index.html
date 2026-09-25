@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tokarium — AIを使うほど、水槽がにぎやかになる</title>
+<meta name="description" content="Claude Code や Codex の利用記録からコインがたまり、デスクトップのドット絵の水槽で魚を育てる Mac アプリ。">
+<meta property="og:title" content="Tokarium">
+<meta property="og:description" content="AIを使うほど、水槽がにぎやかになる。ドット絵の水槽で魚を育てる Mac アプリ。">
+<meta property="og:image" content="https://yuuyuu86.github.io/Tokarium/assets/shots/tank.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B1D36">
+<link rel="icon" type="image/png" href="assets/icon/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#how" data-i18n="skip">本文へ移動</a>
+
+<!-- 潜るほど深くなる海 -->
+<div class="sea" aria-hidden="true"><div class="snow"></div></div>
+<div class="depth" aria-hidden="true">
+  <div class="depth__rail"><div class="depth__fish"></div></div>
+  <div class="depth__label"><span class="depth__num">0</span>m</div>
+</div>
+
+<header class="nav">
+  <a class="nav__logo" href="#top" aria-label="Tokarium">
+    <img src="assets/icon/icon-256.png" alt="" width="28" height="28">
+    <span>Tokarium</span>
+  </a>
+  <nav class="nav__links" aria-label="ページ内の移動">
+    <a href="#how" data-i18n="nav.how">しくみ</a>
+    <a href="#lab" data-i18n="nav.lab">品種改良</a>
+    <a href="#play" data-i18n="nav.play">遊び</a>
+    <a href="#screens" data-i18n="nav.screens">画面</a>
+    <a href="#sources" data-i18n="nav.sources">対応AI</a>
+  </nav>
+  <div class="nav__tools">
+    <button class="chip" id="sound" type="button" aria-pressed="false">
+      <span class="chip__icon" aria-hidden="true">♪</span><span data-i18n="sound.off">音 OFF</span>
+    </button>
+    <button class="chip" id="lang" type="button" aria-label="English">EN</button>
+    <a class="btn btn--hot btn--small" href="#download" data-i18n="nav.download">ダウンロード</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- 水槽そのものがファーストビュー -->
+  <section class="hero" aria-labelledby="hero-title">
+    <canvas class="hero__tank" id="tank" aria-label="魚が泳ぐ水槽。クリックすると魚が寄ってきます"></canvas>
+    <div class="hud" aria-hidden="true">
+      <div class="badge"><span class="badge__drop"></span><span data-i18n="hud.water">水質：きれい</span></div>
+      <div class="badge badge--coin"><span class="coin-icon"></span><span class="mono" id="coins">2,180</span></div>
+    </div>
+    <div class="hero__copy">
+      <p class="eyebrow" data-i18n="hero.eyebrow">Mac のためのドット絵アクアリウム</p>
+      <h1 id="hero-title" class="logo"><span class="logo__word">Tokarium</span></h1>
+      <p class="hero__lead" data-i18n-html="hero.lead">AIを使うほど、<br>水槽がにぎやかになる。</p>
+      <p class="hero__sub" data-i18n="hero.sub">Claude Code や Codex を使うとコインがたまり、デスクトップのドット絵の水槽で魚を育てられます。</p>
+      <div class="hero__cta">
+        <a class="btn btn--hot" href="#download"><span class="btn__arrow" aria-hidden="true">▼</span><span data-i18n="hero.cta">Mac 版をダウンロード</span></a>
+        <button class="btn" id="feed" type="button"><span aria-hidden="true">✦</span> <span data-i18n="hero.feed">餌をあげてみる</span></button>
+      </div>
+      <p class="hero__note" data-i18n="hero.note">無料・macOS 14 以降・Apple シリコン / Intel</p>
+    </div>
+    <figure class="term" aria-label="AIの利用がコインに変わる様子">
+      <div class="term__bar"><span></span><span></span><span></span><em class="mono">~/project</em></div>
+      <pre class="term__body mono" id="term" aria-live="off"></pre>
+      <figcaption class="term__cap" data-i18n="hero.termcap">トークンがコインになって、水槽に落ちていきます</figcaption>
+    </figure>
+    <p class="hero__hint" data-i18n="hero.hint">水をクリックすると、魚が寄ってきます</p>
+  </section>
+
+  <!-- しくみ（本当に順番がある3段階） -->
+  <section class="section" id="how" aria-labelledby="how-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="how.eyebrow">しくみ</p>
+      <h2 id="how-title" data-i18n="how.title">使ったぶんだけ、海が育つ</h2>
+    </div>
+    <ol class="steps">
+      <li class="step reveal">
+        <div class="step__art step__art--term" aria-hidden="true"><span class="mono">$ claude</span><span class="cursor"></span></div>
+        <h3 data-i18n="how.s1.t">いつもどおりAIを使う</h3>
+        <p data-i18n="how.s1.p">このMacに残る利用記録から、トークン数だけを読みます。特別な操作はいりません。</p>
+      </li>
+      <li class="step__arrow" aria-hidden="true"></li>
+      <li class="step reveal">
+        <div class="step__art" aria-hidden="true"><span class="bigcoin"></span></div>
+        <h3 data-i18n="how.s2.t">コインがたまる</h3>
+        <p data-i18n="how.s2.p">重み付きで 50万トークンが 1コイン。出力と入力は1、キャッシュ書き込みは0.25、キャッシュ読み込みは0.1 として数えます。</p>
+      </li>
+      <li class="step__arrow" aria-hidden="true"></li>
+      <li class="step reveal">
+        <div class="step__art" aria-hidden="true"><img class="sprite swim" src="assets/sprites/fish/clown-0.png" alt="" width="17" height="10"></div>
+        <h3 data-i18n="how.s3.t">魚を迎えて育てる</h3>
+        <p data-i18n="how.s3.p">お店で魚や装飾を買い、餌やりと水換えで育てます。元気な成魚が2匹いると、稚魚が生まれることも。</p>
+      </li>
+    </ol>
+    <p class="aside reveal" data-i18n="how.aside">数えるのはアプリを入れたあとの利用だけ。会話の中身は読みません。</p>
+  </section>
+
+  <!-- 品種改良ラボ（触って試せる） -->
+  <section class="section" id="lab" aria-labelledby="lab-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="lab.eyebrow">品種改良</p>
+      <h2 id="lab-title" data-i18n="lab.title">ペアを選んで、まだ見ぬ色へ</h2>
+      <p class="section__lead" data-i18n="lab.lead">魚は色の遺伝子を2つ持ち、親から1つずつ受け継ぎます。1種類の魚につき品種は13。2色を組み合わせた品種は、繁殖でしか生まれません。</p>
+    </div>
+    <div class="lab frame frame--panel reveal">
+      <div class="lab__species" role="radiogroup" aria-label="魚の種類" id="lab-species"></div>
+      <div class="lab__parents">
+        <div class="parent" data-parent="0">
+          <p class="parent__label" data-i18n="lab.p1">親 A</p>
+          <div class="parent__tank"><img class="sprite parent__fish" alt=""></div>
+          <p class="parent__variant mono"></p>
+          <div class="genes"></div>
+        </div>
+        <div class="lab__x" aria-hidden="true">×</div>
+        <div class="parent" data-parent="1">
+          <p class="parent__label" data-i18n="lab.p2">親 B</p>
+          <div class="parent__tank"><img class="sprite parent__fish" alt=""></div>
+          <p class="parent__variant mono"></p>
+          <div class="genes"></div>
+        </div>
+      </div>
+      <div class="lab__result">
+        <p class="lab__rtitle" data-i18n="lab.result">生まれうる稚魚</p>
+        <ul class="outcomes" id="outcomes" aria-live="polite"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 遊び -->
+  <section class="section" id="play" aria-labelledby="play-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="play.eyebrow">遊び</p>
+      <h2 id="play-title" data-i18n="play.title">毎日ちょっとずつ、ずっと続く</h2>
+    </div>
+    <div class="bento">
+      <article class="card card--wide frame frame--inset reveal">
+        <div class="card__media card__media--shot"><img src="assets/shots/missions.png" alt="ミッションの画面" loading="lazy"></div>
+        <div class="card__body">
+          <h3 data-i18n="play.missions.t">ミッションと飼育員ランク</h3>
+          <p data-i18n="play.missions.p">毎日3つ、毎週2つのミッション。餌やりや繁殖で経験値がたまり、ランクが上がるとお店に新しい魚が並びます。ごほうびの「かけら」は竜宮城などの限定の装飾に。</p>
+        </div>
+      </article>
+      <article class="card frame frame--inset reveal">
+        <div class="card__media card__media--mood" aria-hidden="true">
+          <span class="mood"><img class="sprite" src="assets/sprites/fish/betta-0.png" alt=""><i class="heart"></i><i class="heart"></i><i class="heart"></i></span>
+        </div>
+        <div class="card__body">
+          <h3 data-i18n="play.mood.t">性格となつき度</h3>
+          <p data-i18n="play.mood.p">くいしんぼう、臆病、好奇心旺盛…。よく世話をした魚ほど、水をたたくと遠くから寄ってきます。</p>
+        </div>
+      </article>
+      <article class="card frame frame--inset reveal">
+        <div class="card__media card__media--desk" aria-hidden="true">
+          <div class="mini-desk"><div class="mini-desk__bar"></div><div class="mini-desk__tank"></div><div class="mini-desk__icons"><i></i><i></i><i></i></div></div>
+        </div>
+        <div class="card__body">
+          <h3 data-i18n="play.desk.t">壁紙の上でも泳ぐ</h3>
+          <p data-i18n="play.desk.p">デスクトップ表示、ウィジェット、スクリーンセーバー、メニューバーの小窓。作業のじゃまをせずに、いつも水槽が見えます。</p>
+        </div>
+      </article>
+      <article class="card frame frame--inset reveal">
+        <div class="card__media card__media--layout" aria-hidden="true">
+          <img class="sprite deco" src="assets/sprites/deco/torii.png" alt="">
+          <img class="sprite deco" src="assets/sprites/deco/stack.png" alt="">
+          <img class="sprite deco" src="assets/sprites/deco/lotus.png" alt="">
+          <span class="score mono">92</span>
+        </div>
+        <div class="card__body">
+          <h3 data-i18n="play.layout.t">レイアウトに点数がつく</h3>
+          <p data-i18n="play.layout.p">装飾は約60種。「和の庭」「沈没船の宝」など、組み合わせのボーナスを探して配置します。</p>
+        </div>
+      </article>
+      <article class="card frame frame--inset reveal">
+        <div class="card__media card__media--sound" aria-hidden="true">
+          <span class="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <div class="card__body">
+          <h3 data-i18n="play.sound.t">オリジナルのBGMと効果音</h3>
+          <p data-i18n="play.sound.p">昼と夜で変わる曲と、餌やりや水換えの音。すべてこのアプリのために作りました。上の「♪」で試聴できます。</p>
+        </div>
+      </article>
+      <article class="card card--wide frame frame--inset reveal">
+        <div class="card__media card__media--secret" aria-hidden="true" id="secrets"></div>
+        <div class="card__body">
+          <h3 data-i18n="play.secret.t">お店に並ばない、隠れた魚</h3>
+          <p data-i18n="play.secret.p">条件がそろうと、ときどき水槽に迷いこんできます。図鑑にはヒントだけ。記念の魚は、AIごとに 100・1000・5000 コインで3段階。</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 画面 -->
+  <section class="section" id="screens" aria-labelledby="screens-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="screens.eyebrow">画面</p>
+      <h2 id="screens-title" data-i18n="screens.title">水槽の上に、ドット絵のパネル</h2>
+    </div>
+    <div class="window frame frame--panel reveal">
+      <div class="window__tabs" role="tablist" aria-label="画面の切りかえ">
+        <button role="tab" aria-selected="true" data-shot="tank" data-i18n="screens.tank">水槽</button>
+        <button role="tab" aria-selected="false" data-shot="care" data-i18n="screens.care">お世話</button>
+        <button role="tab" aria-selected="false" data-shot="shop" data-i18n="screens.shop">お店</button>
+        <button role="tab" aria-selected="false" data-shot="missions" data-i18n="screens.missions">ミッション</button>
+        <button role="tab" aria-selected="false" data-shot="variants" data-i18n="screens.variants">品種の図鑑</button>
+      </div>
+      <div class="window__view" role="tabpanel">
+        <img id="shot" src="assets/shots/tank.png" alt="水槽の画面" width="1180" height="740" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- 対応AI -->
+  <section class="section" id="sources" aria-labelledby="sources-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="sources.eyebrow">対応AI</p>
+      <h2 id="sources-title" data-i18n="sources.title">このMacに残る記録を読みます</h2>
+    </div>
+    <ul class="sources reveal">
+      <li><span>Claude Code</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span data-i18n="src.cowork">Claude デスクトップ（Cowork）</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span data-i18n="src.codex">Codex（CLI・デスクトップ）</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span>Gemini CLI</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span>Qwen Code</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span>OpenCode</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span>GitHub Copilot CLI</span><em class="tag" data-i18n="tag.measured">実測</em></li>
+      <li><span data-i18n="src.ollama">Ollama（アプリ）</span><em class="tag tag--dim" data-i18n="tag.estimated">推定</em></li>
+    </ul>
+    <p class="aside reveal" data-i18n="sources.note">ChatGPT デスクトップや Claude デスクトップのチャットは、トークン数がMacに残らないため読めません。推定値は、設定でオンにしたときだけコインにします。</p>
+  </section>
+
+  <!-- プライバシー -->
+  <section class="section section--narrow" id="privacy" aria-labelledby="privacy-title">
+    <div class="section__head">
+      <p class="eyebrow" data-i18n="privacy.eyebrow">プライバシー</p>
+      <h2 id="privacy-title" data-i18n="privacy.title">読むのは数字だけ</h2>
+    </div>
+    <div class="promises">
+      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">#</span><p data-i18n="privacy.p1">使うのはトークン数・時刻・重複を防ぐためのIDだけ。会話の本文は読みません。</p></div>
+      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">⌂</span><p data-i18n="privacy.p2">記録はこのMacの中だけで扱い、外へ送りません。APIキーやCookieにも触れません。</p></div>
+      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">✓</span><p data-i18n="privacy.p3">読み取り専用です。AIツールの設定や記録を書きかえることはありません。</p></div>
+    </div>
+  </section>
+
+  <!-- ダウンロード -->
+  <section class="section" id="download" aria-labelledby="download-title">
+    <div class="dl frame frame--gold reveal">
+      <img class="dl__icon" src="assets/icon/icon-256.png" alt="" width="96" height="96">
+      <div class="dl__text">
+        <h2 id="download-title" data-i18n="dl.title">水槽を、あなたのMacに</h2>
+        <p data-i18n="dl.p">無料・MITライセンス。Apple の公証済みで、アップデートはアプリの中から受け取れます。</p>
+      </div>
+      <a class="btn btn--hot btn--big" href="https://github.com/yuuyuu86/Tokarium/releases/latest" id="dl-link"><span class="btn__arrow" aria-hidden="true">▼</span><span data-i18n="dl.cta">Tokarium をダウンロード</span></a>
+      <p class="dl__req mono" data-i18n="dl.req">macOS 14 Sonoma 以降 ・ Apple シリコン / Intel</p>
+    </div>
+    <ol class="install reveal">
+      <li data-i18n-html="install.1">ダウンロードした <b>Tokarium.dmg</b> を開きます</li>
+      <li data-i18n-html="install.2"><b>Tokarium</b> を「アプリケーション」フォルダへドラッグします</li>
+      <li data-i18n-html="install.3">開いたら、読み取るAIを選んで<b>はじめる</b>を押します</li>
+    </ol>
+    <div class="faq">
+      <details class="reveal">
+        <summary data-i18n="faq.q1">これまで使ったぶんもコインになりますか？</summary>
+        <p data-i18n="faq.a1">いいえ。コインになるのは、はじめて起動したあとの利用だけです。最初に魚1匹と50コイン、餌20回分をプレゼントします。</p>
+      </details>
+      <details class="reveal">
+        <summary data-i18n="faq.q2">放っておくと魚は死にますか？</summary>
+        <p data-i18n="faq.a2">餌やりと水換えを忘れ続けると弱り、やがて死んでしまいます。ただしMacを閉じていた間の反映は最大48時間分で、それだけで死ぬことはありません。</p>
+      </details>
+      <details class="reveal">
+        <summary data-i18n="faq.q3">複数のMacで同じ水槽を育てられますか？</summary>
+        <p data-i18n="faq.a3">はい。iCloud Drive で同期すると、コインはMacごとのAI利用の合計になります。</p>
+      </details>
+      <details class="reveal">
+        <summary data-i18n="faq.q4">アンインストールするには？</summary>
+        <p data-i18n-html="faq.a4">Tokarium をゴミ箱に入れ、データも消す場合は <code>~/Library/Application Support/Tokarium</code> を削除します。</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<!-- 海底 -->
+<footer class="floor">
+  <div class="floor__decos" id="floor" aria-hidden="true"></div>
+  <div class="floor__sand">
+    <p class="floor__line"><span data-i18n="footer.bottom">海底に着きました。</span> <a href="#top" data-i18n="footer.up">水面へ戻る ▲</a></p>
+    <p class="floor__small">
+      <a href="https://github.com/yuuyuu86/Tokarium">GitHub</a> ・
+      <a href="https://github.com/yuuyuu86/Tokarium/blob/main/PRIVACY.md" data-i18n="footer.privacy">プライバシー</a> ・
+      <span data-i18n="footer.license">MIT ライセンス。フォントは DotGothic16（SIL OFL）。BGMと効果音はオリジナル。</span>
+      <span>© 2026 yuuyuu86</span>
+    </p>
+  </div>
+</footer>
+
+<audio id="bgm" src="assets/sounds/bgm_day.m4a" loop preload="none"></audio>
+<script src="main.js" defer></script>
+</body>
+</html>

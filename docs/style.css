@@ -1,0 +1,386 @@
+:root {
+  --frame-panel: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2712%27%20height%3D%2712%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%272%27%20y%3D%270%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%271%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2710%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%273%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%275%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%277%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%279%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%230B1D36%27/%3E%3Crect%20x%3D%2710%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2711%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3C/svg%3E");
+  --frame-inset: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2712%27%20height%3D%2712%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%272%27%20y%3D%270%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%272%27%20y%3D%271%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%273%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%275%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%277%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%272%27%20y%3D%279%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%2313294A%27/%3E%3Crect%20x%3D%2710%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2711%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%271%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3Crect%20x%3D%272%27%20y%3D%2711%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27transparent%27/%3E%3C/svg%3E");
+  --frame-gold: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2712%27%20height%3D%2712%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%272%27%20y%3D%270%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%271%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%273%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%275%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%277%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%272%27%20y%3D%279%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23122744%27/%3E%3Crect%20x%3D%2710%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2711%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2711%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3C/svg%3E");
+  --frame-button: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2712%27%20height%3D%2712%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%272%27%20y%3D%270%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%271%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2710%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%273%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%275%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%277%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%279%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%231D4F80%27/%3E%3Crect%20x%3D%2710%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2711%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3C/svg%3E");
+  --frame-button-hot: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2712%27%20height%3D%2712%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%272%27%20y%3D%270%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%271%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2710%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%273%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%275%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%277%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%272%27%20y%3D%279%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFD54F%27/%3E%3Crect%20x%3D%2710%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2711%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23FFF4C2%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2711%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3C/svg%3E");
+  --frame-glass: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2712%27%20height%3D%2712%27%20shape-rendering%3D%27crispEdges%27%3E%3Crect%20x%3D%272%27%20y%3D%270%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%271%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2710%27%20y%3D%271%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%272%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%272%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%273%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%273%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%274%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%275%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%275%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%276%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%276%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%277%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%277%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%278%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%278%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%272%27%20y%3D%279%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27rgba%2811%2C29%2C54%2C0.94%29%27/%3E%3Crect%20x%3D%2710%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2711%27%20y%3D%279%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%271%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2710%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23F2E3B3%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3Crect%20x%3D%272%27%20y%3D%2711%27%20width%3D%278%27%20height%3D%271%27%20fill%3D%27%23061224%27/%3E%3C/svg%3E");
+}
+/* Tokarium の公開ページ。アプリと同じ色・ドット絵の文字・枠で作る。 */
+
+@font-face {
+  font-family: "DotGothic16";
+  src: url("assets/fonts/DotGothic16-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  /* 色（アプリの PixelPalette と水槽から） */
+  --surface: #4FB0E6;   /* 水面ちかく */
+  --sea: #1D4F80;       /* ボタン・中層 */
+  --deep: #0B1D36;      /* パネルの地 */
+  --abyss: #061224;     /* 影・深海 */
+  --sand: #F2E3B3;      /* 枠・砂 */
+  --gold: #FFD54F;      /* コイン・目立たせる */
+  --coral: #FF6A9A;     /* なつき度のハート */
+  --text: #F4F1E6;
+  --dim: #9DB4CC;
+
+  --px: 3px;            /* 1ドット */
+  --font-pixel: "DotGothic16", "Hiragino Sans", system-ui, sans-serif;
+  --font-term: "VT323", "DotGothic16", ui-monospace, monospace;
+  --gutter: clamp(16px, 4vw, 48px);
+  --maxw: 1120px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; overflow-x: clip; }
+body {
+  margin: 0;
+  background: var(--abyss);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: none;
+  overflow-x: hidden;
+}
+img { max-width: 100%; }
+a { color: var(--gold); }
+code { font-family: var(--font-term); font-size: 1.15em; color: var(--sand); }
+.mono { font-family: var(--font-term); letter-spacing: 0.04em; }
+.sprite { image-rendering: pixelated; image-rendering: crisp-edges; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.skip { position: absolute; left: -9999px; }
+.skip:focus { left: 16px; top: 16px; z-index: 100; background: var(--gold); color: var(--abyss); padding: 8px 12px; }
+
+/* ドット絵の枠（9スライス） */
+.frame { border: 12px solid transparent; border-image-slice: 3 fill; border-image-width: 12px; border-image-repeat: stretch; image-rendering: pixelated; }
+.frame--panel { border-image-source: var(--frame-panel); }
+.frame--inset { border-image-source: var(--frame-inset); }
+.frame--gold { border-image-source: var(--frame-gold); }
+
+/* ---------- 潜るほど深くなる海 ---------- */
+.sea {
+  position: fixed; inset: 0; z-index: -2;
+  background: linear-gradient(180deg, var(--sea-top, #1B5E96), var(--sea-bottom, #0E3563));
+  transition: background 0.2s linear;
+}
+.snow { position: absolute; inset: 0; opacity: var(--snow, 0); background-image:
+  radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.5) 50%, transparent 51%),
+  radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,.35) 50%, transparent 51%),
+  radial-gradient(3px 3px at 55% 40%, rgba(255,255,255,.4) 50%, transparent 51%),
+  radial-gradient(2px 2px at 75% 85%, rgba(255,255,255,.3) 50%, transparent 51%),
+  radial-gradient(2px 2px at 90% 15%, rgba(255,255,255,.45) 50%, transparent 51%);
+  background-size: 420px 420px; animation: snow 40s linear infinite; }
+@keyframes snow { to { background-position: 60px 420px; } }
+
+.depth { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.depth.is-on { opacity: 1; }
+.depth__rail { position: relative; width: 6px; height: 180px; background: repeating-linear-gradient(180deg, var(--sand) 0 3px, transparent 3px 18px); opacity: .7; }
+.depth__fish { position: absolute; left: -7px; width: 20px; height: 12px; top: calc(var(--depth, 0) * 168px);
+  background: var(--gold); clip-path: polygon(0 50%, 30% 0, 75% 0, 100% 50%, 75% 100%, 30% 100%); }
+.depth__label { font-family: var(--font-term); font-size: 22px; color: var(--sand); writing-mode: vertical-rl; }
+
+/* ---------- ナビ ---------- */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  display: flex; align-items: center; gap: 20px;
+  padding: 10px var(--gutter);
+  background: rgba(6, 18, 36, 0.72);
+  backdrop-filter: blur(6px);
+  border-bottom: 3px solid rgba(242, 227, 179, 0.25);
+}
+.nav__logo { display: flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; font-size: 20px; }
+.nav__logo img { image-rendering: pixelated; }
+.nav__links { display: flex; gap: 18px; margin-left: 12px; }
+.nav__links a { color: var(--dim); text-decoration: none; font-size: 15px; }
+.nav__links a:hover, .nav__links a.is-here { color: var(--sand); }
+.nav__tools { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.chip { font: inherit; font-size: 14px; color: var(--sand); background: transparent; border: 3px solid rgba(242,227,179,.5); padding: 2px 10px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.chip:hover { border-color: var(--sand); }
+.chip[aria-pressed="true"] { background: var(--gold); color: var(--abyss); border-color: var(--gold); }
+.chip[aria-pressed="true"] .chip__icon { animation: bob 0.6s steps(2) infinite; }
+
+/* ボタン（ドット絵） */
+.btn {
+  --b: var(--frame-button);
+  display: inline-flex; align-items: center; gap: 10px;
+  font: inherit; font-size: 17px; line-height: 1.4; color: var(--text); text-decoration: none; cursor: pointer;
+  background: none; padding: 0; border: 12px solid transparent;
+  border-image: var(--b) 3 fill / 12px stretch; image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 var(--abyss));
+  transition: transform .08s steps(2), filter .08s steps(2);
+}
+.btn:hover { transform: translateY(-2px); filter: drop-shadow(0 6px 0 var(--abyss)); }
+.btn:active { transform: translateY(2px); filter: drop-shadow(0 1px 0 var(--abyss)); }
+.btn--hot { --b: var(--frame-button-hot); color: var(--abyss); }
+.btn--small { font-size: 14px; border-width: 9px; border-image-width: 9px; }
+.btn--big { font-size: 22px; }
+.btn__arrow { display: inline-block; animation: bob 1.2s steps(2) infinite; }
+@keyframes bob { 50% { transform: translateY(3px); } }
+
+/* ---------- ファーストビュー（水槽） ---------- */
+.hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden; background: #3FA0DA; }
+.hero__tank { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; cursor: crosshair; }
+.hud { position: absolute; top: 76px; right: var(--gutter); display: flex; gap: 10px; z-index: 2; pointer-events: none; }
+.badge { display: flex; align-items: center; gap: 8px; font-size: 15px; padding: 0 4px;
+  border: 9px solid transparent; border-image: var(--frame-glass) 3 fill / 9px stretch; image-rendering: pixelated; }
+.badge--coin { color: var(--gold); font-size: 20px; }
+.badge--coin .mono { font-size: 26px; line-height: 1; min-width: 4.2ch; text-align: right; }
+.badge.is-pop { animation: pop .25s steps(3); }
+@keyframes pop { 50% { transform: scale(1.12); } }
+.badge__drop { width: 10px; height: 14px; background: #6FC8FF; clip-path: polygon(50% 0, 100% 60%, 80% 100%, 20% 100%, 0 60%); }
+.coin-icon { width: 18px; height: 18px; background:
+  conic-gradient(from 45deg, var(--gold) 0 25%, #E0A800 0 50%, var(--gold) 0 75%, #FFF0A0 0);
+  clip-path: polygon(33% 0, 67% 0, 100% 33%, 100% 67%, 67% 100%, 33% 100%, 0 67%, 0 33%); }
+
+.hero__copy {
+  position: absolute; left: var(--gutter); top: calc(50% + 30px); transform: translateY(-50%); z-index: 2;
+  max-width: 560px; padding: 28px 30px;
+  border: 12px solid transparent; border-image: var(--frame-glass) 3 fill / 12px stretch; image-rendering: pixelated;
+}
+.eyebrow { margin: 0 0 6px; font-size: 14px; color: var(--gold); letter-spacing: .12em; }
+.logo { margin: 0; line-height: 1; font-weight: 400; }
+.logo__word {
+  font-size: clamp(56px, 9vw, 112px); color: var(--sand); letter-spacing: 0.02em;
+  text-shadow: 4px 4px 0 var(--abyss), 8px 8px 0 rgba(6,18,36,.4);
+  display: inline-block;
+}
+.hero__lead { font-size: clamp(22px, 2.6vw, 30px); line-height: 1.5; margin: 18px 0 10px; color: var(--text); }
+.hero__sub { margin: 0 0 22px; color: var(--dim); }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 14px; }
+.hero__note { margin: 14px 0 0; font-size: 13px; color: var(--dim); }
+.hero__hint { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); margin: 0; z-index: 2; font-size: 13px; color: var(--abyss); background: rgba(242,227,179,.85); padding: 2px 12px; animation: hint 3s steps(1) infinite; }
+@keyframes hint { 80% { opacity: 1; } 90% { opacity: 0.2; } }
+
+/* ターミナル */
+.term { position: absolute; right: var(--gutter); bottom: 72px; z-index: 2; width: min(400px, 40vw); margin: 0;
+  border: 12px solid transparent; border-image: var(--frame-glass) 3 fill / 12px stretch; image-rendering: pixelated; }
+.term__bar { display: flex; gap: 6px; align-items: center; padding-bottom: 6px; border-bottom: 3px dashed rgba(242,227,179,.25); }
+.term__bar span { width: 9px; height: 9px; background: var(--dim); }
+.term__bar span:nth-child(1) { background: #E5534B; } .term__bar span:nth-child(2) { background: var(--gold); } .term__bar span:nth-child(3) { background: #5FD068; }
+.term__bar em { margin-left: auto; font-style: normal; color: var(--dim); font-size: 17px; }
+.term__body { margin: 8px 0 0; height: 168px; overflow: hidden; font-size: 19px; line-height: 1.25; color: #BFE9C9; white-space: pre-wrap; }
+.term__body .t-cmd { color: var(--text); }
+.term__body .t-tok { color: var(--gold); }
+.term__body .t-dim { color: var(--dim); }
+.term__cap { font-size: 12px; color: var(--dim); margin-top: 6px; }
+.token { position: fixed; z-index: 40; font-family: var(--font-term); font-size: 20px; color: var(--abyss); background: var(--gold); padding: 0 6px; pointer-events: none;
+  transition: transform .9s cubic-bezier(.5,-0.3,.6,1), opacity .9s steps(4); }
+
+/* ---------- セクション共通 ---------- */
+.section { max-width: var(--maxw); margin: 0 auto; padding: clamp(80px, 12vw, 150px) var(--gutter) 0; }
+.section--narrow { max-width: 900px; }
+.section__head { margin-bottom: 36px; }
+.section__head h2 { font-weight: 400; font-size: clamp(30px, 4.6vw, 50px); line-height: 1.25; margin: 0; color: var(--sand); text-shadow: 3px 3px 0 var(--abyss); }
+.section__lead { max-width: 640px; color: var(--dim); margin: 16px 0 0; }
+.aside { color: var(--dim); font-size: 14px; margin-top: 28px; }
+
+/* 出てくるとき（1ドットずつ上がるように） */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .5s steps(5), transform .5s steps(5); }
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* しくみ */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 48px 1fr 48px 1fr; align-items: stretch; }
+.step { padding: 22px; border: 12px solid transparent; border-image: var(--frame-inset) 3 fill / 12px stretch; image-rendering: pixelated; }
+.step h3 { font-weight: 400; font-size: 21px; margin: 16px 0 6px; color: var(--text); }
+.step p { margin: 0; color: var(--dim); font-size: 15px; }
+.step__art { height: 96px; display: grid; place-items: center; background: linear-gradient(180deg, #3190C8, #165D93); border: 3px solid var(--abyss); position: relative; overflow: hidden; }
+.step__art .sprite { width: 68px; height: auto; }
+.step__art--term { background: var(--abyss); justify-content: start; padding-left: 16px; grid-auto-flow: column; gap: 4px; font-size: 26px; color: #BFE9C9; }
+.cursor { width: 12px; height: 22px; background: #BFE9C9; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.bigcoin { width: 48px; height: 48px; background:
+  conic-gradient(from 45deg, var(--gold) 0 25%, #E0A800 0 50%, var(--gold) 0 75%, #FFF0A0 0);
+  clip-path: polygon(33% 0, 67% 0, 100% 33%, 100% 67%, 67% 100%, 33% 100%, 0 67%, 0 33%);
+  animation: spin 1.2s steps(6) infinite; }
+@keyframes spin { 0% { transform: scaleX(1); } 50% { transform: scaleX(0.15); } 100% { transform: scaleX(1); } }
+.swim { animation: swim 3s steps(12) infinite alternate; }
+@keyframes swim { from { transform: translateX(-60px); } to { transform: translateX(60px); } }
+.step__arrow { align-self: center; justify-self: center; width: 24px; height: 24px; background: var(--sand);
+  clip-path: polygon(0 33%, 50% 33%, 50% 0, 100% 50%, 50% 100%, 50% 67%, 0 67%); animation: nudge 1.4s steps(2) infinite; }
+@keyframes nudge { 50% { transform: translateX(4px); } }
+
+/* 品種改良ラボ */
+.lab { padding: 18px; display: grid; gap: 24px; grid-template-columns: 1.4fr 1fr; }
+.lab__species { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.lab__species button, .genes button, .window__tabs button {
+  font: inherit; font-size: 14px; color: var(--text); cursor: pointer; padding: 2px 10px;
+  background: var(--sea); border: 3px solid var(--abyss); box-shadow: inset 0 3px 0 #2E6DA8;
+}
+.lab__species button[aria-checked="true"], .window__tabs button[aria-selected="true"] { background: var(--gold); color: var(--abyss); box-shadow: inset 0 3px 0 #FFF0A0; }
+.lab__parents { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: start; }
+.lab__x { align-self: center; font-size: 34px; color: var(--sand); }
+.parent__label { margin: 0 0 6px; color: var(--dim); font-size: 14px; }
+.parent__tank { height: 110px; display: grid; place-items: center; background: linear-gradient(180deg, #3190C8, #165D93); border: 3px solid var(--abyss); }
+.parent__fish { width: 96px; height: auto; transition: transform .2s steps(2); }
+.parent__tank:hover .parent__fish { transform: scaleX(-1); }
+.parent__variant { margin: 6px 0; font-size: 22px; color: var(--gold); min-height: 1.2em; }
+.genes { display: grid; gap: 6px; }
+.genes__row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.genes__row b { font-weight: 400; font-size: 13px; color: var(--dim); width: 4.5em; }
+.genes button { font-size: 12px; padding: 0 6px; border-width: 2px; }
+.genes button[aria-pressed="true"] { background: var(--sand); color: var(--abyss); box-shadow: none; }
+.genes .swatch { display: inline-block; width: 8px; height: 8px; margin-right: 4px; vertical-align: middle; border: 1px solid var(--abyss); }
+.lab__rtitle { margin: 0 0 8px; color: var(--sand); }
+.outcomes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.outcome { display: grid; grid-template-columns: 64px 1fr 48px; gap: 10px; align-items: center; padding: 6px 8px; background: #13294A; border: 3px solid #1D4F80; animation: drop .35s steps(4) both; }
+.outcome img { width: 56px; height: auto; }
+.outcome__name { font-size: 15px; }
+.outcome__bar { display: block; height: 8px; margin-top: 2px; background: repeating-linear-gradient(90deg, var(--gold) 0 5px, transparent 5px 6px); }
+.outcome__pct { font-family: var(--font-term); font-size: 24px; color: var(--gold); text-align: right; }
+.outcome--new { border-color: var(--gold); }
+.outcome--new .outcome__name::after { content: " ★"; color: var(--gold); }
+@keyframes drop { from { opacity: 0; transform: translateY(-10px); } }
+
+/* 遊び（大きさのちがうカード） */
+.bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { display: flex; flex-direction: column; }
+.card--wide { grid-column: span 2; flex-direction: row; }
+.card--wide .card__media { flex: 1.3; }
+.card--wide .card__body { flex: 1; }
+.card__media { position: relative; min-height: 150px; background: linear-gradient(180deg, #3190C8, #165D93); border: 3px solid var(--abyss); overflow: hidden; display: grid; place-items: center; }
+.card__media--shot { background: var(--deep); place-items: start; }
+.card__media--shot img { width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform 1.2s steps(12); }
+.card:hover .card__media--shot img { transform: scale(1.06); }
+.card__body { padding: 14px 6px 4px; }
+.card__body h3 { font-weight: 400; font-size: 20px; margin: 0 0 6px; color: var(--sand); }
+.card__body p { margin: 0; font-size: 14.5px; color: var(--dim); }
+.card { transition: transform .15s steps(3); }
+.card:hover { transform: translateY(-4px); }
+
+.mood { position: relative; }
+.mood .sprite { width: 80px; transition: transform .3s steps(3); }
+.card:hover .mood .sprite { transform: translateX(-10px) scaleX(-1); }
+.heart { position: absolute; top: -6px; right: -18px; width: 12px; height: 11px; background: var(--coral); opacity: 0;
+  clip-path: polygon(0 20%, 20% 0, 50% 20%, 80% 0, 100% 20%, 100% 50%, 50% 100%, 0 50%); }
+.card:hover .heart { animation: heart 1.2s steps(6) infinite; }
+.card:hover .heart:nth-child(3) { animation-delay: .4s; right: -30px; }
+.card:hover .heart:nth-child(4) { animation-delay: .8s; right: -8px; }
+@keyframes heart { 0% { opacity: 0; transform: translateY(10px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-26px); } }
+
+.mini-desk { width: 78%; height: 110px; background: #7A5C9E; border: 3px solid var(--abyss); position: relative; }
+.mini-desk__bar { height: 9px; background: rgba(255,255,255,.7); }
+.mini-desk__tank { position: absolute; left: 10%; right: 26%; bottom: 10px; top: 22px; background: linear-gradient(180deg, rgba(79,176,230,.85), rgba(22,93,147,.9)); }
+.mini-desk__tank::after { content: ""; position: absolute; width: 16px; height: 8px; left: 20%; top: 40%; background: var(--gold);
+  clip-path: polygon(0 50%, 25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%); animation: swimbox 4s steps(16) infinite alternate; }
+@keyframes swimbox { to { left: 70%; top: 55%; } }
+.mini-desk__icons { position: absolute; right: 6px; top: 16px; display: grid; gap: 6px; }
+.mini-desk__icons i { width: 14px; height: 14px; background: var(--sand); display: block; }
+
+.card__media--layout { grid-auto-flow: column; align-items: end; justify-content: center; gap: 10px; padding-bottom: 14px; background: linear-gradient(180deg, #3190C8 0 75%, #D8BE7E 75%); }
+.card__media--layout .deco { height: 62px; width: auto; transition: transform .2s steps(2); }
+.card__media--layout .deco:nth-child(2) { height: 46px; }
+.card__media--layout .deco:nth-child(3) { height: 50px; }
+.card:hover .deco:nth-child(1) { transform: translateY(-4px); }
+.card:hover .deco:nth-child(3) { transform: translateY(-2px); }
+.score { position: absolute; top: 8px; right: 10px; font-size: 32px; color: var(--gold); text-shadow: 2px 2px 0 var(--abyss); }
+
+.eq { display: flex; gap: 6px; align-items: end; height: 70px; }
+.eq i { width: 12px; background: var(--gold); height: 20%; }
+.card:hover .eq i, body.is-sound .eq i { animation: eq .8s steps(4) infinite alternate; }
+.eq i:nth-child(2) { animation-delay: -.2s !important; } .eq i:nth-child(3) { animation-delay: -.5s !important; }
+.eq i:nth-child(4) { animation-delay: -.1s !important; } .eq i:nth-child(5) { animation-delay: -.7s !important; }
+.eq i:nth-child(6) { animation-delay: -.3s !important; } .eq i:nth-child(7) { animation-delay: -.6s !important; }
+@keyframes eq { to { height: 100%; } }
+
+.card__media--secret { display: flex; gap: 14px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 16px; background: linear-gradient(180deg, #123A6E, #061224); }
+.secret { display: grid; justify-items: center; gap: 4px; width: 92px; }
+.secret img { height: 30px; width: auto; filter: brightness(0) opacity(.75); transition: filter .3s steps(3); }
+.secret span { font-size: 11px; color: var(--dim); text-align: center; line-height: 1.4; }
+.secret b { font-weight: 400; font-size: 14px; color: var(--sand); }
+
+/* 画面 */
+.window { padding: 10px; }
+.window__tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.window__view { background: var(--abyss); border: 3px solid var(--abyss); aspect-ratio: 1180 / 740; display: grid; place-items: center; overflow: hidden; }
+.window__view img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.window__view img.is-changing { animation: scan .35s steps(5); }
+@keyframes scan { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+
+/* 対応AI */
+.sources { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.sources li { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(11,29,54,.8); border: 3px solid var(--sea); }
+.sources li:hover { border-color: var(--sand); }
+.tag { font-style: normal; font-size: 12px; padding: 0 8px; background: #5FD068; color: var(--abyss); }
+.tag--dim { background: var(--dim); }
+
+/* プライバシー */
+.promises { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.promise { padding: 18px; background: rgba(6,18,36,.6); border-left: 6px solid var(--gold); }
+.promise p { margin: 0; font-size: 15px; }
+.promise__icon { font-family: var(--font-term); font-size: 40px; line-height: 1; color: var(--gold); }
+
+/* ダウンロード */
+.dl { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; padding: 18px 20px; }
+.dl__icon { image-rendering: pixelated; animation: bob 2s steps(2) infinite; }
+.dl__text h2 { font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); margin: 0; color: var(--gold); }
+.dl__text p { margin: 4px 0 0; color: var(--dim); }
+.dl__req { grid-column: 1 / -1; margin: 0; color: var(--dim); font-size: 19px; }
+.install { counter-reset: s; list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.install li { counter-increment: s; padding: 14px 14px 14px 56px; position: relative; background: rgba(11,29,54,.8); border: 3px solid var(--sea); font-size: 15px; }
+.install li::before { content: counter(s); position: absolute; left: 14px; top: 8px; font-family: var(--font-term); font-size: 38px; color: var(--gold); }
+.install b { font-weight: 400; color: var(--sand); }
+.faq { margin-top: 36px; display: grid; gap: 8px; }
+.faq details { background: rgba(11,29,54,.8); border: 3px solid var(--sea); }
+.faq details[open] { border-color: var(--sand); }
+.faq summary { cursor: pointer; padding: 10px 14px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--font-term); font-size: 26px; line-height: 1; color: var(--gold); }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { margin: 0; padding: 0 14px 14px; color: var(--dim); font-size: 15px; }
+
+/* ---------- 海底 ---------- */
+.floor { margin-top: clamp(100px, 14vw, 180px); position: relative; }
+.floor__decos { position: relative; height: 140px; max-width: 1400px; margin: 0 auto; overflow: hidden; }
+.floor__decos img { position: absolute; bottom: -3px; image-rendering: pixelated; height: auto; transform-origin: bottom; }
+.floor__decos img.sway { animation: sway 3s steps(3) infinite alternate; }
+@keyframes sway { from { transform: skewX(-3deg); } to { transform: skewX(3deg); } }
+.floor__sand { background:
+  radial-gradient(3px 3px at 20% 30%, #C8A96A 50%, transparent 51%),
+  radial-gradient(3px 3px at 60% 60%, #E8D49A 50%, transparent 51%),
+  radial-gradient(3px 3px at 80% 20%, #C8A96A 50%, transparent 51%),
+  #D8BE7E; background-size: 60px 36px; color: var(--abyss); padding: 28px var(--gutter) 36px; border-top: 6px solid #E8D49A; }
+.floor__line { margin: 0; font-size: 18px; text-align: center; }
+.floor__line a, .floor__small a { color: var(--abyss); }
+.floor__small { margin: 10px 0 0; font-size: 12px; text-align: center; color: #5A4A2A; }
+
+/* ---------- 画面の幅に合わせる ---------- */
+@media (max-width: 960px) {
+  .nav__links { display: none; }
+  .steps { grid-template-columns: 1fr; gap: 12px; }
+  .step__arrow { transform: rotate(90deg); animation: none; }
+  .lab { grid-template-columns: 1fr; }
+  .bento { grid-template-columns: 1fr 1fr; }
+  .card--wide { grid-column: 1 / -1; }
+  .promises, .install { grid-template-columns: 1fr; }
+  .depth { display: none; }
+}
+@media (max-width: 720px) {
+  .hero { height: auto; min-height: 0; padding: 84px 0 0; display: flex; flex-direction: column; }
+  .hero__tank { position: relative; height: 56vh; order: 2; }
+  .hero__copy { position: relative; transform: none; left: auto; top: auto; margin: 0 16px 16px; max-width: none; padding: 18px; order: 1; }
+  .hud { top: calc(84px + var(--copy-h, 0px)); }
+  .term { position: relative; right: auto; bottom: auto; width: auto; margin: 16px; order: 3; }
+  .hero__hint { display: none; }
+  .bento { grid-template-columns: 1fr; }
+  .card--wide { flex-direction: column; }
+  .dl { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .lab__parents { grid-template-columns: 1fr; }
+  .lab__x { justify-self: center; }
+  .nav { gap: 10px; }
+  .nav__logo span { display: none; }
+}
+@media (max-width: 480px) {
+  .chip [data-i18n] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .nav__tools .btn--small { font-size: 13px; }
+}
+
+/* 動きを減らす設定のとき */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
