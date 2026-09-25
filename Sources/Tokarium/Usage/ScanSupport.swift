@@ -19,10 +19,12 @@ final class ScanContext {
     func record(source: SourceInfo, key: String?, date: Date?, tokens: TokenBreakdown) -> Bool {
         // 時刻が不明な記録は付与しない（開始前の利用を含めないため）
         guard let date, date >= ledger.startDate else { return false }
+        // 整理済みの期間の記録は数えない（整理したIDで二重に数えないため）
+        if let pruned = ledger.prunedBefore, date < pruned { return false }
         guard !tokens.isEmpty else { return false }
         if let key {
-            guard !ledger.seenKeys.contains(key) else { return false }
-            ledger.seenKeys.insert(key)
+            guard ledger.seen[key] == nil else { return false }
+            ledger.seen[key] = date
         }
         var totals = ledger.sources[source.id] ?? SourceTotals()
         totals.tokens = totals.tokens + tokens

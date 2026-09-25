@@ -12,6 +12,8 @@ struct AquariumView: View {
     /// 魚をクリックした場所（操作メニューを出す位置）。
     @Binding var selectedPoint: CGPoint?
     @State private var hoverPoint: CGPoint?
+    /// 窓が完全に隠れているときは動かさない（省電力）。
+    @State private var windowVisible = true
 
     /// 魚は泳いで動くので、カーソルが止まっていても定期的に判定し直す。
     private let hoverTimer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
@@ -36,7 +38,8 @@ struct AquariumView: View {
                 Canvas { ctx, size in
                     style.drawBackground(&ctx, size: size, tank: tank)
                 }
-                TimelineView(.animation(minimumInterval: 1.0 / Double(max(5, store.settings.fps)))) { timeline in
+                TimelineView(.animation(minimumInterval: 1.0 / Double(max(5, store.effectiveFPS)),
+                                        paused: store.settings.autoPowerSaving && !windowVisible)) { timeline in
                     Canvas { ctx, size in
                         let ambient = store.settings.timeOfDay ? Ambient.at(timeline.date) : .day
                         store.engine.aspect = size.height > 0 ? size.width / size.height : 1.6
@@ -52,6 +55,7 @@ struct AquariumView: View {
                     layoutHandles(size: size, tank: tank, style: style)
                 }
             }
+            .background(WindowVisibilityReader(isVisible: $windowVisible))
             .contentShape(Rectangle())
             .onTapGesture(coordinateSpace: .local) { point in
                 guard interactive else { return }

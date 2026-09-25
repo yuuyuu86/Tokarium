@@ -133,7 +133,7 @@ private struct MenuBarPanel: View {
 
             HStack(spacing: 6) {
                 Button { store.feed() } label: { Label("餌（\(store.state.food)）", systemImage: "leaf.fill") }
-                    .disabled(store.state.food == 0)
+                    .disabled(!store.canFeed)
                 Button { store.changeWater() } label: { Label("水換え", systemImage: "drop.triangle.fill") }
                 Spacer()
                 Button {

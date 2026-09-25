@@ -545,3 +545,65 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
     try ClaudeCodeReader().scan(ctx)
     #expect(ctx.ledger.claudeLimitResetAt == Date(timeIntervalSince1970: 1790000000))
 }
+
+// MARK: - 仕上げ（整理・救済・省電力）
+
+@Test func ledgerPrunesOldKeysAndIgnoresPrunedPeriod() {
+    let start = Date(timeIntervalSince1970: 0)
+    var ledger = UsageLedger(startDate: start)
+    let now = start.addingTimeInterval(100 * 86400)
+    ledger.seen = ["old": start.addingTimeInterval(10 * 86400), "new": now.addingTimeInterval(-86400)]
+    ledger.files = ["/gone": FileState(offset: 1, size: 1, modified: now)]
+    ledger.pruneIfNeeded(now: now, fileExists: { _ in false })
+    #expect(ledger.seen.keys.sorted() == ["new"])
+    #expect(ledger.files.isEmpty)
+    #expect(ledger.prunedBefore == now.addingTimeInterval(-UsageLedger.retentionDays * 86400))
+
+    // 整理した期間の記録は、IDが消えていても数えない
+    let ctx = ScanContext(ledger: ledger, includeEstimated: false)
+    #expect(!ctx.record(source: ClaudeCodeReader().info, key: "old", date: start.addingTimeInterval(10 * 86400), tokens: TokenBreakdown(output: 10)))
+    #expect(ctx.record(source: ClaudeCodeReader().info, key: "fresh", date: now, tokens: TokenBreakdown(output: 10)))
+
+    // 1日に1回まで
+    var again = ctx.ledger
+    again.seen["x"] = start
+    again.pruneIfNeeded(now: now.addingTimeInterval(3600), fileExists: { _ in true })
+    #expect(again.seen["x"] != nil)
+}
+
+@Test func legacySeenKeysAreMigrated() throws {
+    let json = #"{"startDate":0,"seenKeys":["a","b"],"files":{},"codexSessionTotals":{},"ollamaLastRowID":0,"sources":{},"quotas":{}}"#
+    let ledger = try JSONDecoder.tokarium.decode(UsageLedger.self, from: Data(json.utf8))
+    #expect(Set(ledger.seen.keys) == ["a", "b"])
+}
+
+@MainActor
+@Test func rescueFoodOncePerDayWhenBroke() throws {
+    let store = GameStore(directory: try tempHome())
+    // 餌を使い切り、コインも使い切る
+    for _ in 0..<Catalog.initialFood { store.feed() }
+    #expect(store.state.food == 0)
+    while store.coins >= Catalog.medicinePrice { _ = store.buyMedicine() }
+    let cheapest = Catalog.foodPacks.map(\.price).min()!
+    if store.coins >= cheapest { #expect(store.rescueFoodAvailable == false); return }
+    #expect(store.rescueFoodAvailable)
+    #expect(store.canFeed)
+    let feedings = store.state.stats.feedings
+    store.feed()
+    #expect(store.state.stats.feedings == feedings + 1)
+    #expect(!store.rescueFoodAvailable)
+    #expect(!store.canFeed)
+}
+
+@MainActor
+@Test func powerSavingLowersFrameRate() {
+    let power = PowerMonitor()
+    #expect(power.fps(base: 60, auto: false) == 60)
+    #expect(power.fps(base: 60, auto: true) <= 60)
+}
+
+@Test func tutorialHiddenForExistingPlayers() throws {
+    let json = #"{"onboarded":true}"#
+    #expect(try JSONDecoder.tokarium.decode(AppSettings.self, from: Data(json.utf8)).tutorialDone)
+    #expect(!AppSettings().tutorialDone)
+}

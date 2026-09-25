@@ -319,6 +319,10 @@ struct SettingsScreen: View {
                     Text("デスクトップ表示は、Macの壁紙を変えずに壁紙の上へ水槽を重ねます。デスクトップのアイコンはそのまま使えます。お世話はこのウィンドウかメニューバーから行います。")
                         .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                 }
+                Toggle("省電力（窓が隠れているときは止め、バッテリーや低電力モードでは控えめに）", isOn: $store.settings.autoPowerSaving)
+                if store.settings.autoPowerSaving {
+                    Text("\(store.power.statusText)・いまは \(store.effectiveFPS) fps").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                }
                 PixelChoice(title: "アニメーション", selection: $store.settings.fps,
                             options: [(60, String(localized: "なめらか（60fps）")), (30, String(localized: "標準（30fps）")), (15, String(localized: "省電力（15fps）"))])
             }
@@ -358,6 +362,10 @@ struct SettingsScreen: View {
             }
             PixelSection("アップデートとサポート") {
                 UpdateSettings()
+                Button("チュートリアルをもう一度見る") {
+                    store.settings.tutorialDone = false
+                    store.toast = String(localized: "水槽の画面に戻ると、案内が始まります")
+                }
                 Button("不具合を報告…") { store.bugReport = BugReportRequest() }
                 Button("ログをFinderで表示") { NSWorkspace.shared.activateFileViewerSelecting([AppLog.file]) }
                 Text("不具合の報告は、内容を確認してからブラウザやメールで送ります。自動では送信しません。")

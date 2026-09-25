@@ -36,6 +36,10 @@ struct AppSettings: Codable, Equatable {
     var iCloudSync = false
     /// この Mac の識別子（同期でどの Mac が保存したかを見分ける）。
     var machineID = UUID().uuidString
+    /// バッテリーや低電力モードのとき、自動で動きを控えめにする。
+    var autoPowerSaving = true
+    /// 初回のチュートリアルを見終わった。
+    var tutorialDone = false
 
     init() {}
 
@@ -56,6 +60,9 @@ struct AppSettings: Codable, Equatable {
         reminderTimes = try c.decodeIfPresent([Int].self, forKey: .reminderTimes) ?? d.reminderTimes
         iCloudSync = try c.decodeIfPresent(Bool.self, forKey: .iCloudSync) ?? d.iCloudSync
         machineID = try c.decodeIfPresent(String.self, forKey: .machineID) ?? d.machineID
+        autoPowerSaving = try c.decodeIfPresent(Bool.self, forKey: .autoPowerSaving) ?? d.autoPowerSaving
+        // すでに遊んでいる人にはチュートリアルを出さない
+        tutorialDone = try c.decodeIfPresent(Bool.self, forKey: .tutorialDone) ?? onboarded
     }
 }
 
@@ -84,6 +91,10 @@ final class GameStore {
     var placingDecoration: UUID?
 
     @ObservationIgnored let engine = SwimEngine()
+    let power = PowerMonitor()
+
+    /// 省電力を考えたアニメーションの速さ。
+    var effectiveFPS: Int { power.fps(base: settings.fps, auto: settings.autoPowerSaving) }
     @ObservationIgnored fileprivate let scanner: UsageScanner
     @ObservationIgnored let dir: URL
     @ObservationIgnored private var timers: [Timer] = []
@@ -227,8 +238,22 @@ final class GameStore {
 
     // MARK: お世話
 
+    /// コインも餌もないときの救済: 1日1回分だけ無料で餌をあげられる。
+    var rescueFoodAvailable: Bool {
+        let cheapest = Catalog.foodPacks.map(\.price).min() ?? 0
+        return state.food == 0 && coins < cheapest && state.lastRescueDay != DayKey.key(Date()) && !livingFish.isEmpty
+    }
+
+    /// 餌やりができるか（餌があるか、救済の餌が使えるか）。
+    var canFeed: Bool { state.food > 0 || rescueFoodAvailable }
+
     /// 餌を1つ使う。なければ知らせて false。
     private func useFood() -> Bool {
+        if state.food == 0 && rescueFoodAvailable {
+            state.lastRescueDay = DayKey.key(Date())
+            toast = String(localized: "コインも餌もないので、今日の1回分は無料であげました。AIを使うとコインが貯まります")
+            return true
+        }
         guard state.food > 0 else {
             toast = String(localized: "餌がありません。お店で買えます")
             return false

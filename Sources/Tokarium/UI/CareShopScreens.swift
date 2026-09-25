@@ -14,7 +14,7 @@ struct CareScreen: View {
                                 word: WaterCondition(store.state.tank.waterQuality).label)
                         HStack(spacing: 12) {
                             Button { store.feed() } label: { Label("餌をあげる", systemImage: "leaf") }
-                                .disabled(store.state.food == 0)
+                                .disabled(!store.canFeed)
                             Button { store.changeWater() } label: { Label("水換え", systemImage: "drop.triangle") }
                         }
                         .controlSize(.large)

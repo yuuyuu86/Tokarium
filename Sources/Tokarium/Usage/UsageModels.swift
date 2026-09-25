@@ -114,7 +114,13 @@ struct FileState: Codable, Equatable {
 /// 保存するのは件数・時刻・取得元・重複判定用ID・トークン数のみ。
 struct UsageLedger: Codable {
     var startDate: Date
-    var seenKeys: Set<String> = []
+    /// 重複判定用のID → その記録の日時（古いものは定期的に整理する）。
+    var seen: [String: Date] = [:]
+    /// ここより古い記録は整理済みなので数えない（整理したIDで二重に数えないため）。
+    var prunedBefore: Date?
+    var lastPrunedAt: Date?
+    /// Codex: セッションごとの最後の記録日時（整理に使う）。
+    var codexSessionUpdated: [String: Date] = [:]
     var files: [String: FileState] = [:]
     /// Codex: セッションごとに最後に見た累計トークン（重み付き前の内訳）。
     var codexSessionTotals: [String: TokenBreakdown] = [:]
@@ -133,7 +139,16 @@ struct UsageLedger: Codable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         startDate = try c.decode(Date.self, forKey: .startDate)
-        seenKeys = try c.decodeIfPresent(Set<String>.self, forKey: .seenKeys) ?? []
+        seen = try c.decodeIfPresent([String: Date].self, forKey: .seen) ?? [:]
+        // 以前の形式（日時なし）は、読み込んだ時点の日時で引き継ぐ
+        struct Legacy: Decodable { var seenKeys: Set<String>? }
+        if seen.isEmpty, let old = try? Legacy(from: decoder).seenKeys {
+            let now = Date()
+            for k in old { seen[k] = now }
+        }
+        prunedBefore = try c.decodeIfPresent(Date.self, forKey: .prunedBefore)
+        lastPrunedAt = try c.decodeIfPresent(Date.self, forKey: .lastPrunedAt)
+        codexSessionUpdated = try c.decodeIfPresent([String: Date].self, forKey: .codexSessionUpdated) ?? [:]
         files = try c.decodeIfPresent([String: FileState].self, forKey: .files) ?? [:]
         codexSessionTotals = try c.decodeIfPresent([String: TokenBreakdown].self, forKey: .codexSessionTotals) ?? [:]
         ollamaLastRowID = try c.decodeIfPresent(Int64.self, forKey: .ollamaLastRowID) ?? 0
@@ -142,6 +157,25 @@ struct UsageLedger: Codable {
         daily = try c.decodeIfPresent([String: [String: Double]].self, forKey: .daily) ?? [:]
         claudeRecent = try c.decodeIfPresent([String: RecentUse].self, forKey: .claudeRecent) ?? [:]
         claudeLimitResetAt = try c.decodeIfPresent(Date.self, forKey: .claudeLimitResetAt)
+    }
+
+    /// 記録を残す日数。
+    static let retentionDays: Double = 60
+
+    /// 古い重複判定用のIDや読み取り位置を整理する（1日1回まで）。
+    mutating func pruneIfNeeded(now: Date = Date(), fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) {
+        if let last = lastPrunedAt, now.timeIntervalSince(last) < 86400 { return }
+        lastPrunedAt = now
+        let cutoff = now.addingTimeInterval(-Self.retentionDays * 86400)
+        guard cutoff > startDate else { return }
+        prunedBefore = max(prunedBefore ?? cutoff, cutoff)
+        seen = seen.filter { $0.value >= cutoff }
+        files = files.filter { fileExists($0.key) && $0.value.modified >= cutoff }
+        let staleSessions = Set(codexSessionUpdated.filter { $0.value < cutoff }.keys)
+        codexSessionUpdated = codexSessionUpdated.filter { !staleSessions.contains($0.key) }
+        codexSessionTotals = codexSessionTotals.filter { !staleSessions.contains($0.key) }
+        let cutoffDay = DayKey.key(now.addingTimeInterval(-400 * 86400))
+        daily = daily.filter { $0.key >= cutoffDay }
     }
 
     /// その日にAIで得たコイン。

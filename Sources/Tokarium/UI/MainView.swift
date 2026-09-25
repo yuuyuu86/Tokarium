@@ -34,6 +34,7 @@ struct MainView: View {
     @State private var hovered: UUID?
     @State private var editing = false
     @State private var windowSize = CGSize(width: 1080, height: 700)
+    @State private var tutorialStep = 0
 
     var body: some View {
         ZStack {
@@ -76,6 +77,14 @@ struct MainView: View {
             }
         }
         .overlay(alignment: .bottom) { ToastView().padding(.bottom, 72) }
+        .overlayPreferenceValue(TutorialAnchorKey.self) { anchors in
+            if showTutorial {
+                TutorialOverlay(anchors: anchors, step: $tutorialStep) {
+                    store.settings.tutorialDone = true
+                    tutorialStep = 0
+                }
+            }
+        }
         .font(.pixel(.body))
         .foregroundStyle(PixelPalette.text)
         .tint(PixelPalette.gold)
@@ -88,6 +97,10 @@ struct MainView: View {
             BugReportView(crash: req.crash).modifier(PixelSheet())
         }
         .frame(minWidth: 820, minHeight: 560)
+    }
+
+    private var showTutorial: Bool {
+        store.settings.onboarded && !store.settings.tutorialDone && screen == .tank && store.bugReport == nil
     }
 
     /// クリックした魚の操作メニュー。クリックした場所の近くに出す。
@@ -179,6 +192,7 @@ private struct TopHUD: View {
             }
             .help("AIを使うと増えます")
             .accessibilityLabel("コイン \(store.coins)")
+            .tutorialAnchor("coins")
         }
         // 左上の信号ボタンをよける
         .padding(.leading, 84)
@@ -330,6 +344,7 @@ private struct BottomBar: View {
                     .fixedSize()
                 }
                 .buttonStyle(PixelButtonStyle(prominent: screen == s))
+                .tutorialAnchor(s.rawValue)
                 .help(s.title)
                 .accessibilityLabel(s.title)
                 .accessibilityAddTraits(screen == s ? .isSelected : [])
@@ -343,8 +358,9 @@ private struct BottomBar: View {
                 .fixedSize()
             }
             .buttonStyle(.pixel)
-            .disabled(store.state.food == 0)
-            .help(store.state.food == 0 ? "餌がありません。お店で買えます" : "水槽の魚みんなに餌をあげます（餌を1つ使います）")
+            .tutorialAnchor("feed")
+            .disabled(!store.canFeed)
+            .help(!store.canFeed ? "餌がありません。お店で買えます" : store.state.food == 0 ? "コインも餌もないので、今日の1回分は無料です" : "水槽の魚みんなに餌をあげます（餌を1つ使います）")
             .accessibilityLabel("餌をあげる")
             Button { store.changeWater() } label: {
                 HStack(spacing: 6) {
@@ -354,6 +370,7 @@ private struct BottomBar: View {
                 .fixedSize()
             }
             .buttonStyle(.pixel)
+            .tutorialAnchor("water")
             .help("水換え")
             .accessibilityLabel("水換え")
             if screen == .tank {
@@ -424,7 +441,7 @@ private struct FishActionMenu: View {
             }
             if fish.isAlive {
                 action("餌をあげる（残り \(store.state.food)）", "leaf.fill") { store.feed(fish: fish.id) }
-                    .disabled(store.state.food == 0)
+                    .disabled(!store.canFeed)
                 if fish.isSick {
                     action("薬をあげる（残り \(store.state.medicine)）", "cross.case.fill") { store.giveMedicine(fish.id) }
                         .disabled(store.state.medicine == 0)

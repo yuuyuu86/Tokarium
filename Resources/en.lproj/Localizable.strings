@@ -31,6 +31,7 @@
 "%@を置く場所をクリックしてください" = "Click where you want to put the %@";
 "%@を読み取る" = "Read %@";
 "%@・%@・%lld日齢" = "%@ · %@ · %lld days old";
+"%@・いまは %lld fps" = "%@ · now %lld fps";
 "%@（%@）にお店に並びます" = "Sold during %@ (%@)";
 "%@（%lld）" = "%@ (%lld)";
 "%@：ドラッグで移動、右クリックで奥/手前・しまう" = "%@: drag to move, right-click to change depth or put away";
@@ -46,6 +47,7 @@
 "%lld時間の枠" = "%lld-hour window";
 "+30分" = "+30 min";
 "15種類の魚を迎えた" = "Welcomed 15 kinds of fish";
+"1日1〜2回が目安です。餌はお店で買えます（はじめに20回分あります）。" = "Aim for once or twice a day. You can buy food at the Shop (you start with 20 servings).";
 "1日に %lld コイン以上得ると、水槽に宝箱が流れてきます。" = "Earn %lld or more coins in a day and a treasure chest drifts into your tank.";
 "1週間の枠" = "Weekly window";
 "30日" = "30 days";
@@ -65,6 +67,7 @@
 "AIの利用で %lld コイン増えました" = "You earned %lld coins from AI usage";
 "AIの利用で1000コインを得た" = "Earned 1,000 coins from AI usage";
 "AIを使うと、このMacに残る利用記録からコインが貯まります。コインで魚や装飾を買えます。" = "As you use AI, the usage records on this Mac turn into coins. Spend them on fish and decorations.";
+"AIを使うと、このMacの利用記録からコインが貯まります。1万トークン（重み付き）で1コインです。" = "Using AI earns coins from the usage records on this Mac. Every 10,000 weighted tokens make 1 coin.";
 "AIを使うと増えます" = "Earn more by using AI";
 "AI利用記録" = "AI usage records";
 "AI利用記録を今すぐ読み取る" = "Read AI usage now";
@@ -84,6 +87,7 @@
 "Gemini CLI・OpenCode・Copilot CLI・Ollama は、利用枠の情報がMac内に残らないため表示できません。" = "Gemini CLI, OpenCode, Copilot CLI, and Ollama don’t leave usage-limit data on your Mac, so it can’t be shown.";
 "Gemini や Qwen をたくさん使った記念の魚。青から紫へ。" = "A commemorative fish for heavy Gemini or Qwen use, blue fading to purple.";
 "GitHub で報告…" = "Report on GitHub…";
+"Mac が熱くなっているので、動きを控えめにしています" = "Your Mac is running hot, so animation is reduced";
 "Mac のスクリーンセーバーとして、あなたの水槽が泳ぎます。水槽の中身は数分おきに新しくなります。" = "Your tank swims as your Mac’s screen saver. Its contents update every few minutes.";
 "Mac を買いかえたときなどに、水槽・図鑑・実績・コインの記録をまとめて移せます。" = "Move your tank, encyclopedia, achievements, and coin records together, for example when you get a new Mac.";
 "Macを閉じている間も時間は進みますが、反映するのは最大48時間分で、それだけで死ぬことはありません。" = "Time passes while your Mac is closed, but at most 48 hours are applied, and that alone will never kill a fish.";
@@ -96,6 +100,7 @@
 "Tokarium" = "Tokarium";
 "Tokarium のアップデートで対応します。水槽はそのまま遊べます。" = "A Tokarium update will fix this. Your tank still works normally.";
 "Tokarium へようこそ" = "Welcome to Tokarium";
+"Tokarium へようこそ！" = "Welcome to Tokarium!";
 "Tokarium を終了" = "Quit Tokarium";
 "[クラッシュ] Tokarium が予期せず終了した" = "[Crash] Tokarium quit unexpectedly";
 "[不具合] " = "[Bug] ";
@@ -173,6 +178,7 @@
 "とげとげのひれが華やか。" = "Showy, spiky fins.";
 "とてもよごれている（魚が弱ります）" = "Very dirty (fish are weakening)";
 "どっしりした石。" = "A solid, sturdy stone.";
+"どのAIでどれだけコインを得たかや、利用枠の目安を確かめられます。" = "See how many coins each AI earned you and roughly how much of your usage limits you’ve used.";
 "なめらか（60fps）" = "Smooth (60 fps)";
 "にぎやかな水槽" = "A Lively Tank";
 "にぎやかな水槽のあかし。" = "Proof of a lively tank.";
@@ -225,9 +231,13 @@
 "クリスマスツリー" = "Christmas tree";
 "クーリーローチ" = "Kuhli loach";
 "グッピー" = "Guppy";
+"コイン" = "Coins";
 "コイン %lld" = "%lld coins";
 "コインが足りません" = "Not enough coins";
+"コインで魚・装飾・餌・設備を買えます。装飾は買ったあと、水槽で置き場所を選びます。" = "Spend coins on fish, decorations, food, and equipment. After buying a decoration, you choose where it goes in the tank.";
 "コインになるのは、いまから後の利用だけです。これまでの利用は含みません。" = "Only usage from now on becomes coins. Past usage isn’t counted.";
+"コインも餌もないので、今日の1回分は無料であげました。AIを使うとコインが貯まります" = "You’re out of coins and food, so today’s feeding was free. Use AI to earn more coins";
+"コインも餌もないので、今日の1回分は無料です" = "Out of coins and food, so today’s feeding is free";
 "コイン付与の開始" = "Coins counted since";
 "コイン換算: %@" = "In coins: %@";
 "コピーしました" = "Copied";
@@ -242,6 +252,7 @@
 "システム設定 ＞ プライバシーとセキュリティ ＞ フルディスクアクセス で Tokarium を許可してください。" = "Allow Tokarium in System Settings > Privacy & Security > Full Disk Access.";
 "シルバーアロワナ" = "Silver arowana";
 "スイレン" = "Water lily";
+"スキップ" = "Skip";
 "スクリーンセーバー" = "Screen Saver";
 "スクリーンセーバーを入れました。設定で「Tokarium」を選んでください" = "Screen saver installed. Choose “Tokarium” in Settings";
 "スクリーンセーバーを入れられませんでした: %@" = "Couldn’t install the screen saver: %@";
@@ -258,6 +269,7 @@
 "ターミナルグッピー（Codex 記念）" = "Terminal guppy (Codex)";
 "チャットのトークン数はMac内に残りません。Claude デスクトップの Cowork と Code は対応しています。" = "Chat token counts aren’t stored on your Mac. Cowork and Code in Claude desktop are supported.";
 "チャット履歴の文字数・時刻・行番号のみ（本文は保存しません）。4文字＝1トークンとして推定" = "Only character counts, times, and row numbers from chat history (text isn’t stored). Estimated at 4 characters = 1 token";
+"チュートリアルをもう一度見る" = "Show Tutorial Again";
 "チューブサンゴ" = "Tube coral";
 "チョウチョウウオ" = "Butterflyfish";
 "ツインスター（Gemini 記念）" = "Twin star (Gemini)";
@@ -266,6 +278,7 @@
 "デスクトップ表示" = "Desktop";
 "デスクトップ表示は、Macの壁紙を変えずに壁紙の上へ水槽を重ねます。デスクトップのアイコンはそのまま使えます。お世話はこのウィンドウかメニューバーから行います。" = "Desktop mode layers the tank over your wallpaper without changing it. Desktop icons keep working. Care for your fish from this window or the menu bar.";
 "デスクトップ表示へ" = "To Desktop Mode";
+"デスクトップ表示・リマインド・スクリーンセーバーはここから。魚たちをよろしくお願いします！" = "Desktop mode, reminders, and the screen saver are all here. Please take good care of your fish!";
 "データ" = "Data";
 "データベースを開けませんでした（%d）" = "Couldn’t open the database (%d)";
 "トークン数がMac内に記録されないため読み取れません。" = "Token counts aren’t recorded on your Mac, so they can’t be read.";
@@ -285,6 +298,7 @@
 "バックアップと同期" = "Backup & Sync";
 "バックアップを書き出しました" = "Backup saved";
 "バックアップを書き出す…" = "Export Backup…";
+"バッテリーで動いているので、動きを控えめにしています" = "Running on battery, so animation is reduced";
 "バランスよく積んだ石。" = "Carefully balanced stones.";
 "バリスネリア" = "Vallisneria";
 "バージョン" = "Version";
@@ -328,6 +342,7 @@
 "付与開始後の利用記録はまだありません。" = "No usage recorded since coins started counting.";
 "会話データが暗号化されて保存され、トークン数も記録されないため読み取れません。" = "Conversations are stored encrypted and token counts aren’t recorded, so they can’t be read.";
 "会話記録（JSONL）のうち、応答ごとのトークン数・時刻・応答IDのみ" = "From conversation logs (JSONL): only per-response token counts, times, and response IDs";
+"低電力モードなので、動きを控えめにしています" = "Low Power Mode is on, so animation is reduced";
 "体調" = "Health";
 "何をしていたときに起きましたか？" = "What were you doing when it happened?";
 "保存するのは水槽・魚・装飾・コイン、利用記録の件数・時刻・取得元・重複判定用のID・トークン数だけです。AIとの会話本文・APIキー・Cookieは保存しません。" = "Tokarium stores only your tank, fish, decorations, and coins, plus record counts, times, sources, de-duplication IDs, and token counts. It never stores AI conversations, API keys, or cookies.";
@@ -356,6 +371,7 @@
 "名前" = "Name";
 "名前を変える" = "Rename";
 "図鑑" = "Encyclopedia";
+"図鑑と実績" = "Encyclopedia & Achievements";
 "図鑑コンプリート" = "Encyclopedia Complete";
 "図鑑コンプリートのあかし。" = "Proof of a complete encyclopedia.";
 "場所: %@" = "Location: %@";
@@ -440,6 +456,7 @@
 "気が強い" = "Feisty";
 "水の中の小さな神社。" = "A little shrine under the water.";
 "水の汚れる速さが半分になります。" = "Water gets dirty half as fast.";
+"水は少しずつ汚れます。数日に1回換えないと、魚が病気になりやすくなります。" = "Water slowly gets dirty. Change it every few days, or your fish may get sick.";
 "水をきれいにしました" = "The water is clean again";
 "水ヨーヨー" = "Water balloon yo-yo";
 "水換え" = "Change Water";
@@ -456,6 +473,7 @@
 "水槽の主役になるお城。" = "A castle to be the star of your tank.";
 "水槽の写真を撮る（操作パネルは写りません）" = "Take a photo of the tank (controls aren’t included)";
 "水槽の演出" = "Tank Effects";
+"水槽の画面に戻ると、案内が始まります" = "The tour starts when you return to the tank";
 "水槽の表示方法" = "How to show your tank";
 "水槽の魚 %lld/%lld 匹" = "Fish in tank: %lld/%lld";
 "水槽の魚たちが待っています。" = "Your fish are waiting.";
@@ -489,6 +507,7 @@
 "目のさめるような瑠璃色。" = "A dazzling lapis blue.";
 "相性注意: %@" = "Doesn’t get along with: %@";
 "省電力（15fps）" = "Power saving (15 fps)";
+"省電力（窓が隠れているときは止め、バッテリーや低電力モードでは控えめに）" = "Save power (pause when hidden, slow down on battery or in Low Power Mode)";
 "真っ赤な鼻先がトレードマーク。" = "Known for its bright red nose.";
 "石・流木" = "Stones & Wood";
 "石積み" = "Stone stack";
@@ -556,6 +575,7 @@
 "起きたこと" = "What happened";
 "起動" = "Startup";
 "迎えた %lld・生まれた %lld" = "Welcomed %lld · born %lld";
+"迎えた魚が記録されます。実績を達成すると、限定の装飾がもらえます。" = "Every fish you welcome is recorded. Unlocking achievements earns limited decorations.";
 "送るのはアプリの版、macOSの版、設定、水槽の数、エラーの内容だけです。AIとの会話本文やファイルの中身は含みません。送る前にブラウザやメールで内容を確認・編集できます。" = "Only the app and macOS versions, your settings, tank counts, and error details are included, never AI conversations or file contents. You can review and edit everything in your browser or email before sending.";
 "送る内容を確認する" = "Review what will be sent";
 "通知がオフになっています。「起動」の通知をオンにしてください。" = "Notifications are off. Turn them on under Startup.";
@@ -573,6 +593,7 @@
 "閉じる" = "Close";
 "開く" = "Open";
 "離れていた間の %@ を水槽に反映しました。" = "Applied %@ of time that passed while you were away.";
+"電源につながっています（設定どおりの速さ）" = "Plugged in (full speed)";
 "青いしまで元気いっぱい。" = "Full of energy, with blue stripes.";
 "青い体に黒いもよう。" = "A blue body with black markings.";
 "青い石" = "Blue stone";
@@ -586,6 +607,7 @@
 "餌がなくなりました" = "You’re out of food";
 "餌が残り %lld 回分です" = "Only %lld servings of food left";
 "餌は1日1〜2回、水換えは数日に1回が目安です。あげすぎると水が汚れます。汚れた水が続くと病気になりやすくなります。" = "Feed once or twice a day and change the water every few days. Overfeeding dirties the water, and dirty water makes fish more likely to get sick.";
+"餌やり" = "Feeding";
 "餌やり1回で1つ使います。" = "Each feeding uses 1 serving.";
 "餌やり1回で1つ使います。お店で買えます" = "Each feeding uses 1 serving. Buy more at the Shop.";
 "餌やりと水換えをしてあげてください。" = "Please feed them and change the water.";
@@ -607,6 +629,7 @@
 "魚が危険なときに通知する" = "Notify me when a fish is in danger";
 "魚が寿命まで生きた" = "A fish lived out its full lifespan";
 "魚たち" = "Your Fish";
+"魚にカーソルを重ねるとようすが、クリックすると餌やりなどのメニューが出ます。水をクリックすると魚が寄ってきます。" = "Hover over a fish to see how it’s doing, or click it for feeding and more. Click the water and fish will swim over.";
 "魚に餌をあげた" = "Fed your fish";
 "魚博士" = "Fish Scholar";
 "魚博士へのごほうび。" = "A reward for a fish scholar.";

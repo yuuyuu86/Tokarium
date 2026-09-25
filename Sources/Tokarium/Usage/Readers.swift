@@ -175,6 +175,7 @@ struct CodexReader: UsageReader {
         guard let info = payload["info"] as? [String: Any],
               let totalDict = info["total_token_usage"] as? [String: Any] else { return }
         let total = Self.breakdown(totalDict)
+        if let date { ctx.ledger.codexSessionUpdated[sessionID] = max(ctx.ledger.codexSessionUpdated[sessionID] ?? date, date) }
         let baseline = ctx.ledger.codexSessionTotals[sessionID] ?? TokenBreakdown()
         ctx.ledger.codexSessionTotals[sessionID] = TokenBreakdown(
             input: max(total.input, baseline.input), output: max(total.output, baseline.output),
