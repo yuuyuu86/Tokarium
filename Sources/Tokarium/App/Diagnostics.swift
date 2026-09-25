@@ -3,7 +3,15 @@ import Foundation
 
 /// アプリのログ。`~/Library/Logs/Tokarium/tokarium.log` に書く。会話本文などは書かない。
 enum AppLog {
-    static let directory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/Tokarium", isDirectory: true)
+    /// テストや動作確認（TOKARIUM_DATA_DIR）のときは、本物のログを汚さないよう別の場所に書く。
+    static let directory: URL = {
+        if let dir = ProcessInfo.processInfo.environment["TOKARIUM_DATA_DIR"] {
+            return URL(fileURLWithPath: dir).appendingPathComponent("Logs", isDirectory: true)
+        }
+        if isTesting { return FileManager.default.temporaryDirectory.appendingPathComponent("TokariumTestLogs", isDirectory: true) }
+        return FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/Tokarium", isDirectory: true)
+    }()
+    static var isTesting: Bool { NSClassFromString("XCTestCase") != nil || Bundle.main.bundlePath.hasSuffix(".xctest") }
     static var file: URL { directory.appendingPathComponent("tokarium.log") }
     private static let queue = DispatchQueue(label: "tokarium.log")
     private static let formatter: ISO8601DateFormatter = {
