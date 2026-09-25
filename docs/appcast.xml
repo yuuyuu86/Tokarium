@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Tokarium</title>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Fri, 25 Sep 2026 22:32:04 +0900</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/yuuyuu86/Tokarium/releases/download/v0.1.0/Tokarium-0.1.0.dmg" length="11127207" type="application/octet-stream" sparkle:edSignature="ZsF5NQJC0/sIjFODhdKGscALJgPdSex9PRcRbD2iBjRHsL0CLpa5QkIFbXNrpZJEaoy+cc8yHtEmKKgSZmxoAQ=="/>
+        </item>
+    </channel>
+</rss>
