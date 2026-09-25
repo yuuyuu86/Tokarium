@@ -100,9 +100,11 @@ struct Genotype: Codable, Equatable, Hashable {
     var text: String { "\(a.label) × \(b.label)" }
 
     /// お店の魚の遺伝子。たいていは野生型で、ときどき色の遺伝子をかくし持っている。
-    static func forShop<R: RandomNumberGenerator>(rng: inout R) -> Genotype {
+    /// かくし持つ色は、種類ごとの「出やすい色」になりやすい（同じ色の2匹を見つけやすいように）。
+    static func forShop<R: RandomNumberGenerator>(speciesID: String, rng: inout R) -> Genotype {
         guard Double.random(in: 0..<1, using: &rng) < Genetics.shopCarrierChance else { return .wild }
-        return Genotype(a: .wild, b: ColorGene.mutations.randomElement(using: &rng) ?? .gold)
+        let pool = Double.random(in: 0..<1, using: &rng) < Genetics.paletteChance ? Genetics.palette(speciesID) : ColorGene.mutations
+        return Genotype(a: .wild, b: pool.randomElement(using: &rng) ?? .gold)
     }
 }
 
@@ -157,9 +159,17 @@ enum Personality: String, Codable, CaseIterable {
 
 enum Genetics {
     /// お店の魚が色の遺伝子をかくし持っている確率。
-    static let shopCarrierChance = 0.25
+    static let shopCarrierChance = 0.5
+    /// かくし持つ色が、その種類の出やすい色である確率。
+    static let paletteChance = 0.75
+
+    /// 種類ごとの出やすい色（2つ。種類で決まっていて変わらない）。
+    static func palette(_ speciesID: String) -> [ColorGene] {
+        var rng = SeededRandom(seed: ("palette-" + speciesID).stableSeed)
+        return Array(ColorGene.mutations.shuffled(using: &rng).prefix(2))
+    }
     /// 生まれるとき、遺伝子1つが突然変異する確率。
-    static let mutationChance = 0.03
+    static let mutationChance = 0.04
     /// 稚魚が親のどちらかの性格を受け継ぐ確率。
     static let inheritPersonalityChance = 0.5
 
@@ -214,4 +224,33 @@ enum Affection {
 
 extension Int {
     func clamped(_ lo: Int, _ hi: Int) -> Int { Swift.min(hi, Swift.max(lo, self)) }
+}
+
+// MARK: - 今日の入荷
+
+/// お店に毎日2匹並ぶ、品種の魚（単色の品種だけ。組み合わせの品種は繁殖でしか手に入らない）。
+struct StockOffer: Identifiable, Equatable {
+    let id: String
+    let speciesID: String
+    let variant: FishVariant
+
+    var species: FishSpecies { Catalog.species(speciesID) }
+    var price: Int { species.price * 3 + 60 }
+    var name: String { String(localized: "\(variant.label)・\(species.name)") }
+}
+
+enum DailyStock {
+    static let count = 2
+
+    /// その日の入荷。ランクで買える種類の中から、日付で決まった魚が並ぶ。
+    static func offers(on date: Date = Date(), rank: Int) -> [StockOffer] {
+        let day = DayKey.key(date)
+        var rng = SeededRandom(seed: ("stock-" + day).stableSeed)
+        let candidates = Catalog.fish.filter { $0.isRegular && KeeperRank.required($0) <= rank }
+        return candidates.shuffled(using: &rng).prefix(count).enumerated().map { i, sp in
+            let colors = Genetics.palette(sp.id)
+            let gene = colors[Int.random(in: 0..<colors.count, using: &rng)]
+            return StockOffer(id: "\(day):\(i)", speciesID: sp.id, variant: FishVariant(rawValue: gene.rawValue) ?? .gold)
+        }
+    }
 }

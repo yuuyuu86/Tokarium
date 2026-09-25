@@ -152,6 +152,8 @@ private func codexLine(at: Date, input: Int, cached: Int, output: Int) -> String
 @Test func neglectedFishWeakensThenDies() {
     var s = GameState.newGame(now: Date(timeIntervalSince1970: 0))
     s.tank.fish[0].fullness = 100
+    // くいしんぼうは少し早くおなかがすくので、ふつうの性格で確かめる
+    s.tank.fish[0].personality = .calm
     // 起動したまま少しずつ進める（再開扱いにしない）
     var t = Date(timeIntervalSince1970: 0)
     func run(hours: Double) {
@@ -424,10 +426,26 @@ private func careFor(_ s: inout GameState, from start: Date, hours: Int, water: 
 @Test func dailyLedgerRecordsCreditedCoins() {
     let start = Date()
     let ctx = ScanContext(ledger: UsageLedger(startDate: start), includeEstimated: false)
-    ctx.record(source: ClaudeCodeReader().info, key: "a", date: start.addingTimeInterval(1), tokens: TokenBreakdown(output: 20_000))
+    ctx.record(source: ClaudeCodeReader().info, key: "a", date: start.addingTimeInterval(1), tokens: TokenBreakdown(output: 2 * Int64(CurrencyRule.tokensPerCoin)))
     let today = DayKey.key(start.addingTimeInterval(1))
     #expect(ctx.ledger.coins(on: today) == 2)
     #expect(ctx.ledger.coins(from: ["claude-code"]) == 2)
+    #expect(ctx.ledger.coinsEarned == 2)
+}
+
+/// レートを変える前に得たコインは、以前のレートのまま残る。変えたあとの分だけ新しいレートになる。
+@Test func rateChangeKeepsEarlierCoins() throws {
+    let json = #"{"startDate":0,"sources":{"claude-code":{"tokens":{"input":0,"output":1000000,"cacheWrite":0,"cacheRead":0},"records":1,"creditedWeighted":1000000,"uncreditedWeighted":0}},"daily":{"2026-09-25":{"claude-code":1000000}}}"#
+    let old = try JSONDecoder.tokarium.decode(UsageLedger.self, from: Data(json.utf8))
+    let before = Int(1_000_000 / CurrencyRule.legacyTokensPerCoin)
+    #expect(old.coinsEarned == before)
+    #expect(old.coins(on: "2026-09-25") == Double(before))
+    let ctx = ScanContext(ledger: old, includeEstimated: false)
+    ctx.record(source: ClaudeCodeReader().info, key: "new", date: Date(), tokens: TokenBreakdown(output: Int64(CurrencyRule.tokensPerCoin)))
+    #expect(ctx.ledger.coinsEarned == before + 1)
+    // 保存して読み直しても変わらない
+    let again = try JSONDecoder.tokarium.decode(UsageLedger.self, from: JSONEncoder.tokarium.encode(ctx.ledger))
+    #expect(again.coinsEarned == before + 1)
 }
 
 @MainActor

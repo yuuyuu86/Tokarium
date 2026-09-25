@@ -33,7 +33,9 @@ final class ScanContext {
         let credit = source.kind == .measured || (source.kind == .estimated && includeEstimated)
         if credit {
             totals.creditedWeighted += tokens.weighted
+            totals.creditedCoins += tokens.weighted / CurrencyRule.tokensPerCoin
             ledger.daily[DayKey.key(date), default: [:]][source.id, default: 0] += tokens.weighted
+            ledger.dailyCoins[DayKey.key(date), default: [:]][source.id, default: 0] += tokens.weighted / CurrencyRule.tokensPerCoin
         } else {
             totals.uncreditedWeighted += tokens.weighted
         }

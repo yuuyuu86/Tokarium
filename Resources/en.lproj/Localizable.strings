@@ -38,6 +38,8 @@
 "%@を置きました" = "Placed the %@";
 "%@を置く場所をクリックしてください" = "Click where you want to put the %@";
 "%@を読み取る" = "Read %@";
+"%@を里親に出しました。新しいおうちで元気に暮らします" = "%@ went to a new home. It will live happily there";
+"%@を里親に出しますか？" = "Send %@ to a new home?";
 "%@・%@" = "%@ · %@";
 "%@・%@・%lld日齢" = "%@ · %@ · %lld days old";
 "%@・%lld代目・%@" = "%@ · Generation %lld · %@";
@@ -85,7 +87,7 @@
 "AIの利用で1000コインを得た" = "Earned 1,000 coins from AI usage";
 "AIの親友" = "Best Friends with AI";
 "AIを使うと、このMacに残る利用記録からコインが貯まります。コインで魚や装飾を買えます。" = "As you use AI, the usage records on this Mac turn into coins. Spend them on fish and decorations.";
-"AIを使うと、このMacの利用記録からコインが貯まります。1万トークン（重み付き）で1コインです。" = "Using AI earns coins from the usage records on this Mac. Every 10,000 weighted tokens make 1 coin.";
+"AIを使うと、このMacの利用記録からコインが貯まります。5万トークン（重み付き）で1コインです。" = "Using AI earns coins from the usage records on this Mac. 50,000 tokens (weighted) make 1 coin.";
 "AIを使うと増えます" = "Earn more by using AI";
 "AI利用記録" = "AI usage records";
 "AI利用記録を今すぐ読み取る" = "Read AI usage now";
@@ -471,6 +473,7 @@
 "今すぐ自動バックアップを作る" = "Back Up Now";
 "今すぐ読み取る" = "Read Now";
 "今日のお題" = "Today's Quests";
+"今日の入荷（品種の魚）" = "Today's Arrivals (Variety Fish)";
 "今日はAIをたくさん使いました！ 宝箱が流れてきました" = "You used AI a lot today! A treasure chest drifted in";
 "今週のお題" = "This Week's Quests";
 "付与開始後の利用記録はまだありません。" = "No usage recorded since coins started counting.";
@@ -495,6 +498,7 @@
 "再起動すると切り替わります。" = "Takes effect after restarting.";
 "写真を保存しました（ピクチャ/Tokarium）。クリップボードにも入れました" = "Photo saved to Pictures/Tokarium and copied to the clipboard";
 "写真を撮る" = "Take Photo";
+"出やすい色: %@" = "Common colors: %@";
 "利用上限に達しています。%@ごろにリセット" = "Usage limit reached. Resets around %@";
 "利用枠" = "Limit";
 "前回、Tokarium が予期せず終了しました" = "Tokarium quit unexpectedly last time";
@@ -528,6 +532,7 @@
 "図鑑コンプリート" = "Encyclopedia Complete";
 "図鑑コンプリートのあかし。" = "Proof of a complete encyclopedia.";
 "場所: %@" = "Location: %@";
+"売り切れ" = "Sold out";
 "変更" = "Rename";
 "夏祭り" = "Summer Festival";
 "夏祭りのおみやげ。" = "A summer festival souvenir.";
@@ -650,6 +655,8 @@
 "水晶の柱" = "Crystal Pillar";
 "水槽" = "Tank";
 "水槽。魚 %lld 匹。水質は%@。" = "Aquarium. %lld fish. Water: %@.";
+"水槽から出して、場所を空けます" = "Take it out of the tank to make room";
+"水槽から出して、場所を空けます。元には戻せません。" = "This takes it out of the tank to make room. This cannot be undone.";
 "水槽から取り出します。元には戻せません。" = "It will be removed from the tank. This can’t be undone.";
 "水槽がいっぱいです。お店で水槽を大きくできます" = "The tank is full. You can upgrade it in the Shop.";
 "水槽で稚魚が生まれた" = "Fry were born in your tank";
@@ -753,6 +760,7 @@
 "自然な雰囲気の流木。" = "Natural-looking driftwood.";
 "良好" = "Great";
 "色とりどりの小石。" = "Colorful little stones.";
+"色の遺伝子を2つそろえて持つ魚です。毎日0時に入れかわり、1匹ずつしか入荷しません。組み合わせの品種は、繁殖でしか生まれません。" = "These fish carry two matching color genes. They change every day at midnight, and only one of each arrives. Combination varieties can only be bred.";
 "色違い" = "Rare color";
 "色違いの稚魚が生まれました！" = "A rare-colored fry was born!";
 "色違いの魚との出会いの記念。" = "Celebrates meeting a rare-colored fish.";
@@ -820,6 +828,7 @@
 "遺跡の柱と、つぼか岩のアーチ" = "Ruin pillars, plus a pot or rock arch";
 "配置の編集で、右クリックから手前と奥を使い分けましょう。" = "In layout editing, right-click to use both front and back.";
 "配置を編集" = "Edit Layout";
+"里親に出す" = "Send to a new home";
 "野生型" = "Wild";
 "金の貝がら" = "Golden shell";
 "金貨の山" = "Pile of gold coins";

@@ -13,7 +13,7 @@ enum Simulation {
     // 1時間あたりの変化量
     static let fullnessDecayPerHour = 100.0 / 60.0
     static let waterDecayBasePerHour = 0.55
-    static let waterDecayPerFishPerHour = 0.08
+    static let waterDecayPerFishPerHour = 0.05
     static let starvingHealthLossPerHour = 2.0
     static let dirtyWaterHealthLossPerHour = 1.5
     static let sickHealthLossPerHour = 1.2
@@ -25,7 +25,7 @@ enum Simulation {
 
     static let feedAmount = 30.0
     /// 満腹を超えた餌1につき水質がどれだけ下がるか。
-    static let overfeedPollution = 0.15
+    static let overfeedPollution = 0.05
 
     // 成長
     static let growthPerHour = 1.0 / (7 * 24)
@@ -40,9 +40,9 @@ enum Simulation {
     static let medicineHealthBoost = 10.0
 
     // 繁殖
-    static let breedingChancePerHour = 0.012
+    static let breedingChancePerHour = 0.02
     static let breedingCooldown: TimeInterval = 24 * 3600
-    static let breedingWaterThreshold = 60.0
+    static let breedingWaterThreshold = 50.0
 
     // 色違い
     static let shinyChance = 0.03

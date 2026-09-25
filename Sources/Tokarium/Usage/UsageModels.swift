@@ -17,7 +17,10 @@ enum MeasureKind: String, Codable {
 
 /// 通貨換算（確定: 重み付き換算）。
 enum CurrencyRule {
-    static let tokensPerCoin = 10_000.0
+    /// 重み付きトークンいくつで1コインか。
+    static let tokensPerCoin = 50_000.0
+    /// 以前のレート。レートを変える前に得たコインは、このレートのまま残す。
+    static let legacyTokensPerCoin = 10_000.0
     static let inputWeight = 1.0
     static let outputWeight = 1.0
     static let cacheWriteWeight = 0.25
@@ -57,6 +60,22 @@ struct SourceTotals: Codable, Equatable {
     var creditedWeighted: Double = 0
     /// 推定値で通貨に含めなかった重み付きトークン。
     var uncreditedWeighted: Double = 0
+    /// 得たコイン。付与したときのレートで換算して足していく（レートを変えても過去の分は変わらない）。
+    var creditedCoins: Double = 0
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        tokens = try c.decodeIfPresent(TokenBreakdown.self, forKey: .tokens) ?? TokenBreakdown()
+        records = try c.decodeIfPresent(Int.self, forKey: .records) ?? 0
+        lastRecordAt = try c.decodeIfPresent(Date.self, forKey: .lastRecordAt)
+        creditedWeighted = try c.decodeIfPresent(Double.self, forKey: .creditedWeighted) ?? 0
+        uncreditedWeighted = try c.decodeIfPresent(Double.self, forKey: .uncreditedWeighted) ?? 0
+        // レートを変える前のデータは、以前のレートで換算した分を引き継ぐ
+        creditedCoins = try c.decodeIfPresent(Double.self, forKey: .creditedCoins)
+            ?? creditedWeighted / CurrencyRule.legacyTokensPerCoin
+    }
 }
 
 struct RecentUse: Codable, Equatable {
@@ -129,6 +148,8 @@ struct UsageLedger: Codable {
     var quotas: [String: QuotaInfo] = [:]
     /// 日ごと・取得元ごとの、コインに換算した重み付きトークン（日付はその Mac の時刻）。
     var daily: [String: [String: Double]] = [:]
+    /// 日ごと・取得元ごとの、得たコイン（付与したときのレートで換算）。
+    var dailyCoins: [String: [String: Double]] = [:]
     /// Claude の最近の応答（5時間枠の推定に使う。24時間より古いものは消す）。応答ID → 時刻とトークン数。
     var claudeRecent: [String: RecentUse] = [:]
     /// Claude の利用上限に達したと記録されたときの、リセット予定時刻。
@@ -155,6 +176,8 @@ struct UsageLedger: Codable {
         sources = try c.decodeIfPresent([String: SourceTotals].self, forKey: .sources) ?? [:]
         quotas = try c.decodeIfPresent([String: QuotaInfo].self, forKey: .quotas) ?? [:]
         daily = try c.decodeIfPresent([String: [String: Double]].self, forKey: .daily) ?? [:]
+        dailyCoins = try c.decodeIfPresent([String: [String: Double]].self, forKey: .dailyCoins)
+            ?? daily.mapValues { $0.mapValues { $0 / CurrencyRule.legacyTokensPerCoin } }
         claudeRecent = try c.decodeIfPresent([String: RecentUse].self, forKey: .claudeRecent) ?? [:]
         claudeLimitResetAt = try c.decodeIfPresent(Date.self, forKey: .claudeLimitResetAt)
     }
@@ -176,23 +199,24 @@ struct UsageLedger: Codable {
         codexSessionTotals = codexSessionTotals.filter { !staleSessions.contains($0.key) }
         let cutoffDay = DayKey.key(now.addingTimeInterval(-400 * 86400))
         daily = daily.filter { $0.key >= cutoffDay }
+        dailyCoins = dailyCoins.filter { $0.key >= cutoffDay }
     }
 
     /// その日にAIで得たコイン。
     func coins(on day: String) -> Double {
-        (daily[day] ?? [:]).values.reduce(0, +) / CurrencyRule.tokensPerCoin
+        (dailyCoins[day] ?? [:]).values.reduce(0, +)
     }
 
     /// 取得元ごとの、これまでに得たコイン。
     func coins(from sourceIDs: [String]) -> Int {
-        Int(sourceIDs.reduce(0) { $0 + (sources[$1]?.creditedWeighted ?? 0) } / CurrencyRule.tokensPerCoin)
+        Int(sourceIDs.reduce(0) { $0 + (sources[$1]?.creditedCoins ?? 0) })
     }
 
     var creditedWeighted: Double {
         sources.values.reduce(0) { $0 + $1.creditedWeighted }
     }
 
-    var coinsEarned: Int { Int(creditedWeighted / CurrencyRule.tokensPerCoin) }
+    var coinsEarned: Int { Int(sources.values.reduce(0) { $0 + $1.creditedCoins }) }
 }
 
 enum SourceStatus: Equatable {

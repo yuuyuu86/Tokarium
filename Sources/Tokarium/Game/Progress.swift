@@ -46,6 +46,24 @@ struct PlayStats: Codable, Equatable {
     var lastDeathAt: Date?
     var touches = 0
     var treasures = 0
+    /// 里親に出した数。
+    var adoptions = 0
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        feedings = try c.decodeIfPresent(Int.self, forKey: .feedings) ?? 0
+        waterChanges = try c.decodeIfPresent(Int.self, forKey: .waterChanges) ?? 0
+        births = try c.decodeIfPresent(Int.self, forKey: .births) ?? 0
+        deaths = try c.decodeIfPresent(Int.self, forKey: .deaths) ?? 0
+        fishBought = try c.decodeIfPresent(Int.self, forKey: .fishBought) ?? 0
+        decorationsBought = try c.decodeIfPresent(Int.self, forKey: .decorationsBought) ?? 0
+        lastDeathAt = try c.decodeIfPresent(Date.self, forKey: .lastDeathAt)
+        touches = try c.decodeIfPresent(Int.self, forKey: .touches) ?? 0
+        treasures = try c.decodeIfPresent(Int.self, forKey: .treasures) ?? 0
+        adoptions = try c.decodeIfPresent(Int.self, forKey: .adoptions) ?? 0
+    }
 }
 
 // MARK: - 設備（一度買うとずっと働く）

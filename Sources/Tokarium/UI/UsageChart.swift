@@ -26,8 +26,8 @@ struct UsageChart: View {
     }
 
     private func coins(_ day: String, _ g: Group) -> Double {
-        let d = store.ledger.daily[day] ?? [:]
-        return g.sources.reduce(0) { $0 + (d[$1] ?? 0) } / CurrencyRule.tokensPerCoin
+        let d = store.ledger.dailyCoins[day] ?? [:]
+        return g.sources.reduce(0) { $0 + (d[$1] ?? 0) }
     }
 
     var body: some View {

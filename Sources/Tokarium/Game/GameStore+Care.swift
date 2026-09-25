@@ -98,6 +98,18 @@ extension GameStore {
         save()
     }
 
+    /// 生きている魚を里親に出す（水槽から出して、場所を空ける）。
+    func adopt(_ id: UUID) {
+        guard let f = state.tank.fish.first(where: { $0.id == id && $0.isAlive }) else { return }
+        state.tank.fish.removeAll { $0.id == id }
+        for i in state.tank.fish.indices where state.tank.fish[i].partnerID == id { state.tank.fish[i].partnerID = nil }
+        state.stats.adoptions += 1
+        gainXP(.adoption)
+        toast = String(localized: "\(f.name)を里親に出しました。新しいおうちで元気に暮らします")
+        sfx(.farewell)
+        save()
+    }
+
     /// 死んだ魚とお別れする（水槽から取り出す）。
     func farewell(_ id: UUID) {
         if let f = state.tank.fish.first(where: { $0.id == id && !$0.isAlive }) {

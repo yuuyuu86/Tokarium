@@ -46,6 +46,34 @@ extension GameStore {
         for q in state.claimableQuests() { claim(q) }
     }
 
+    // MARK: 今日の入荷
+
+    var todaysStock: [StockOffer] { DailyStock.offers(rank: state.rank) }
+
+    @discardableResult
+    func buyStock(_ offer: StockOffer) -> PurchaseError? {
+        guard !state.stockBought.contains(offer.id) else { return nil }
+        guard coins >= offer.price else { return failed(.notEnoughCoins) }
+        guard livingFish.count < state.tank.size.maxFish else { return failed(.tankFull) }
+        let gene = ColorGene(rawValue: offer.variant.rawValue) ?? .gold
+        var fish = Fish(speciesID: offer.speciesID, name: offer.name, fullness: 70, purchasedAt: Date(),
+                        x: .random(in: 0.2...0.8), y: offer.species.zone == .bottom ? 0.82 : 0.15)
+        fish.genotype = Genotype(a: gene, b: gene)
+        state.addFish(fish, at: Date())
+        state.stats.fishBought += 1
+        state.coinsSpent += offer.price
+        // 過ぎた日の記録は消す
+        let today = DayKey.key(Date())
+        state.stockBought = state.stockBought.filter { $0.hasPrefix(today) }
+        state.stockBought.insert(offer.id)
+        toast = String(localized: "\(offer.name)を水槽に入れました")
+        sfx(.buy)
+        sfx(.tap)
+        evaluateProgress()
+        save()
+        return nil
+    }
+
     // MARK: かけらの交換
 
     @discardableResult

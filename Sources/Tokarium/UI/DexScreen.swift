@@ -210,6 +210,10 @@ private struct VariantBook: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text(sp.name).font(.pixel(.callout))
+                        if sp.isRegular {
+                            Text("出やすい色: \(Genetics.palette(sp.id).map(\.label).joined(separator: String(localized: "・")))")
+                                .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+                        }
                         Spacer()
                         Text("\(entry?.variants.count ?? 0)/\(FishVariant.allCases.count)").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                     }

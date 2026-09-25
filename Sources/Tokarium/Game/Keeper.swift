@@ -4,7 +4,7 @@ import Foundation
 
 /// 経験値のもとになる行動。
 enum XPEvent: String, Codable, CaseIterable {
-    case feed, waterChange, birth, grownUp, newSpecies, newVariant, achievement, quest, oldAge, layout, secret
+    case feed, waterChange, birth, grownUp, newSpecies, newVariant, achievement, quest, oldAge, layout, secret, adoption
 
     /// 1回でもらえる経験値。
     var amount: Int {
@@ -20,6 +20,7 @@ enum XPEvent: String, Codable, CaseIterable {
         case .oldAge: return 20
         case .layout: return 0  // 評価の上がった分
         case .secret: return 60
+        case .adoption: return 5
         }
     }
 
@@ -28,6 +29,7 @@ enum XPEvent: String, Codable, CaseIterable {
         switch self {
         case .feed: return 5
         case .waterChange: return 3
+        case .adoption: return 5
         default: return nil
         }
     }
@@ -39,7 +41,7 @@ enum KeeperRank {
     /// そのランクになるのに必要な累計の経験値。
     static func xpRequired(for rank: Int) -> Int {
         guard rank > 1 else { return 0 }
-        return Int((40 * pow(Double(rank - 1), 1.6)).rounded())
+        return Int((40 * pow(Double(rank - 1), 1.7)).rounded())
     }
 
     static func rank(forXP xp: Int) -> Int {

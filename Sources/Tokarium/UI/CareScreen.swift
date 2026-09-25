@@ -58,6 +58,7 @@ private struct FishRow: View {
     let fish: Fish
     @State private var name = ""
     @State private var confirmFarewell = false
+    @State private var confirmAdopt = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -93,7 +94,13 @@ private struct FishRow: View {
                 }
                 .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
                 if fish.isAlive {
-                    PartnerPicker(fish: fish)
+                    HStack {
+                        PartnerPicker(fish: fish)
+                        Spacer()
+                        Button("里親に出す") { confirmAdopt = true }
+                            .font(.pixel(.caption))
+                            .help("水槽から出して、場所を空けます")
+                    }
                 }
                 if let mood = Ecology.mood(fish, in: store.state.tank) {
                     Text(mood).font(.pixel(.caption))
@@ -118,6 +125,11 @@ private struct FishRow: View {
         .pixelInset(highlight: fish.condition.isDanger)
         .onAppear { name = fish.name }
         .onChange(of: fish.name) { _, new in name = new }
+        .confirmationDialog("\(fish.name)を里親に出しますか？", isPresented: $confirmAdopt) {
+            Button("里親に出す", role: .destructive) { store.adopt(fish.id) }
+        } message: {
+            Text("水槽から出して、場所を空けます。元には戻せません。")
+        }
         .confirmationDialog("\(fish.name)とお別れしますか？", isPresented: $confirmFarewell) {
             Button("お別れする", role: .destructive) { store.farewell(fish.id) }
         } message: {

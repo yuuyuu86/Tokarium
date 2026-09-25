@@ -58,6 +58,27 @@ struct ShopScreen: View {
     private var fishSection: some View {
         let size = store.state.tank.size
         Text("水槽の魚 \(store.livingFish.count)/\(size.maxFish) 匹").font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        HStack(spacing: 8) {
+            Image(systemName: "shippingbox.fill").foregroundStyle(PixelPalette.gold)
+            Text("今日の入荷（品種の魚）").font(.pixel(.headline)).foregroundStyle(PixelPalette.gold)
+        }
+        Text("色の遺伝子を2つそろえて持つ魚です。毎日0時に入れかわり、1匹ずつしか入荷しません。組み合わせの品種は、繁殖でしか生まれません。")
+            .font(.pixel(.caption)).foregroundStyle(PixelPalette.dim)
+        LazyVGrid(columns: columns, spacing: 12) {
+            ForEach(store.todaysStock) { offer in
+                let sold = store.state.stockBought.contains(offer.id)
+                ShopCard(title: offer.name, blurb: offer.species.blurb, price: offer.price,
+                         canAfford: !sold && store.coins >= offer.price,
+                         tags: [offer.variant.label]) {
+                    FishIcon(speciesID: offer.speciesID, variant: offer.variant)
+                } buy: {
+                    message = store.buyStock(offer)?.errorDescription
+                }
+                .overlay(alignment: .topTrailing) {
+                    if sold { Text("売り切れ").font(.pixel(.caption)).padding(6).foregroundStyle(PixelPalette.gold) }
+                }
+            }
+        }
         if let event = SeasonalEvents.active() {
             eventHeader(event)
             LazyVGrid(columns: columns, spacing: 12) {

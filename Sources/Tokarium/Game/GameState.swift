@@ -113,7 +113,7 @@ struct Fish: Codable, Identifiable, Equatable {
         self.x = x
         self.y = y
         var rng = SystemRandomNumberGenerator()
-        self.genotype = .forShop(rng: &rng)
+        self.genotype = .forShop(speciesID: speciesID, rng: &rng)
         self.personality = Personality.allCases.randomElement() ?? .calm
         self.size = Double.random(in: 0.9...1.1)
     }
@@ -141,7 +141,7 @@ struct Fish: Codable, Identifiable, Equatable {
         y = try c.decodeIfPresent(Double.self, forKey: .y) ?? 0.5
         // 品種・性格ができる前の魚は、ID から決まった値にする（読むたびに変わらない）
         var seeded = SeededRandom(seed: id.uuidString.stableSeed)
-        genotype = try c.decodeIfPresent(Genotype.self, forKey: .genotype) ?? .forShop(rng: &seeded)
+        genotype = try c.decodeIfPresent(Genotype.self, forKey: .genotype) ?? .forShop(speciesID: speciesID, rng: &seeded)
         personality = try c.decodeIfPresent(Personality.self, forKey: .personality)
             ?? Personality.allCases.randomElement(using: &seeded) ?? .calm
         affection = try c.decodeIfPresent(Double.self, forKey: .affection) ?? 0
@@ -240,6 +240,8 @@ struct GameState: Codable, Equatable {
     var selectedTitle: String?
     /// いちばん高かったレイアウトの評価。
     var bestLayoutScore = 0
+    /// 「今日の入荷」で買ったもの（日付:番号）。
+    var stockBought: Set<String> = []
 
     struct XPCounted: Codable, Equatable {
         var species = 0
@@ -283,6 +285,7 @@ struct GameState: Codable, Equatable {
         memories = try c.decodeIfPresent([FishMemory].self, forKey: .memories) ?? []
         selectedTitle = try c.decodeIfPresent(String.self, forKey: .selectedTitle)
         bestLayoutScore = try c.decodeIfPresent(Int.self, forKey: .bestLayoutScore) ?? 0
+        stockBought = try c.decodeIfPresent(Set<String>.self, forKey: .stockBought) ?? []
         xpDay = try c.decodeIfPresent(String.self, forKey: .xpDay)
         xpToday = try c.decodeIfPresent([String: Int].self, forKey: .xpToday) ?? [:]
         // 図鑑ができる前のデータは、いまいる魚から図鑑を作る

@@ -96,7 +96,7 @@ private struct SourceRow: View {
                 Text("入力 \(t.tokens.input.grouped)・出力 \(t.tokens.output.grouped)・キャッシュ書込 \(t.tokens.cacheWrite.grouped)・キャッシュ読込 \(t.tokens.cacheRead.grouped) トークン（\(t.records) 件）")
                     .font(.pixel(.caption)).monospacedDigit()
                 HStack {
-                    Text("コイン換算: \(String(format: "%.1f", t.creditedWeighted / CurrencyRule.tokensPerCoin))")
+                    Text("コイン換算: \(String(format: "%.1f", t.creditedCoins))")
                     if t.uncreditedWeighted > 0 {
                         Text("・推定値のため換算していない分: \(String(format: "%.1f", t.uncreditedWeighted / CurrencyRule.tokensPerCoin))")
                     }
