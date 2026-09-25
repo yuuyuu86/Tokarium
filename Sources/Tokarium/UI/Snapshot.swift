@@ -8,9 +8,8 @@ enum Snapshot {
         FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Pictures/Tokarium", isDirectory: true)
     }
 
-    /// いまの水槽を画像にして、ピクチャ/Tokarium に保存し、クリップボードにも入れる。
-    @discardableResult
-    static func take(store: GameStore, size: CGSize) -> URL? {
+    /// いまの水槽を画像にする（操作パネルなし）。
+    static func render(store: GameStore, size: CGSize, scale: CGFloat = 2) -> CGImage? {
         let tank = store.state.tank
         let style = store.style
         let engine = store.engine
@@ -23,8 +22,14 @@ enum Snapshot {
         .frame(width: size.width, height: size.height)
 
         let renderer = ImageRenderer(content: view)
-        renderer.scale = 2
-        guard let cg = renderer.cgImage else { return nil }
+        renderer.scale = scale
+        return renderer.cgImage
+    }
+
+    /// いまの水槽を画像にして、ピクチャ/Tokarium に保存し、クリップボードにも入れる。
+    @discardableResult
+    static func take(store: GameStore, size: CGSize) -> URL? {
+        guard let cg = render(store: store, size: size) else { return nil }
         let rep = NSBitmapImageRep(cgImage: cg)
         guard let png = rep.representation(using: .png, properties: [:]) else { return nil }
         do {

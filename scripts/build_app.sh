@@ -39,6 +39,26 @@ fi
 if [[ -n "${BUILD_NUMBER:-}" ]]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP/Contents/Info.plist"
 fi
+# ウィジェット（WidgetKit の拡張。サンドボックス必須）
+WIDGET="$APP/Contents/PlugIns/TokariumWidget.appex"
+mkdir -p "$WIDGET/Contents/MacOS" build/widget
+WIDGET_ARCHS=(arm64)
+[[ "${UNIVERSAL:-0}" == "1" ]] && WIDGET_ARCHS=(arm64 x86_64)
+WIDGET_BINS=()
+for arch in "${WIDGET_ARCHS[@]}"; do
+  xcrun swiftc -parse-as-library -application-extension -target "$arch-apple-macos14.0" -sdk "$(xcrun --show-sdk-path --sdk macosx)" \
+    -O -module-name TokariumWidget -o "build/widget/TokariumWidget-$arch" Widget/TokariumWidget.swift -framework WidgetKit -framework SwiftUI
+  WIDGET_BINS+=("build/widget/TokariumWidget-$arch")
+done
+lipo -create "${WIDGET_BINS[@]}" -output "$WIDGET/Contents/MacOS/TokariumWidget"
+cp Widget/Info.plist "$WIDGET/Contents/Info.plist"
+if [[ -n "${VERSION:-}" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$WIDGET/Contents/Info.plist"
+fi
+if [[ -n "${BUILD_NUMBER:-}" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$WIDGET/Contents/Info.plist"
+fi
+
 if [[ ! -f build/AppIcon.icns ]]; then
   swift scripts/make_icon.swift build/AppIcon.iconset
   iconutil -c icns build/AppIcon.iconset -o build/AppIcon.icns
@@ -54,9 +74,13 @@ if [[ -n "${SIGN_IDENTITY:-}" ]]; then
   "${SIGN[@]}" "$SPARKLE/Versions/B/Autoupdate"
   "${SIGN[@]}" "$SPARKLE/Versions/B/Updater.app"
   "${SIGN[@]}" "$SPARKLE"
+  "${SIGN[@]}" --entitlements Widget/TokariumWidget.entitlements "$WIDGET"
   "${SIGN[@]}" --entitlements Resources/Tokarium.entitlements "$APP"
 else
-  codesign --force --deep --sign - "$APP"
+  # 内側から順に署名する（--deep だとウィジェットのサンドボックス設定が消える）
+  codesign --force --deep --sign - "$SPARKLE"
+  codesign --force --sign - --entitlements Widget/TokariumWidget.entitlements "$WIDGET"
+  codesign --force --sign - "$APP"
 fi
 codesign --verify --strict "$APP"
 echo "作成しました: $APP ($(lipo -archs "$APP/Contents/MacOS/Tokarium"))"

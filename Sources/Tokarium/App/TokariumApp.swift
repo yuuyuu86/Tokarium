@@ -43,6 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let updater = Updater()
     private var desktop: DesktopController?
     private var termSource: DispatchSourceSignal?
+    private var widgetTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppLog.info("起動 \(Diagnostics.appVersion) \(Diagnostics.systemSummary)")
@@ -60,6 +61,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         store.onDisplaySettingsChanged = { [weak desktop] in desktop?.update() }
         store.start()
         desktop.update()
+        // ウィジェット用の水槽の画像と状態（数分おき、危険な魚が変わったときはすぐ）
+        WidgetExporter.update(store: store, force: true)
+        widgetTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                WidgetExporter.update(store: self.store)
+            }
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -70,6 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         store.simulate()
         store.save()
+        WidgetExporter.update(store: store, force: true)
         Diagnostics.endSession()
     }
 }

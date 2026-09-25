@@ -85,7 +85,7 @@ final class GameStore {
 
     @ObservationIgnored let engine = SwimEngine()
     @ObservationIgnored fileprivate let scanner: UsageScanner
-    @ObservationIgnored private let dir: URL
+    @ObservationIgnored let dir: URL
     @ObservationIgnored private var timers: [Timer] = []
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored var onDisplaySettingsChanged: (() -> Void)?
