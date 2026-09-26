@@ -56,7 +56,7 @@
     "privacy.p3": "Read-only. It never changes your AI tools' settings or records.",
     "dl.title": "Bring the tank to your Mac",
     "dl.p": "Free and MIT licensed. Notarized by Apple, with updates delivered inside the app.",
-    "dl.cta": "Download Tokarium", "dl.req": "macOS 14 Sonoma or later · Apple silicon / Intel",
+    "dl.cta": "Download Tokarium", "dl.brew": "Or install with Homebrew", "dl.req": "macOS 14 Sonoma or later · Apple silicon / Intel",
     "install.1": "Open the downloaded <b>Tokarium.dmg</b>",
     "install.2": "Drag <b>Tokarium</b> into your Applications folder",
     "install.3": "Open it, choose which AI to read, and click <b>Start</b>",

@@ -137,6 +137,7 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 
 ## 自動アップデート（Sparkle）と不具合の報告
 
+- リリースしたら `scripts/update_cask.sh <版>` で Homebrew の tap（yuuyuu86/homebrew-tap）の cask も更新する
 - アップデートは Sparkle。`scripts/release.sh` が署名済み DMG と `appcast.xml` を作る。
   公開鍵は `Resources/Info.plist` の `SUPublicEDKey`、対になる秘密鍵は開発者のキーチェーンにある（なくすと更新を配れなくなるので `generate_keys -x` で書き出して保管する）
 - 配信先は `Resources/Info.plist` の `SUFeedURL`（GitHub Pages の `docs/appcast.xml`）

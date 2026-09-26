@@ -31,6 +31,12 @@
 
 [Releases](https://github.com/yuuyuu86/Tokarium/releases/latest) から `Tokarium-x.x.x.dmg` をダウンロードし、Tokarium を「アプリケーション」フォルダへドラッグします。
 
+Homebrew でも入れられます。
+
+```bash
+brew install --cask yuuyuu86/tap/tokarium
+```
+
 - macOS 14 Sonoma 以降（Apple シリコン / Intel）
 - 無料・MIT ライセンス
 - Apple の公証済み。アップデートはアプリの中から受け取れます
@@ -135,6 +141,7 @@ swift test
 - **Play:** feed and breed fish (13 color varieties per species), complete daily and weekly missions, collect 54 species including hidden and memorial fish, and score your layout.
 - **Everywhere:** window or desktop mode, a widget, a screen saver and a menu bar window. Original music and sound effects.
 - **Privacy:** your conversations are never read, and nothing leaves your Mac.
+- **Install:** download the DMG, or `brew install --cask yuuyuu86/tap/tokarium`.
 - **Requirements:** macOS 14 or later, Apple silicon or Intel. Free and MIT licensed.
 
 [Download the latest release](https://github.com/yuuyuu86/Tokarium/releases/latest) · [Website](https://yuuyuu86.github.io/Tokarium/)
