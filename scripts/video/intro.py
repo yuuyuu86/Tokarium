@@ -35,6 +35,8 @@ BANDS = [(91, 184, 234), (74, 168, 224), (58, 152, 212), (46, 134, 196), (37, 11
 
 f16 = ImageFont.truetype(FONT, 16)
 f32 = ImageFont.truetype(FONT, 32)
+# フォントは文字の上に余白を持つ（16px なら 4 ドット）。text() の y が文字の見た目の上端になるよう差し引く
+PAD = {id(f): f.getmetrics()[0] - f.size for f in (f16, f32)}
 
 _cache = {}
 def sprite(path, k=1, silhouette=False):
@@ -60,7 +62,8 @@ def steps(x, n): return math.floor(x * n) / n  # ドット絵らしく、動き�
 def typed(s, t, a, b): return s[:int(len(s) * seg(t, a, b))]
 
 def text(d, xy, s, font=f16, fill=TEXT, shadow=ABYSS, anchor='la'):
-    x, y = xy
+    """y は文字の見た目の上端。"""
+    x, y = xy[0], xy[1] - PAD[id(font)]
     if shadow:
         d.text((x + 1, y + 1), s, font=font, fill=shadow, anchor=anchor)
     d.text((x, y), s, font=font, fill=fill, anchor=anchor)
@@ -209,7 +212,7 @@ def scene_terminal(img, d, t):
     open_p = back(seg(t, T['open'], T['open'] + 0.35))
     if open_p <= 0:
         return None
-    cx, cy, hw, hh = 160, 88, 146, max(2, round(50 * open_p))
+    cx, cy, hw, hh = 160, 88, 146, max(2, round(48 * open_p))
     lift = round(ease_in(seg(t, *T['lift'])) * -150)
     x0, y0, x1, y1 = cx - hw, cy - hh + lift, cx + hw, cy + hh + lift
     frame_box(d, x0, y0, x1, y1)
@@ -220,12 +223,12 @@ def scene_terminal(img, d, t):
     d.line((x0 + 5, y0 + 13, x1 - 5, y0 + 13), fill=SEA)
     n = int(len(CMD) * seg(t, *T['type']))
     cursor = '_' if int(t * 4) % 2 and n < len(CMD) else ''
-    text(d, (x0 + 8, y0 + 18), CMD[:n] + cursor, shadow=None)
+    text(d, (x0 + 8, y0 + 20), CMD[:n] + cursor, shadow=None)
     if t > T['line2']:
-        text(d, (x0 + 14, y0 + 36), '• Update parser.ts (+12 −3)', fill=DIM, shadow=None)
+        text(d, (x0 + 14, y0 + 39), '• Update parser.ts (+12 −3)', fill=DIM, shadow=None)
     if t > T['line3']:
-        text(d, (x0 + 14, y0 + 54), '• Run tests — 42 passed', fill=(95, 208, 104), shadow=None)
-    tok_xy = (x0 + 14, y0 + 72)
+        text(d, (x0 + 14, y0 + 58), '• Run tests — 42 passed', fill=(95, 208, 104), shadow=None)
+    tok_xy = (x0 + 14, y0 + 77)
     if T['count'][0] < t < T['gather'][0]:
         k = ease_out(seg(t, *T['count']))
         shown = f'{int(TOKENS * k):,}'
@@ -330,9 +333,9 @@ def card_content(card, cd, i, x, lt):
         names = ['Claude', 'Codex', 'Gemini', 'Qwen', 'OpenCode', 'Copilot']
         for k, nm in enumerate(names):
             if lt > 0.1 + k * 0.1:
-                cx, cy = x + 12 + (k % 3) * 74, 86 + (k // 3) * 20
-                cd.rectangle((cx, cy, cx + 70, cy + 16), fill=SEA)
-                text(cd, (cx + 35, cy), nm, shadow=None, anchor='ma')
+                cx, cy = x + 12 + (k % 3) * 74, 84 + (k // 3) * 21
+                cd.rectangle((cx, cy, cx + 70, cy + 18), fill=SEA)
+                text(cd, (cx + 35, cy + 1), nm, shadow=None, anchor='ma')
     else:
         for k in range(12):
             h = 4 + round(abs(math.sin(lt * 7 + k * 0.9)) * 22)
