@@ -28,7 +28,7 @@
 
   --px: 3px;            /* 1ドット */
   --font-pixel: "DotGothic16", "Hiragino Sans", system-ui, sans-serif;
-  --font-term: "VT323", "DotGothic16", ui-monospace, monospace;
+  --font-term: "DotGothic16", ui-monospace, monospace;
   --gutter: clamp(16px, 4vw, 48px);
   --maxw: 1120px;
 }

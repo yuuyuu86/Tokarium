@@ -25,7 +25,7 @@
 
 ## しくみ
 
-1. **いつもどおりAIを使う** — このMacに残る利用記録から、トークン数だけを読みます。
+1. **いつもどおりAIを使う** — このMacに残る利用記録から、トークン数だけを取り出して使います。
 2. **コインがたまる** — 重み付きで 50万トークンが 1コイン（入力・出力は1、キャッシュ書き込みは0.25、キャッシュ読み込みは0.1 として数えます）。
 3. **魚を迎えて育てる** — お店で魚や装飾を買い、餌やりと水換えで育てます。元気な成魚が2匹いると、稚魚が生まれることも。
 
@@ -97,8 +97,9 @@ ChatGPT デスクトップ、Claude デスクトップのチャット、Cursor �
 
 ## プライバシー
 
-- 使うのはトークン数・時刻・重複を防ぐためのIDだけです。**会話の本文は読みません。**
-- 記録はこのMacの中だけで扱い、外へ送りません。APIキーやCookieにも触れません。
+- 使うのはトークン数・時刻・重複を防ぐためのIDだけです。**会話の本文は使わず、保存も送信もしません。**
+- 記録はこのMacの中だけで扱い、外へ送りません（外と通信するのはアップデートの確認だけです）。APIキーやCookieにも触れません。
+- iCloud Drive での同期をオンにしたときだけ、水槽のデータをあなたの iCloud Drive に保存します。
 - 読み取り専用です。AIツールの設定や記録を書きかえることはありません。
 
 くわしくは [PRIVACY.md](PRIVACY.md) をご覧ください。
@@ -112,7 +113,7 @@ ChatGPT デスクトップ、Claude デスクトップのチャット、Cursor �
 はい。iCloud Drive で同期すると、コインはMacごとのAI利用の合計になります。
 
 **アンインストールするには？**
-Tokarium をゴミ箱に入れます。データも消す場合は `~/Library/Application Support/Tokarium` を削除してください。
+Tokarium をゴミ箱に入れます。データも消す場合は `~/Library/Application Support/Tokarium` を削除してください。Homebrew で入れた場合は `brew uninstall --zap --cask tokarium` で、データまでまとめて消せます。
 
 **不具合を見つけたら？**
 アプリの「ヘルプ → 不具合を報告…」から、内容を確認したうえで [Issues](https://github.com/yuuyuu86/Tokarium/issues) に送れます。自動では送信しません。
@@ -141,10 +142,10 @@ swift test
 
 **The more you use AI, the livelier your tank.** Tokarium is a macOS app that turns the tokens you spend in Claude Code, Codex and other AI tools into coins. Spend them on fish and decorations for a pixel-art aquarium that lives on your desktop.
 
-- **How it works:** Tokarium reads only token counts from usage records already on your Mac. 500,000 weighted tokens make 1 coin. Only usage after you install counts.
+- **How it works:** Tokarium uses only the token counts in usage records already on your Mac. 500,000 weighted tokens make 1 coin. Only usage after you install counts.
 - **Play:** feed and breed fish (13 color varieties per species), complete daily and weekly missions, collect 54 species including hidden and memorial fish, and score your layout.
 - **Everywhere:** window or desktop mode, a widget, a screen saver and a menu bar window. Original music and sound effects.
-- **Privacy:** your conversations are never read, and nothing leaves your Mac.
+- **Privacy:** your conversations are never used, stored or sent. Apart from update checks, nothing leaves your Mac.
 - **Install:** download the DMG, or `brew install --cask yuuyuu86/tap/tokarium`.
 - **Requirements:** macOS 14 or later, Apple silicon or Intel. Free and MIT licensed.
 

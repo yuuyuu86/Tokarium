@@ -1,5 +1,7 @@
 # Tokarium プライバシーについて
 
+[English](#english)
+
 Tokarium は、あなたのMacの中だけで動くゲームです。ゲームのデータを外部へ送信しません。有料のAI APIも呼び出しません。
 
 外部と通信するのは次の2つだけです。
@@ -31,8 +33,10 @@ Tokarium は、あなたのMacの中だけで動くゲームです。ゲーム�
 - コイン計算の帳簿: 取得元ごとのトークン数と件数、最新の記録時刻、重複を防ぐためのID、読み取り位置（`usage-ledger.json`）
 - 設定（`settings.json`）
 - ウィジェット用の水槽の画像と状態（`widget/`）
+- スクリーンセーバー用の水槽の状態（`saver-scene.json`）
+- 自動バックアップ（`backups/`、1日1回・7世代）
 
-「iCloud Drive で同期」をオンにしたときは、水槽のデータ（`game.json`）と Mac ごとに得たコインの数を、あなたの iCloud Drive の `Tokarium` フォルダにも保存します。水槽の写真は、撮ったときだけ `~/Pictures/Tokarium` に保存します。
+「iCloud Drive で同期」をオンにしたときは、水槽のデータ（`game.json`）と Mac ごとに得たコインの数を、あなたの iCloud Drive の `Tokarium` フォルダにも保存します。水槽の写真は、撮ったときだけ `~/Pictures/Tokarium` に保存します。スクリーンセーバーは、設定で入れたときだけ `~/Library/Screen Savers/Tokarium.saver` に置きます。
 
 AIとの会話本文、APIキー、パスワード、ブラウザのCookieは保存しません。
 
@@ -46,4 +50,49 @@ AIとの会話本文、APIキー、パスワード、ブラウザのCookieは保
 
 ## データの削除
 
-アプリを削除したうえで `~/Library/Application Support/Tokarium/` フォルダを削除すると、Tokarium のデータはすべて消えます。AIアプリの利用記録には影響しません。
+アプリを削除したうえで `~/Library/Application Support/Tokarium/` フォルダを削除すると、Tokarium のデータはすべて消えます。Homebrew で入れた場合は `brew uninstall --zap --cask tokarium` で、ログやスクリーンセーバーを含めてまとめて消せます。AIアプリの利用記録には影響しません。
+
+---
+
+<a id="english"></a>
+
+# Privacy (English)
+
+Tokarium is a game that runs entirely on your Mac. It never sends your game data anywhere and never calls paid AI APIs.
+
+It connects to the network in only two cases:
+
+- **Update checks:** it asks the update feed (appcast.xml) whether a new version exists. This is an ordinary request that includes the app name and version, not detailed information about your Mac. You can turn off automatic checks in Settings.
+- **Bug reports:** only when you choose "Report a Problem…", it opens your browser (GitHub) or email with the report filled in. You review it and decide whether to send it. Nothing is sent automatically.
+
+## What it reads
+
+It reads, read-only, the usage records of the AI apps you allow during setup or later in Settings: Claude Code, Claude desktop (Cowork), Codex (CLI and desktop), Gemini CLI, Qwen Code, OpenCode, GitHub Copilot CLI and Ollama. From these records it uses only token counts, times and IDs to avoid double counting (for Ollama, which has no token counts, it estimates tokens from the length of messages).
+
+The record files also contain your conversations, but Tokarium never uses, stores or sends them, and never changes the records.
+
+## What it stores
+
+Only the following, in `~/Library/Application Support/Tokarium/`:
+
+- Your tank, fish, decorations, coins spent and first launch time (`game.json`)
+- The coin ledger: token counts and record counts per source, latest record times, IDs to avoid double counting, and read positions (`usage-ledger.json`)
+- Settings (`settings.json`)
+- Tank images and status for the widget (`widget/`) and the screen saver (`saver-scene.json`)
+- Automatic backups (`backups/`, daily, 7 generations)
+
+If you turn on iCloud Drive sync, your tank data and the coins earned on each Mac are also saved to the `Tokarium` folder in your iCloud Drive. Photos of your tank are saved to `~/Pictures/Tokarium` only when you take one.
+
+Tokarium never stores your AI conversations, API keys, passwords or browser cookies.
+
+## Logs
+
+`~/Library/Logs/Tokarium/tokarium.log` records launches and read errors, with your home folder path and user name masked. Conversations are never written to it.
+
+## Notifications
+
+Tokarium shows macOS notifications when a fish is in danger or sick, when fry are born and when you earn an achievement. If you turn on care reminders, it also notifies you at set times. You can turn these off in Settings.
+
+## Deleting your data
+
+Delete the app, then delete `~/Library/Application Support/Tokarium/` to remove all Tokarium data. If you installed with Homebrew, `brew uninstall --zap --cask tokarium` removes everything, including logs and the screen saver. Your AI apps' usage records are not affected.

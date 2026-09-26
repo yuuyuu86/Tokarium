@@ -12,9 +12,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0B1D36">
 <link rel="icon" type="image/png" href="assets/icon/favicon-32.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -86,13 +83,13 @@
       <li class="step reveal">
         <div class="step__art step__art--term" aria-hidden="true"><span class="mono">$ claude</span><span class="cursor"></span></div>
         <h3 data-i18n="how.s1.t">いつもどおりAIを使う</h3>
-        <p data-i18n="how.s1.p">このMacに残る利用記録から、トークン数だけを読みます。特別な操作はいりません。</p>
+        <p data-i18n="how.s1.p">このMacに残る利用記録から、トークン数だけを取り出して使います。特別な操作はいりません。</p>
       </li>
       <li class="step__arrow" aria-hidden="true"></li>
       <li class="step reveal">
         <div class="step__art" aria-hidden="true"><span class="bigcoin"></span></div>
         <h3 data-i18n="how.s2.t">コインがたまる</h3>
-        <p data-i18n="how.s2.p">重み付きで 50万トークンが 1コイン。出力と入力は1、キャッシュ書き込みは0.25、キャッシュ読み込みは0.1 として数えます。</p>
+        <p data-i18n="how.s2.p">重み付きで 50万トークンが 1コイン。入力と出力は1、キャッシュ書き込みは0.25、キャッシュ読み込みは0.1 として数えます。</p>
       </li>
       <li class="step__arrow" aria-hidden="true"></li>
       <li class="step reveal">
@@ -101,7 +98,7 @@
         <p data-i18n="how.s3.p">お店で魚や装飾を買い、餌やりと水換えで育てます。元気な成魚が2匹いると、稚魚が生まれることも。</p>
       </li>
     </ol>
-    <p class="aside reveal" data-i18n="how.aside">数えるのはアプリを入れたあとの利用だけ。会話の中身は読みません。</p>
+    <p class="aside reveal" data-i18n="how.aside">数えるのはアプリを入れたあとの利用だけ。会話の本文は使いません。</p>
   </section>
 
   <!-- 品種改良ラボ（触って試せる） -->
@@ -176,7 +173,7 @@
         </div>
         <div class="card__body">
           <h3 data-i18n="play.layout.t">レイアウトに点数がつく</h3>
-          <p data-i18n="play.layout.p">装飾は約60種。「和の庭」「沈没船の宝」など、組み合わせのボーナスを探して配置します。</p>
+          <p data-i18n="play.layout.p">装飾は57種。「和の庭」「沈没船の宝」など、組み合わせのボーナスを探して配置します。</p>
         </div>
       </article>
       <article class="card frame frame--inset reveal">
@@ -252,11 +249,11 @@
   <section class="section section--narrow" id="privacy" aria-labelledby="privacy-title">
     <div class="section__head">
       <p class="eyebrow" data-i18n="privacy.eyebrow">プライバシー</p>
-      <h2 id="privacy-title" data-i18n="privacy.title">読むのは数字だけ</h2>
+      <h2 id="privacy-title" data-i18n="privacy.title">使うのは数字だけ</h2>
     </div>
     <div class="promises">
-      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">#</span><p data-i18n="privacy.p1">使うのはトークン数・時刻・重複を防ぐためのIDだけ。会話の本文は読みません。</p></div>
-      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">⌂</span><p data-i18n="privacy.p2">記録はこのMacの中だけで扱い、外へ送りません。APIキーやCookieにも触れません。</p></div>
+      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">#</span><p data-i18n="privacy.p1">使うのはトークン数・時刻・重複を防ぐためのIDだけ。会話の本文は使わず、保存も送信もしません。</p></div>
+      <div class="promise reveal"><span class="promise__icon" aria-hidden="true">⌂</span><p data-i18n="privacy.p2">記録はこのMacの中だけで扱います。外と通信するのはアップデートの確認だけ。APIキーやCookieにも触れません。</p></div>
       <div class="promise reveal"><span class="promise__icon" aria-hidden="true">✓</span><p data-i18n="privacy.p3">読み取り専用です。AIツールの設定や記録を書きかえることはありません。</p></div>
     </div>
   </section>
@@ -293,7 +290,7 @@
       </details>
       <details class="reveal">
         <summary data-i18n="faq.q4">アンインストールするには？</summary>
-        <p data-i18n-html="faq.a4">Tokarium をゴミ箱に入れ、データも消す場合は <code>~/Library/Application Support/Tokarium</code> を削除します。</p>
+        <p data-i18n-html="faq.a4">Tokarium をゴミ箱に入れ、データも消す場合は <code>~/Library/Application Support/Tokarium</code> を削除します。Homebrew で入れた場合は <code>brew uninstall --zap --cask tokarium</code> でまとめて消せます。</p>
       </details>
     </div>
   </section>
