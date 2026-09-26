@@ -2,7 +2,7 @@
   <img src="docs/assets/icon/icon-256.png" width="96" alt="">
 </p>
 
-<h1 align="center">Tokarium（トーカリウム）</h1>
+<h1 align="center">Tokarium</h1>
 
 <p align="center">
   <b>AIを使うほど、水槽がにぎやかになる。</b><br>
