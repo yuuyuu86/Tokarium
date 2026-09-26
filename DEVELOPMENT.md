@@ -141,6 +141,8 @@ Claude 系は応答ID＋リクエストIDで、Codex はセッションごとの
 - アップデートは Sparkle。`scripts/release.sh` が署名済み DMG と `appcast.xml` を作る。
   公開鍵は `Resources/Info.plist` の `SUPublicEDKey`、対になる秘密鍵は開発者のキーチェーンにある（なくすと更新を配れなくなるので `generate_keys -x` で書き出して保管する）
 - 配信先は `Resources/Info.plist` の `SUFeedURL`（GitHub Pages の `docs/appcast.xml`）
+- 紹介動画は `python3 scripts/video/intro.py` で作る（`build/video/tokarium-intro.mp4`）。作り直したら `docs/assets/video/` の MP4 と GIF も差し替える:
+  `ffmpeg -i build/video/tokarium-intro.mp4 -vf "fps=15,scale=640:360:flags=neighbor,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=none" docs/assets/video/tokarium-intro.gif`
 - 公開ページは `docs/`（GitHub Pages）。素材は `scripts/make_site_assets.sh` でアプリの描画から作り直せる
 - 前回が異常終了だった場合、起動時に報告画面を出す。報告は内容を確認してから
   GitHub Issues（`TKFeedbackURL`）かメール（`TKFeedbackEmail`、空なら非表示）で送る。自動送信はしない

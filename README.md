@@ -16,7 +16,11 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/shots/tank.png" alt="Tokarium の水槽の画面" width="820">
+  <a href="https://yuuyuu86.github.io/Tokarium/assets/video/tokarium-intro.mp4">
+    <img src="docs/assets/video/tokarium-intro.gif" alt="Tokarium の紹介動画（30秒）" width="820">
+  </a>
+  <br>
+  <sub>▶ クリックすると、BGMつきの動画（30秒）が開きます</sub>
 </p>
 
 ## しくみ
